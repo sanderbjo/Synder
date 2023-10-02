@@ -28,40 +28,43 @@ fun chatScreen(modifier: Modifier = Modifier) {
         Chat("Monica 45", "Monica: Heisann storegutten ;)", "Sent 4:00PM", Icons.Default.AccountBox),
         Chat("Dudan 19", "Dudan: Omg så store biceps!!!", "Sent 4:00PM", Icons.Default.AccountBox),
         Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
     )
-
-    Surface (
+    //Column
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)){
+            .background(Color.White)) {
+        item { Text(text = "All Chats", fontSize = 32.sp) }
 
-        LazyColumn(
+        items(userChats) { it ->
+            Chat(it)
+        }
 
-        ) {
-            item { Text(text = "All Chats", fontSize = 32.sp) }
+        item {
+            Divider(
+                color = Color.Black,
+                thickness = 2.dp,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f) // 80% total width
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .padding(start = 1.dp, end = 1.dp)
+            )
+        }
 
-            items(userChats) { it ->
-                Chat(it)
-            }
-
-            item {
-                Divider(
-                    color = Color.Black,
-                    thickness = 2.dp,
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f) // 80% total width
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                        .padding(start = 1.dp, end = 1.dp)
-                )
-            }
-
-            item {
-                Text(
-                    text = "Ingen Flere Chats!",
-                    fontSize = 15.sp,
-                    modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
-                )
-            }
+        item {
+            Text(
+                text = "Ingen Flere Chats!",
+                fontSize = 15.sp,
+                modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
+            )
         }
     }
 }
