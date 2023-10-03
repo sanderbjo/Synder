@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -35,7 +37,7 @@ import com.example.synder.ui.theme.SynderTheme
 import com.example.synder.R
 
 @Composable
-fun profileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(modifier: Modifier = Modifier) {
 
     val images = listOf(
         painterResource(id = R.drawable.ic_launcher_foreground),
@@ -59,9 +61,14 @@ fun profileScreen(modifier: Modifier = Modifier) {
                         .width(120.dp))
             }
         }
-        Text(text = "Ola Nordmann",Modifier.padding(top = 12.dp))
-        Text(text = "bio:")
-        Text(text = "Jeg er på utskikk etter noe kortsiktig og meningsløst;)")
+        Card(modifier.padding(12.dp)) {
+            Column(modifier.padding(12.dp,), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Ola Nordmann",Modifier.padding(top = 12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Jeg er på utskikk etter noe kortsiktig og meningsløst;)")
+            }
+        }
+        Spacer(modifier = Modifier.height(40.dp))
         Row(modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
             Button(onClick = { /*TODO*/ },
@@ -72,9 +79,11 @@ fun profileScreen(modifier: Modifier = Modifier) {
                     imageVector = Icons.Default.Edit,
                     contentDescription = null
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Rediger bilder")
             }
         }
+        Spacer(modifier = Modifier.height(40.dp))
         Row(Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween) {
             Button(onClick = { /*TODO*/ },
@@ -86,7 +95,8 @@ fun profileScreen(modifier: Modifier = Modifier) {
                     imageVector = Icons.Default.Edit,
                     contentDescription = null
                 )
-                Text(text = "Instillinger")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Innstillinger")
             }
             Button(onClick = { /*TODO*/ },
                 Modifier
@@ -97,10 +107,11 @@ fun profileScreen(modifier: Modifier = Modifier) {
                     imageVector = Icons.Default.Edit,
                     contentDescription = null
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Personlig informasjon")
             }
         }
-        Row(
+        /*Row(
             Modifier
                 .fillMaxSize()
                 .padding(top = 12.dp) ,horizontalArrangement = Arrangement.SpaceAround) {
@@ -127,7 +138,7 @@ fun profileScreen(modifier: Modifier = Modifier) {
                 }
                 Text(text = "Edit images")
             }
-        }
+        }*/
     }
 }
 
@@ -136,6 +147,6 @@ fun profileScreen(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewProfile(){
     SynderTheme {
-        Navigation()
+        ProfileScreen()
     }
 }

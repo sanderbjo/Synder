@@ -37,8 +37,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.synder.ui.ProfileScreen
 import com.example.synder.ui.chatScreen
-import com.example.synder.ui.profileScreen
 import com.example.synder.ui.SwipeScreen
 import com.example.synder.ui.theme.SynderTheme
 
@@ -163,7 +163,7 @@ fun Navigation() {
             modifier = Modifier.padding(innerPadding))
         {
             composable(Screen.Profile.name){
-                profileScreen()
+                ProfileScreen()
             }
             composable(Screen.Swipe.name){
                 SwipeScreen()
