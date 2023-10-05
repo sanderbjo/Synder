@@ -1,4 +1,4 @@
-package com.example.synder.ui
+package com.example.synder.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

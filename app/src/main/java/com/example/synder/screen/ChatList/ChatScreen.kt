@@ -1,4 +1,4 @@
-package com.example.synder.ui
+package com.example.synder.screen.ChatList
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.synder.models.Chat
-import com.example.synder.ui.Chat
+import com.example.synder.screen.Chat
 
 @Composable
 fun chatScreen(modifier: Modifier = Modifier) {

@@ -1,4 +1,4 @@
-package com.example.synder.ui
+package com.example.synder.screen.swipe
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
