@@ -1,4 +1,4 @@
-package com.example.synder.screen
+package com.example.synder.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -19,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.synder.Screen
 import com.example.synder.models.Chat
 
 @Composable
@@ -34,12 +37,19 @@ fun Chat(it: Chat) {
             )
             .padding(16.dp) // Add padding inside the box
     ) {
-        Row() {
-            Icon(imageVector = it.icon, contentDescription = null)
-            Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
+        Button(onClick = { navController.navigate(Screen.Chats.name){
+            popUpTo(navController.graph.findStartDestination().id){
+                saveState = true
+            }
+            launchSingleTop = true
+        }) {
+            Row() {
+                Icon(imageVector = it.icon, contentDescription = null)
+                Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
+            }
+            Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
+            Text(text = it.latestRecieved, fontSize = 12.sp) // Adjust text size as needed
         }
-        Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
-        Text(text = it.latestRecieved, fontSize = 12.sp) // Adjust text size as needed
     }
 }
 
