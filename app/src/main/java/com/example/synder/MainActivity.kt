@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -178,16 +179,22 @@ fun Navigation() {
                 SwipeScreen()
             }
             composable(Screen.Chats.name){
-                SegmentedButton(curRoute = curRoute, navController = navController)
-                chatScreen(curRoute, navController)
+                Column {
+                    SegmentedButton(curRoute = curRoute, navController = navController, 1)
+                    chatScreen(curRoute, navController)
+                }
             }
             composable(Screen.Matches.name){
-                SegmentedButton(curRoute = curRoute, navController = navController)
-                matchScreen(curRoute, navController)
+                Column {
+                    SegmentedButton(curRoute = curRoute, navController = navController, 2)
+                    matchScreen(curRoute, navController)
+                }
             }
             composable(Screen.Chat.name){
-                ChatTopNavigation(curRoute = curRoute, navController = navController)
-                conversationWindow(curRoute, navController)
+                Column {
+                    ChatTopNavigation(curRoute = curRoute, navController = navController)
+                    conversationWindow()
+                }
             }
         }
     }

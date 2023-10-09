@@ -14,7 +14,8 @@ import com.example.synder.Screen
 
 
 @Composable
-fun SegmentedButton(curRoute: String, navController: NavHostController) {
+fun SegmentedButton(curRoute: String, navController: NavHostController, checked: Number) {
+    //legg til funksjonalitet for å endre farge på knappene med checked = 1 eller 2
     Row {
         Button(onClick = { if (curRoute != Screen.Chats.name) {
             navController.navigate(Screen.Chats.name){

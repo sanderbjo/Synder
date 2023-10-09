@@ -21,11 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.Chat
 
 @Composable
-fun Chat(it: Chat) {
+fun Chat(it: Chat, curRoute: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -37,12 +38,12 @@ fun Chat(it: Chat) {
             )
             .padding(16.dp) // Add padding inside the box
     ) {
-        Button(onClick = { navController.navigate(Screen.Chats.name){
+        Button(onClick = { navController.navigate(Screen.Chat.name){
             popUpTo(navController.graph.findStartDestination().id){
                 saveState = true
             }
             launchSingleTop = true
-        }) {
+        }}) {
             Row() {
                 Icon(imageVector = it.icon, contentDescription = null)
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
@@ -51,6 +52,7 @@ fun Chat(it: Chat) {
             Text(text = it.latestRecieved, fontSize = 12.sp) // Adjust text size as needed
         }
     }
+
 }
 
 /*val userChats = listOf(

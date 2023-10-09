@@ -24,6 +24,8 @@ import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.components.Chat
+import com.example.synder.components.Message
+import com.example.synder.models.Message
 
 /*
 enum class ChatList {
@@ -129,7 +131,7 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         item { Text(text = "All Chats", fontSize = 32.sp) }
 
         items(userChats) { it ->
-            Chat(it)
+            Chat(it, curRoute, navController)
         }
 
         item {
@@ -170,7 +172,7 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
         item { Text(text = "All Chats", fontSize = 32.sp) }
 
         items(matches) { it ->
-            Chat(it)
+            Chat(it, curRoute, navController)
         }
 
         item {
@@ -198,30 +200,22 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
 
 
 @Composable
-fun conversationWindow(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+fun conversationWindow(modifier: Modifier = Modifier) {
     val messages = listOf(
-        Chat("Christine 21", "Christine: Hello", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Monica 45", "Monica: Heisann storegutten ;)", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Dudan 19", "Dudan: Omg så store biceps!!!", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Message("Christine", "Hello", "Sent 4:00PM", false),
+        Message("Christine", "Heisann storegutten ;)", "Sent 4:00PM", false),
+        Message("Du", "Sex?", "Sent 4:00PM", true),
+        Message("Christine", "Selvfølgelig! Jeg er en opriktig hore jeg!", "Sent 4:00PM", false),
     )
     //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)) {
-        item { Text(text = "All Chats", fontSize = 32.sp) }
+        item { Text(text = "Conversation with X", fontSize = 32.sp) }
 
         items(messages) { it ->
-            Chat(it)
+            Message(it)
         }
 
         item {
