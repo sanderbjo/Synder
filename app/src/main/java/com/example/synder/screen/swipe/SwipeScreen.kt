@@ -1,5 +1,7 @@
-package com.example.synder.screen.swipe
+package com.example.synder.ui
 
+
+import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,6 +27,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,16 +36,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.synder.R
 import com.example.synder.models.UserProfile
+import kotlinx.coroutines.delay
 
 @Composable
 fun SwipeScreen() {
     val profiles by remember { mutableStateOf(testprofiles()) }
     var currentIndex by remember { mutableIntStateOf(0) }
+    var swipeOffset by remember { mutableStateOf(0) }
+    val screenWidth = getScreenWidthInt()
+
 
     @Composable
     fun likeDislikeButtons(onLike: () -> Unit, onSuperLike: () -> Unit, onDislike: () -> Unit) {
@@ -79,11 +93,21 @@ fun SwipeScreen() {
     }
 
     @Composable
-    fun profileCard(userProfile: UserProfile) {
+    fun profileCard(userProfile: UserProfile, swipeOffset: Int) {
+        val offsetXState by animateIntOffsetAsState(
+            targetValue = IntOffset(swipeOffset, 0))
+
+        LaunchedEffect(swipeOffset){
+            if (swipeOffset != 0){
+                delay(400)
+                currentIndex ++
+            }
+        }
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .offset { offsetXState }
         ) {
             Column(
                 modifier = Modifier
@@ -97,6 +121,10 @@ fun SwipeScreen() {
                         .fillMaxWidth()
                         .aspectRatio(1f)
                         .background(MaterialTheme.colorScheme.background)
+                        .graphicsLayer {
+                            translationX = 0f
+                        },
+                    contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = userProfile.name, style = MaterialTheme.typography.headlineSmall)
@@ -111,6 +139,12 @@ fun SwipeScreen() {
         }
     }
 
+    DisposableEffect(currentIndex){
+        onDispose {
+            swipeOffset = 0
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -119,8 +153,8 @@ fun SwipeScreen() {
         items(profiles.size) { index ->
             if (index == currentIndex) {
                 profileCard(
-                    userProfile = profiles[index])
-
+                    userProfile = profiles[index],
+                    swipeOffset = swipeOffset)
             }
         }
         item {
@@ -131,28 +165,54 @@ fun SwipeScreen() {
             ) {
                 likeDislikeButtons(
                     onLike = {
-                        currentIndex ++ },
+                        swipeOffset = screenWidth
+                    },
+
                     onDislike = {
-                        currentIndex ++ },
+                        swipeOffset = -screenWidth
+                    }
+                    ,
                     onSuperLike = {
                         currentIndex ++
                     })
             }
         }
-
     }
-
-
 }
+
+
+
+
+@Composable
+fun getScreenWidthInt(): Int {
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current.density
+    return (configuration.screenWidthDp * density).toInt()
+}
+
+
 
 private fun testprofiles(): List<UserProfile> {
     return listOf(
         UserProfile(1, "Katinka", 18, "I love hiking and traveling.", "https://example.com/alice.jpg"),
         UserProfile(2, "Kari", 25, "Passionate about photography.", "https://example.com/bob.jpg"),
-        UserProfile(3, "Eline", 30, "Foodie and adventurer.", "https://example.com/charlie.jpg"),
-        UserProfile(4, "Ida", 32, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(3, "Eline", 28, "Foodie and adventurer.", "https://example.com/charlie.jpg"),
+        UserProfile(4, "Marie", 27, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Helene", 24, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Josefine", 19, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Sandra", 20, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Hedda", 25, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Charlotte", 25, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Caroline", 21, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Kristine", 24, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile(4, "Elisa", 18, "Tech enthusiast.", "https://example.com/david.jpg"),
     )
+
 }
+
+
+
+
 
 @Composable
 @Preview

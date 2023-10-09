@@ -39,7 +39,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.ChatList.chatScreen
-import com.example.synder.screen.swipe.SwipeScreen
+import com.example.synder.ui.SwipeScreen
 import com.example.synder.ui.theme.SynderTheme
 
 
