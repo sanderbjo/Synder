@@ -205,14 +205,19 @@ fun conversationWindow(modifier: Modifier = Modifier) {
         Message("Christine", "Hello", "Sent 4:00PM", false),
         Message("Christine", "Heisann storegutten ;)", "Sent 4:00PM", false),
         Message("Du", "Sex?", "Sent 4:00PM", true),
-        Message("Christine", "Selvfølgelig! Jeg er en opriktig hore jeg!", "Sent 4:00PM", false),
-    )
+        Message("Christine", "Selvfølgelig! Jeg er en oppriktig hore jeg!", "Sent 4:00PM", false),
+        Message("Du", "Var det jeg visste, din absolute sjus >;(", "Sent 4:01PM", true),
+        Message("Du", "Vi er ferdig. Hade!", "Sent 4:01PM", true),
+        Message("Christine", "NEI PLSSS KAN GI BLWJ JEG SVERGER", "Sent 4:00PM", false),
+        Message("Christine", "DOn LeaVE MEHEHEHEHEHE", "Sent 4:00PM", false),
+
+
+        )
     //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)) {
-        item { Text(text = "Conversation with X", fontSize = 32.sp) }
 
         items(messages) { it ->
             Message(it)
@@ -232,7 +237,7 @@ fun conversationWindow(modifier: Modifier = Modifier) {
         item {
             Text(
                 text = "Ingen Flere Meldinger!",
-                fontSize = 10.sp,
+                fontSize = 15.sp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)

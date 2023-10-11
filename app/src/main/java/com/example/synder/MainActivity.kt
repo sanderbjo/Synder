@@ -198,32 +198,6 @@ fun Navigation() {
             }
         }
     }
-    @Composable
-    fun ChatRedirection() {
-        Button(onClick = { if (curRoute != Screen.Chat.name) {
-            navController.navigate(Screen.Chat.name){
-                popUpTo(navController.graph.findStartDestination().id){
-                    saveState = true
-                }
-                launchSingleTop = true
-            }
-        } }) {
-
-        }
-    }
-    @Composable
-    fun ChatsClick() {
-        Button(onClick = { if (curRoute != Screen.Chats.name) {
-            navController.navigate(Screen.Chats.name){
-                popUpTo(navController.graph.findStartDestination().id){
-                    saveState = true
-                }
-                launchSingleTop = true
-            }
-        } }) {
-
-        }
-    }
 }
 
 
