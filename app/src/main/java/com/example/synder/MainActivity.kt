@@ -45,7 +45,7 @@ import com.example.synder.components.ChatTopNavigation
 import com.example.synder.components.SegmentedButton
 import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.ChatList.chatScreen
-import com.example.synder.ui.SwipeScreen
+import com.example.synder.screen.swipe.SwipeScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
 import com.example.synder.ui.theme.SynderTheme

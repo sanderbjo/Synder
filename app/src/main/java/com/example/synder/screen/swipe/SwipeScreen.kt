@@ -1,14 +1,16 @@
-package com.example.synder.ui
-
+package com.example.synder.screen.swipe
 
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,12 +53,14 @@ import androidx.compose.ui.unit.dp
 import com.example.synder.R
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeScreen() {
     val profiles by remember { mutableStateOf(testprofiles()) }
     var currentIndex by remember { mutableIntStateOf(0) }
-    var swipeOffset by remember { mutableStateOf(0) }
+    var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
 
 
@@ -94,8 +102,15 @@ fun SwipeScreen() {
 
     @Composable
     fun profileCard(userProfile: UserProfile, swipeOffset: Int) {
+
         val offsetXState by animateIntOffsetAsState(
             targetValue = IntOffset(swipeOffset, 0))
+
+        val swipeableState = rememberSwipeableState(0)
+        val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
+
+        val anchors = mapOf(0f to 0, -sizePx to 1, sizePx to -1)
+
 
         LaunchedEffect(swipeOffset){
             if (swipeOffset != 0){
@@ -103,39 +118,66 @@ fun SwipeScreen() {
                 currentIndex ++
             }
         }
-        Card(
+
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(16.dp)
                 .offset { offsetXState }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                    contentDescription = userProfile.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                        .background(MaterialTheme.colorScheme.background)
-                        .graphicsLayer {
-                            translationX = 0f
-                        },
-                    contentScale = ContentScale.Crop
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                    orientation = Orientation.Horizontal
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = userProfile.name, style = MaterialTheme.typography.headlineSmall)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Age: ${userProfile.age}", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = userProfile.bio, style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(16.dp))
+
+        )
+        {
+            Card(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(16.dp)
+                    .offset { offsetXState },
+
+                ) {
+                LaunchedEffect(swipeableState.targetValue){
+                    if (swipeableState.targetValue.toFloat() == -1f){
+                        delay(200)
+                        currentIndex ++
+
+                    } else if (swipeableState.targetValue.toFloat() == 1f){
+                        delay(200)
+                        currentIndex ++
+                    }
+
+                }
+                Column(
+                    modifier = Modifier
+                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        contentDescription = userProfile.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .background(MaterialTheme.colorScheme.background)
+                            .graphicsLayer {
+                                translationX = 0f
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = userProfile.name, style = MaterialTheme.typography.headlineSmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Age: ${userProfile.age}", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = userProfile.bio, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
-
-
         }
     }
 
@@ -160,6 +202,7 @@ fun SwipeScreen() {
         item {
             Card (
                 modifier = Modifier
+                    .fillMaxHeight()
                     .fillMaxWidth()
                     .padding(16.dp),
             ) {
@@ -209,11 +252,6 @@ private fun testprofiles(): List<UserProfile> {
     )
 
 }
-
-
-
-
-
 @Composable
 @Preview
 fun Previewpage() {
