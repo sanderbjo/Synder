@@ -203,15 +203,14 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
 fun conversationWindow(modifier: Modifier = Modifier) {
     val messages = listOf(
         Message("Christine", "Hello", "Sent 4:00PM", false),
-        Message("Christine", "Heisann storegutten ;)", "Sent 4:00PM", false),
-        Message("Du", "Sex?", "Sent 4:00PM", true),
-        Message("Christine", "Selvfølgelig! Jeg er en oppriktig hore jeg!", "Sent 4:00PM", false),
-        Message("Du", "Var det jeg visste, din absolute sjus >;(", "Sent 4:01PM", true),
-        Message("Du", "Vi er ferdig. Hade!", "Sent 4:01PM", true),
-        Message("Christine", "NEI PLSSS KAN GI BLWJ JEG SVERGER", "Sent 4:00PM", false),
-        Message("Christine", "DOn LeaVE MEHEHEHEHEHE", "Sent 4:00PM", false),
-
-
+        Message("Du", "Hvordan går det?", "Sent 4:01PM", true),
+        Message("Christine", "Ja", "Sent 4:00PM", false),
+        Message("Du", "Ser du er interessert i å ha en samtale ass", "Sent 4:01PM", true),
+        Message("Christine", "Ja", "Sent 4:00PM", false),
+        Message("Du", ":|", "Sent 4:01PM", true),
+        Message("Christine", "Ok", "Sent 4:00PM", false),
+        Message("Du", "fuck you", "Sent 4:01PM", true),
+        Message("Christine", "hade", "Sent 4:00PM", false),
         )
     //Column
     LazyColumn(
