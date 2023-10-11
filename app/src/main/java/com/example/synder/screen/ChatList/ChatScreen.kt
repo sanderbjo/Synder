@@ -110,18 +110,18 @@ fun SegmentedButton(
 @Composable
 fun chatScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
     val userChats = listOf(
-        Chat("Christine 21", "Christine: Hello", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Monica 45", "Monica: Heisann storegutten ;)", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Dudan 19", "Dudan: Omg så store biceps!!!", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
-        Chat("Polkan 23", "Du: Jævla fitte", "Sent 4:00PM", Icons.Default.AccountBox),
+        Chat("Emma 28", "Emma: Hei der! Hvordan har dagen din vært?", "Sendt 10:15", Icons.Default.AccountBox),
+        Chat("Sophie 32", "Sophie: Hei, hva skjer? :)", "Sendt 11:30", Icons.Default.AccountBox),
+        Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45", Icons.Default.AccountBox),
+        Chat("Nora 25", "Nora: Hei! Hvordan har du det?", "Sendt 15:20", Icons.Default.AccountBox),
+        Chat("Mia 29", "Mia: Håper du har det bra! :)", "Sendt 16:45", Icons.Default.AccountBox),
+        Chat("Emma 28", "Du: Vil du ha sammleie uti skogen kl 19 bak noen søppelcontainere i dag? :) klem hilsen daniel sørensen", "Sendt 10:15", Icons.Default.AccountBox),
+        Chat("Sophie 32", "Sophie: Hei jeg liker pik- jeg mener bicepen din >-<", "Sendt 11:30", Icons.Default.AccountBox),
+        Chat("Olivia 22", "Olivia: Oi så stor den var! Ta flere bilder storegutten ;)", "Sendt 13:45", Icons.Default.AccountBox),
+        Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten som stod utenfor vinduet mitt og stalka meg hele tida?", "Sendt 15:20", Icons.Default.AccountBox),
+        Chat("Mia 29", "Mia: Fjern deg! Har sett deg før, du burde vært arrestert!", "Sendt 16:45", Icons.Default.AccountBox)
+
+
     )
     //Column
     LazyColumn(
