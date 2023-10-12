@@ -115,11 +115,11 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45", Icons.Default.AccountBox),
         Chat("Nora 25", "Nora: Hei! Hvordan har du det?", "Sendt 15:20", Icons.Default.AccountBox),
         Chat("Mia 29", "Mia: Håper du har det bra! :)", "Sendt 16:45", Icons.Default.AccountBox),
-        Chat("Emma 28", "Du: Vil du ha sammleie uti skogen kl 19 bak noen søppelcontainere i dag? :) klem hilsen daniel sørensen", "Sendt 10:15", Icons.Default.AccountBox),
-        Chat("Sophie 32", "Sophie: Hei jeg liker pik- jeg mener bicepen din >-<", "Sendt 11:30", Icons.Default.AccountBox),
-        Chat("Olivia 22", "Olivia: Oi så stor den var! Ta flere bilder storegutten ;)", "Sendt 13:45", Icons.Default.AccountBox),
-        Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten som stod utenfor vinduet mitt og stalka meg hele tida?", "Sendt 15:20", Icons.Default.AccountBox),
-        Chat("Mia 29", "Mia: Fjern deg! Har sett deg før, du burde vært arrestert!", "Sendt 16:45", Icons.Default.AccountBox)
+        Chat("Emma 28", "Du: Vil du ha bli med ut på date :)", "Sendt 10:15", Icons.Default.AccountBox),
+        Chat("Sophie 32", "Sophie: Hei jeg liker bicepen din >-<", "Sendt 11:30", Icons.Default.AccountBox),
+        Chat("Olivia 22", "Olivia: Hei kjekken ;)", "Sendt 13:45", Icons.Default.AccountBox),
+        Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten jeg pratet med på byen sist lørdag:)", "Sendt 15:20", Icons.Default.AccountBox),
+        Chat("Mia 29", "Mia: Hei har du hatt en fin dag:)", "Sendt 16:45", Icons.Default.AccountBox)
 
 
     )
@@ -209,7 +209,7 @@ fun conversationWindow(modifier: Modifier = Modifier) {
         Message("Christine", "Ja", "Sent 4:00PM", false),
         Message("Du", ":|", "Sent 4:01PM", true),
         Message("Christine", "Ok", "Sent 4:00PM", false),
-        Message("Du", "fuck you", "Sent 4:01PM", true),
+        Message("Du", "...", "Sent 4:01PM", true),
         Message("Christine", "hade", "Sent 4:00PM", false),
         )
     //Column
