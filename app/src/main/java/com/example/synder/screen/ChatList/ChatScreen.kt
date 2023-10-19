@@ -24,88 +24,9 @@ import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.components.Chat
+import com.example.synder.components.Chatbar
 import com.example.synder.components.Message
 import com.example.synder.models.Message
-
-/*
-enum class ChatList {
-    Chats,
-    Matches,
-    Chat
-}
-
-@Composable
-fun Parent(modifier: Modifier = Modifier) {
-    val navControllerChat = rememberNavController()
-    val chatRoute by rememberUpdatedState(newValue = navControllerChat.currentBackStackEntryAsState().value?.destination?.route ?: ChatList.Chats.name)
-
-    Scaffold(
-        topBar = {
-            // Add a top bar if needed
-        },
-        content = {
-            // Content of your screen
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                // Your content here
-                Text("Your screen content goes here")
-
-                SegmentedButton()
-            }
-        }
-    ) {innerPadding ->
-        NavHost(navControllerChat = navControllerChat,
-            startDestination = ChatList.Chats.name,
-            modifier = Modifier.padding(innerPadding))
-        {
-            composable(ChatList.Chats.name){
-                ProfileScreen()
-            }
-            composable(ChatList.Matches.name){
-                SwipeScreen()
-            }
-            composable(ChatList.Chat.name){
-                chatScreen()
-            }
-        }
-    }
-}
-}
-@Composable
-fun SegmentedButton(
-    items: List<String>,
-    selected: String,
-    onItemSelected: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        items.forEach { item ->
-            val isSelected = item == selected
-            Button(
-                icon = { Icon(Icons.Default.Person, contentDescription = null) },
-                selected = chatRoute == Screen.Profile.name,
-                onClick = {
-                    if (chatRoute != Screen.Profile.name) {
-                        navControllerChat.navigate(Screen.Profile.name){
-                            popUpTo(navControllerChat.graph.findStartDestination().id){
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                },
-                label = { Text(text = ChatList.Chats.name)},
-                alwaysShowLabel = true
-            )
-        }
-    }
-}
-*/
 
 @Composable
 fun chatScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
@@ -241,6 +162,9 @@ fun conversationWindow(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
+        }
+        item {
+            Chatbar()
         }
     }
 }
