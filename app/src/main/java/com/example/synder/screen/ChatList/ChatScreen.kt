@@ -235,7 +235,7 @@ fun conversationWindow(modifier: Modifier = Modifier) {
 
         item {
             Text(
-                text = "Ingen Flere Meldinger!",
+                text = "Siste melding 4:00PM",
                 fontSize = 15.sp,
                 modifier = Modifier
                     .fillMaxWidth()
