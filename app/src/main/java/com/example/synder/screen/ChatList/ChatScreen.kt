@@ -163,8 +163,5 @@ fun conversationWindow(modifier: Modifier = Modifier) {
                     .wrapContentWidth(Alignment.CenterHorizontally)
             )
         }
-        item {
-            Chatbar()
-        }
     }
 }

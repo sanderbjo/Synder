@@ -49,6 +49,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.synder.components.ChatTopNavigation
+import com.example.synder.components.Chatbar
 import com.example.synder.components.SegmentedButton
 import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.ChatList.chatScreen
@@ -116,65 +117,69 @@ fun Navigation() {
         },
 
         bottomBar = {
-            BottomNavigation (
-                modifier = Modifier.fillMaxWidth()
-                                    .alpha(if (isVisible) 1f else 0f),
-            backgroundColor = MaterialTheme.colorScheme.primaryContainer
-            ){
-                //Profil screen
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = null)},
-                    selected = curRoute == Screen.Profile.name,
-                    onClick = {
-                        if (curRoute != Screen.Profile.name) {
-                            navController.navigate(Screen.Profile.name){
-                                popUpTo(navController.graph.findStartDestination().id){
-                                    saveState = true
+            if (isVisible == true) {
+                BottomNavigation (
+                    modifier = Modifier.fillMaxWidth(),
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer
+                ){
+                    //Profil screen
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Default.Person, contentDescription = null)},
+                        selected = curRoute == Screen.Profile.name,
+                        onClick = {
+                            if (curRoute != Screen.Profile.name) {
+                                navController.navigate(Screen.Profile.name){
+                                    popUpTo(navController.graph.findStartDestination().id){
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
-                    },
-                    label = { Text(text = Screen.Profile.name)},
-                    alwaysShowLabel = true
-                )
+                        },
+                        label = { Text(text = Screen.Profile.name)},
+                        alwaysShowLabel = true
+                    )
 
-                // Swipe screen
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    selected = curRoute == Screen.Swipe.name,
-                    onClick = {
-                        if (curRoute != Screen.Swipe.name) {
-                            navController.navigate(Screen.Swipe.name){
-                                popUpTo(navController.graph.findStartDestination().id){
-                                    saveState = true
+                    // Swipe screen
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                        selected = curRoute == Screen.Swipe.name,
+                        onClick = {
+                            if (curRoute != Screen.Swipe.name) {
+                                navController.navigate(Screen.Swipe.name){
+                                    popUpTo(navController.graph.findStartDestination().id){
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
-                    },
-                    label = { Text(text = Screen.Swipe.name)},
-                    alwaysShowLabel = true
-                )
+                        },
+                        label = { Text(text = Screen.Swipe.name)},
+                        alwaysShowLabel = true
+                    )
 
-                // Chat screen
-                BottomNavigationItem(
-                    icon = { Icon(Icons.Default.Email, contentDescription = null)},
-                    selected = curRoute == Screen.Chats.name,
-                    onClick = {
-                        if (curRoute != Screen.Chats.name) {
-                            navController.navigate(Screen.Chats.name){
-                                popUpTo(navController.graph.findStartDestination().id){
-                                    saveState = true
+                    // Chat screen
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Default.Email, contentDescription = null)},
+                        selected = curRoute == Screen.Chats.name,
+                        onClick = {
+                            if (curRoute != Screen.Chats.name) {
+                                navController.navigate(Screen.Chats.name){
+                                    popUpTo(navController.graph.findStartDestination().id){
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
                             }
-                        }
-                    },
-                    label = { Text(text = Screen.Chats.name)},
-                    alwaysShowLabel = true
-                )
+                        },
+                        label = { Text(text = Screen.Chats.name)},
+                        alwaysShowLabel = true
+                    )
+                }
+            } else {
+                Chatbar()
             }
+
         }
 
     ) {innerPadding ->
