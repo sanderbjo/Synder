@@ -57,5 +57,4 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController) {
         Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
         Text(text = it.latestRecieved, fontSize = 12.sp) // Adjust text size as needed
     }
-
 }

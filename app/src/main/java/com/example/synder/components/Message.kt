@@ -43,8 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun Message(it: Message) {
         val shape = RoundedCornerShape(
-                topStart = 8.dp,
-                topEnd = if (it.sentbyuser) 8.dp else 0.dp,
+                topStart = if (it.sentbyuser) 8.dp else 0.dp,
+                topEnd = if (it.sentbyuser) 0.dp else 8.dp,
                 bottomStart = 0.dp,
                 bottomEnd = if (it.sentbyuser) 0.dp else 8.dp
         )
@@ -60,13 +60,15 @@ fun Message(it: Message) {
                         .fillMaxWidth()
                         .padding(8.dp)
         ) {
-                Column ( modifier = Modifier.padding(5.dp) ) {
-                        Text(
-                                text = it.name,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                color = Color.White,
-                        )
+                Column(modifier = Modifier.padding(5.dp)) {
+                        if (!it.sentbyuser) {
+                                Text(
+                                        text = it.name,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp,
+                                        color = Color.White,
+                                )
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                                 text = it.message,
@@ -83,5 +85,4 @@ fun Message(it: Message) {
                         )
                 }
         }
-
 }
