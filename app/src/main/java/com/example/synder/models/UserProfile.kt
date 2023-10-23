@@ -1,9 +1,11 @@
 package com.example.synder.models
 
+import com.google.firebase.firestore.DocumentId
+
 data class UserProfile(
-    val id: Int,
-    val name: String,
-    val age: Int,
-    val bio: String,
-    val profileImageUrl: String
+    @DocumentId val id: String = "",
+    val name: String = "",
+    val age: String = "",
+    val bio: String = "",
+    val profileImageUrl: String = ""
 )

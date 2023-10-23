@@ -13,13 +13,16 @@ class StorageServiceImpl
 @Inject
 constructor(private val firestore: FirebaseFirestore) : StorageService {
     override val users: Flow<List<UserProfile>>
-        get() = firestore.collection("users").dataObjects()
+        get() = firestore.collection(USERS).dataObjects()
 
     override suspend fun getUser(userId: String): UserProfile? =
-        firestore.collection("users").document(userId).get().await().toObject()
+        firestore.collection(USERS).document(userId).get().await().toObject()
 
 
     override suspend fun saveUser(user: UserProfile): String =
-        firestore.collection("users").add(user).await().id
+        firestore.collection(USERS).add(user).await().id
 
+    companion object {
+        private const val USERS = "users"
+    }
 }
