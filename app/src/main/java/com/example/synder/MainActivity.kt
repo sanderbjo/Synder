@@ -41,8 +41,10 @@ import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.ui.SwipeScreen
 import com.example.synder.ui.theme.SynderTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

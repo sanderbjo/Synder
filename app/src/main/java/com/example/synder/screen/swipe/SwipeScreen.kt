@@ -194,18 +194,18 @@ fun getScreenWidthInt(): Int {
 
 private fun testprofiles(): List<UserProfile> {
     return listOf(
-        UserProfile(1, "Katinka", 18, "I love hiking and traveling.", "https://example.com/alice.jpg"),
-        UserProfile(2, "Kari", 25, "Passionate about photography.", "https://example.com/bob.jpg"),
-        UserProfile(3, "Eline", 28, "Foodie and adventurer.", "https://example.com/charlie.jpg"),
-        UserProfile(4, "Marie", 27, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Helene", 24, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Josefine", 19, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Sandra", 20, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Hedda", 25, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Charlotte", 25, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Caroline", 21, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Kristine", 24, "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile(4, "Elisa", 18, "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("1", "Katinka", "18", "I love hiking and traveling.", "https://example.com/alice.jpg"),
+        UserProfile("2", "Kari", "25", "Passionate about photography.", "https://example.com/bob.jpg"),
+        UserProfile("3", "Eline", "28", "Foodie and adventurer.", "https://example.com/charlie.jpg"),
+        UserProfile("4", "Marie", "27", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Helene", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Josefine", "19", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Sandra", "20", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Hedda", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Charlotte", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Caroline", "21", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Kristine", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
+        UserProfile("4", "Elisa", "18", "Tech enthusiast.", "https://example.com/david.jpg"),
     )
 
 }
