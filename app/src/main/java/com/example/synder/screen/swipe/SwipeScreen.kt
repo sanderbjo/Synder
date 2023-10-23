@@ -120,13 +120,6 @@ fun SwipeScreen() {
         val anchors = mapOf(0f to 0, -sizePx to 1, sizePx to -1)
 
 
-        LaunchedEffect(swipeOffset){
-            if (swipeOffset != 0){
-                delay(400)
-                currentIndex ++
-            }
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -188,12 +181,6 @@ fun SwipeScreen() {
         }
     }
 
-    DisposableEffect(currentIndex){
-        onDispose {
-            swipeOffset = 0
-        }
-    }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -204,7 +191,7 @@ fun SwipeScreen() {
                 if (index == currentIndex) {
                     profileCard(
                         userProfile = profiles[index + 1],
-                        swipeOffset = swipeOffset,
+                        swipeOffset = 0,
                         modifier = Modifier.zIndex(0f)
                     )
                     profileCard(
