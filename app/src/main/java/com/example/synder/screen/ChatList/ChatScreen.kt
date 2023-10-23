@@ -1,6 +1,7 @@
 package com.example.synder.screen.ChatList
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,8 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,12 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.components.Chat
-import com.example.synder.components.Chatbar
 import com.example.synder.components.Message
 import com.example.synder.models.Message
 
@@ -49,31 +45,16 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)) {
-        item { Text(text = "All Chats", fontSize = 32.sp) }
+        item {
+            PageStart(title = "Chats")
+        }
 
         items(userChats) { it ->
             Chat(it, curRoute, navController)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
-        }
-
-        item {
-            Text(
-                text = "Ingen Flere Chats!",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
+            PageEnd(textcontent = "Ingen flere Chats!")
         }
     }
 }
@@ -89,32 +70,18 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)) {
-        item { Text(text = "All Chats", fontSize = 32.sp) }
+            .background(Color.White)
+    ) {
+        item {
+            PageStart(title = "Syndere")
+        }
 
         items(matches) { it ->
             Chat(it, curRoute, navController, true)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
-        }
-
-        item {
-            Text(
-                text = "Ingen flere Syndere!",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
+            PageEnd(textcontent = "Ingen flere Syndere!")
         }
     }
 }
@@ -137,31 +104,48 @@ fun conversationWindow(modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)) {
+            .background(Color.White)
+    ) {
 
         items(messages) { it ->
             Message(it)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
+            PageEnd(textcontent = "Siste melding 4:00PM")
         }
+    }
+}
 
-        item {
-            Text(
-                text = "Siste melding 4:00PM",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
-        }
+@Composable
+fun PageStart (title: String) {
+    Column (horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(20.dp)) {
+        Text(text = "Nylige ${title}", fontSize = 32.sp)
+        Divider(
+            color = Color.Black,
+            thickness = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth() // 80% total width
+        )
+    }
+}
+@Composable
+fun PageEnd (textcontent: String) {
+    Column (horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(20.dp)) {
+        Divider(
+            color = Color.Black,
+            thickness = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth() // 80% total width
+        )
+        Text(
+            text = textcontent,
+            fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        )
     }
 }
