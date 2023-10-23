@@ -62,6 +62,7 @@ fun SwipeScreen() {
     var currentIndex by remember { mutableIntStateOf(0) }
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
+    var delayIncrement by remember {mutableStateOf(false) }
 
 
     @Composable
@@ -72,7 +73,9 @@ fun SwipeScreen() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 IconButton(
-                    onClick = onDislike,
+                    onClick = {
+                        onDislike()
+                        swipeOffset = -screenWidth},
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Clear, contentDescription = "Dislike",
@@ -81,7 +84,9 @@ fun SwipeScreen() {
                 Spacer(modifier = Modifier.width(32.dp))
 
                 IconButton(
-                    onClick = onSuperLike,
+                    onClick = {
+                        onSuperLike()
+                        swipeOffset = screenWidth},
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = "Super Like",
@@ -90,7 +95,9 @@ fun SwipeScreen() {
                 Spacer(modifier = Modifier.width(32.dp))
 
                 IconButton(
-                    onClick = onLike,
+                    onClick = {
+                        onLike()
+                        swipeOffset = screenWidth},
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Favorite, contentDescription = "Like",
@@ -208,17 +215,26 @@ fun SwipeScreen() {
             ) {
                 likeDislikeButtons(
                     onLike = {
-                        swipeOffset = screenWidth
+                        delayIncrement = true
+
                     },
 
                     onDislike = {
-                        swipeOffset = -screenWidth
+                        delayIncrement = true
                     }
                     ,
                     onSuperLike = {
-                        currentIndex ++
+                        delayIncrement = true
                     })
             }
+        }
+    }
+    LaunchedEffect(delayIncrement){
+        if (delayIncrement) {
+            delay(200)
+            currentIndex ++
+            swipeOffset = 0
+            delayIncrement = false
         }
     }
 }
