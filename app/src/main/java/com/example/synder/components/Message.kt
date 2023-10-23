@@ -72,7 +72,7 @@ fun Message(it: Message) {
                         Row(
                                 modifier = Modifier
                                         .fillMaxWidth() // Ensure the row takes the full width of the card
-                                        .padding(start = 15.dp, top = 2.dp, bottom = 2.dp),
+                                        .padding(start = 15.dp, end = 15.dp, top = 2.dp, bottom = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically
                         ) {
                                 if (!it.sentbyuser) {
@@ -106,7 +106,6 @@ fun Message(it: Message) {
                                 }
                         }
                 }
-
 
                 if (!it.sentbyuser) {
                         Spacer(modifier = Modifier.weight(1f))
