@@ -1,6 +1,7 @@
 package com.example.synder.screen.ChatList
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,8 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,93 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.components.Chat
 import com.example.synder.components.Message
 import com.example.synder.models.Message
-
-/*
-enum class ChatList {
-    Chats,
-    Matches,
-    Chat
-}
-
-@Composable
-fun Parent(modifier: Modifier = Modifier) {
-    val navControllerChat = rememberNavController()
-    val chatRoute by rememberUpdatedState(newValue = navControllerChat.currentBackStackEntryAsState().value?.destination?.route ?: ChatList.Chats.name)
-
-    Scaffold(
-        topBar = {
-            // Add a top bar if needed
-        },
-        content = {
-            // Content of your screen
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                // Your content here
-                Text("Your screen content goes here")
-
-                SegmentedButton()
-            }
-        }
-    ) {innerPadding ->
-        NavHost(navControllerChat = navControllerChat,
-            startDestination = ChatList.Chats.name,
-            modifier = Modifier.padding(innerPadding))
-        {
-            composable(ChatList.Chats.name){
-                ProfileScreen()
-            }
-            composable(ChatList.Matches.name){
-                SwipeScreen()
-            }
-            composable(ChatList.Chat.name){
-                chatScreen()
-            }
-        }
-    }
-}
-}
-@Composable
-fun SegmentedButton(
-    items: List<String>,
-    selected: String,
-    onItemSelected: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        items.forEach { item ->
-            val isSelected = item == selected
-            Button(
-                icon = { Icon(Icons.Default.Person, contentDescription = null) },
-                selected = chatRoute == Screen.Profile.name,
-                onClick = {
-                    if (chatRoute != Screen.Profile.name) {
-                        navControllerChat.navigate(Screen.Profile.name){
-                            popUpTo(navControllerChat.graph.findStartDestination().id){
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                },
-                label = { Text(text = ChatList.Chats.name)},
-                alwaysShowLabel = true
-            )
-        }
-    }
-}
-*/
 
 @Composable
 fun chatScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
@@ -128,31 +45,16 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)) {
-        item { Text(text = "All Chats", fontSize = 32.sp) }
+        item {
+            PageStart(title = "Chats")
+        }
 
         items(userChats) { it ->
             Chat(it, curRoute, navController)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
-        }
-
-        item {
-            Text(
-                text = "Ingen Flere Chats!",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
+            PageEnd(textcontent = "Ingen flere Chats!")
         }
     }
 }
@@ -168,32 +70,18 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)) {
-        item { Text(text = "All Chats", fontSize = 32.sp) }
+            .background(Color.White)
+    ) {
+        item {
+            PageStart(title = "Syndere")
+        }
 
         items(matches) { it ->
-            Chat(it, curRoute, navController)
+            Chat(it, curRoute, navController, true)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
-        }
-
-        item {
-            Text(
-                text = "Ingen flere Syndere!",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
+            PageEnd(textcontent = "Ingen flere Syndere!")
         }
     }
 }
@@ -202,45 +90,63 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
 @Composable
 fun conversationWindow(modifier: Modifier = Modifier) {
     val messages = listOf(
-        Message("Christine", "Hello", "Sent 4:00PM", false),
-        Message("Du", "Hvordan går det?", "Sent 4:01PM", true),
-        Message("Christine", "Ja", "Sent 4:00PM", false),
-        Message("Du", "Ser du er interessert i å ha en samtale ass", "Sent 4:01PM", true),
-        Message("Christine", "Ja", "Sent 4:00PM", false),
-        Message("Du", ":|", "Sent 4:01PM", true),
-        Message("Christine", "Ok", "Sent 4:00PM", false),
-        Message("Du", "...", "Sent 4:01PM", true),
-        Message("Christine", "hade", "Sent 4:00PM", false),
+        Message("Christine", "Hello", "4:00PM", false),
+        Message("Du", "Hvordan går det?", "4:01PM", true),
+        Message("Christine", "Ja", "4:00PM", false),
+        Message("Du", "Ser du er interessert i å ha en samtale ass", " 4:01PM", true),
+        Message("Christine", "Ja", "4:00PM", false),
+        Message("Du", ":|", "4:01PM", true),
+        Message("Christine", "Ok", "4:00PM", false),
+        Message("Du", "...", "4:01PM", true),
+        Message("Christine", "hade", "4:00PM", false),
         )
     //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)) {
+            .background(Color.White)
+    ) {
 
         items(messages) { it ->
             Message(it)
         }
 
         item {
-            Divider(
-                color = Color.Black,
-                thickness = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f) // 80% total width
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(start = 1.dp, end = 1.dp)
-            )
+            PageEnd(textcontent = "Siste melding4:00PM")
         }
+    }
+}
 
-        item {
-            Text(
-                text = "Ingen Flere Meldinger!",
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
-        }
+@Composable
+fun PageStart (title: String) {
+    Column (horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)) {
+        Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp))
+        Divider(
+            color = Color.Black,
+            thickness = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth() // 80% total width
+        )
+    }
+}
+@Composable
+fun PageEnd (textcontent: String) {
+    Column (horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(20.dp)) {
+        Divider(
+            color = Color.Black,
+            thickness = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth() // 80% total width
+        )
+        Text(
+            text = textcontent,
+            fontSize = 17.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .padding(top = 10.dp)
+        )
     }
 }

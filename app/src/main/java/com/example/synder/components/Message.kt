@@ -30,30 +30,85 @@ import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.models.Message
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun Message(it: Message) {
-        Column(
-                modifier = Modifier
-                        .border(
-                                shape = if (!it.sentbyuser) {
-                                        RoundedCornerShape(30.dp, 30.dp, 30.dp, 0.dp)
-                                } else {
-                                        RoundedCornerShape(30.dp, 30.dp, 0.dp, 30.dp)
-                                },
-                                border = BorderStroke(1.dp, Color.Black),
-                        )
-                        .wrapContentSize()
-                        .background(if (!it.sentbyuser) Color.Gray else Color.Blue)
-                        .clip(RoundedCornerShape(8.dp))
-                        .padding(16.dp)
-                        .padding(
-                                start = if (it.sentbyuser) 8.dp else 0.dp,
-                                end = if (!it.sentbyuser) 8.dp else 0.dp
-                        )
-        ) {
-                Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color.White)
-                Text(text = it.message, fontSize = 16.sp, color = Color.White)
-                Text(text = it.date, fontSize = 12.sp, color = Color.White)
+        val shape = RoundedCornerShape(
+                topStart = 15.dp,
+                topEnd =  15.dp,
+                bottomStart = if (it.sentbyuser) 15.dp else 0.dp,
+                bottomEnd = if (it.sentbyuser) 0.dp else 15.dp
+        )
+        Row {
+                if (it.sentbyuser) {
+                        Spacer(modifier = Modifier.weight(1f))
+                }
+
+                OutlinedCard(
+                        colors = CardDefaults.cardColors(
+                                containerColor = if (it.sentbyuser) Color(0xFF4F378B) else Color(0xFF901D1D),
+                                contentColor = Color.White,
+                        ),
+                        border = BorderStroke(
+                                width = 2.dp,
+                                color = if (it.sentbyuser) Color(0xFF8B6CE3) else Color(0xFFD3454E),
+                        ),
+                        shape = shape,
+                        modifier = Modifier
+                                .padding(15.dp)
+                                .fillMaxWidth(0.9f) // Limit width to 90% of the available space
+                ) {
+                        Row(
+                                modifier = Modifier
+                                        .fillMaxWidth() // Ensure the row takes the full width of the card
+                                        .padding(start = 15.dp, end = 15.dp, top = 2.dp, bottom = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                        ) {
+                                if (!it.sentbyuser) {
+                                        Monogram(name = it.name)
+                                }
+
+                                Column(
+                                        modifier = Modifier
+                                                .padding(10.dp)
+                                                .weight(1f) // Allow the column to take up the available space
+                                ) {
+                                        Text(
+                                                text = it.name + "(${it.date})",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 20.sp,
+                                                color = Color.White,
+                                                textAlign = if (it.sentbyuser) TextAlign.End else TextAlign.Start // Align the name text to the right
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                                text = it.message,
+                                                fontSize = 16.sp,
+                                                color = Color.White,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = if (it.sentbyuser) TextAlign.End else TextAlign.Start // Align the name text to the right
+                                        )
+                                }
+                                if (it.sentbyuser) {
+                                        Monogram(name = it.name)
+                                }
+                        }
+                }
+
+                if (!it.sentbyuser) {
+                        Spacer(modifier = Modifier.weight(1f))
+                }
         }
 }
