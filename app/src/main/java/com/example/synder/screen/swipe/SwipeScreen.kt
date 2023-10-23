@@ -50,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.synder.R
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
@@ -108,7 +109,7 @@ fun SwipeScreen() {
     }
 
     @Composable
-    fun profileCard(userProfile: UserProfile, swipeOffset: Int) {
+    fun profileCard(userProfile: UserProfile, swipeOffset: Int, modifier: Modifier) {
 
         val offsetXState by animateIntOffsetAsState(
             targetValue = IntOffset(swipeOffset, 0))
@@ -199,10 +200,21 @@ fun SwipeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(profiles.size) { index ->
-            if (index == currentIndex) {
-                profileCard(
-                    userProfile = profiles[index],
-                    swipeOffset = swipeOffset)
+            Box(){
+                if (index == currentIndex) {
+                    profileCard(
+                        userProfile = profiles[index + 1],
+                        swipeOffset = swipeOffset,
+                        modifier = Modifier.zIndex(0f)
+                    )
+                    profileCard(
+                        userProfile = profiles[index + 0],
+                        swipeOffset = swipeOffset,
+                        modifier = Modifier.zIndex(1f)
+                        )
+
+                }
+
             }
         }
         item {
