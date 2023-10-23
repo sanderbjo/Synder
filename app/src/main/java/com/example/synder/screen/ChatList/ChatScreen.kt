@@ -93,7 +93,7 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
         item { Text(text = "All Chats", fontSize = 32.sp) }
 
         items(matches) { it ->
-            Chat(it, curRoute, navController)
+            Chat(it, curRoute, navController, true)
         }
 
         item {

@@ -18,6 +18,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -72,7 +74,8 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentSize(Alignment.Center)
-            .padding(5.dp)
+            .padding(5.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
         OutlinedCard(
             modifier = Modifier
@@ -97,7 +100,8 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(top = 5.dp, start = 5.dp),
+                    .padding(top = 5.dp, start = 5.dp)
+                    .fillMaxHeight(),
                 horizontalArrangement = Arrangement.Center,
             )  {
                 Icon(

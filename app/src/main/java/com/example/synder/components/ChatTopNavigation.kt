@@ -46,8 +46,8 @@ fun ChatTopNavigation(curRoute: String, navController: NavHostController) {
         }
         Text(
             text = "Chat med Cathrine 25",
-            fontSize = 25.sp,
-            modifier = Modifier.fillMaxWidth()
+            fontSize = 22.sp,
         )
+        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(30.dp))
     }
 }
