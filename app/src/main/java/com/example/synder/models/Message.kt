@@ -2,9 +2,9 @@ package com.example.synder.models
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-data class Chat (
+data class Message (
     val name: String,
-    val latestChat: String,
-    val latestRecieved: String,
-    val icon: ImageVector
+    val message: String,
+    val date: String,
+    val sentbyuser: Boolean
 )
