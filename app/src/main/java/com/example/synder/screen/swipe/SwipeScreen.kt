@@ -144,7 +144,7 @@ fun SwipeScreen() {
                 modifier = Modifier
                     .fillMaxHeight()
                     .padding(16.dp)
-                    .offset { offsetXState },
+                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
 
                 ) {
                 LaunchedEffect(swipeableState.targetValue){
@@ -160,7 +160,6 @@ fun SwipeScreen() {
                 }
                 Column(
                     modifier = Modifier
-                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
