@@ -90,15 +90,15 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
 @Composable
 fun conversationWindow(modifier: Modifier = Modifier) {
     val messages = listOf(
-        Message("Christine", "Hello", "Sent 4:00PM", false),
-        Message("Du", "Hvordan går det?", "Sent 4:01PM", true),
-        Message("Christine", "Ja", "Sent 4:00PM", false),
-        Message("Du", "Ser du er interessert i å ha en samtale ass", "Sent 4:01PM", true),
-        Message("Christine", "Ja", "Sent 4:00PM", false),
-        Message("Du", ":|", "Sent 4:01PM", true),
-        Message("Christine", "Ok", "Sent 4:00PM", false),
-        Message("Du", "...", "Sent 4:01PM", true),
-        Message("Christine", "hade", "Sent 4:00PM", false),
+        Message("Christine", "Hello", "4:00PM", false),
+        Message("Du", "Hvordan går det?", "4:01PM", true),
+        Message("Christine", "Ja", "4:00PM", false),
+        Message("Du", "Ser du er interessert i å ha en samtale ass", " 4:01PM", true),
+        Message("Christine", "Ja", "4:00PM", false),
+        Message("Du", ":|", "4:01PM", true),
+        Message("Christine", "Ok", "4:00PM", false),
+        Message("Du", "...", "4:01PM", true),
+        Message("Christine", "hade", "4:00PM", false),
         )
     //Column
     LazyColumn(
@@ -112,7 +112,7 @@ fun conversationWindow(modifier: Modifier = Modifier) {
         }
 
         item {
-            PageEnd(textcontent = "Siste melding 4:00PM")
+            PageEnd(textcontent = "Siste melding4:00PM")
         }
     }
 }
@@ -120,8 +120,8 @@ fun conversationWindow(modifier: Modifier = Modifier) {
 @Composable
 fun PageStart (title: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(20.dp)) {
-        Text(text = "Nylige ${title}", fontSize = 32.sp)
+        modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)) {
+        Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp))
         Divider(
             color = Color.Black,
             thickness = 2.dp,
@@ -142,10 +142,11 @@ fun PageEnd (textcontent: String) {
         )
         Text(
             text = textcontent,
-            fontSize = 15.sp,
+            fontSize = 17.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally)
+                .padding(top = 10.dp)
         )
     }
 }

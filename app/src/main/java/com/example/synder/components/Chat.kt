@@ -63,29 +63,18 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Bo
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            Card(
-                modifier = Modifier.size(50.dp), // Set the size to create a circle
-                shape = CircleShape, // Use CircleShape to make the card circular
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE46962),
-                    contentColor = Color.White,
-                )
-            ) {
-                Text(
-                    text = it.name.substring(0, 1),
-                    color = Color.White, // Set text color to white
-                    fontSize = 24.sp, // Adjust the font size as needed
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize(), // Center text both vertically and horizontally
-                    textAlign = TextAlign.Center // Center align the text
-                )
-            }
+            Monogram(name = it.name)
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
                 Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
-                Text(text = it.latestRecieved, fontSize = 12.sp) // Adjust text size as needed
+                if (!match) {
+                    Card(
+                        modifier = Modifier.padding(top = 10.dp)
+                    ) {
+                        Text(text = it.latestRecieved, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                    }
+                }
             }
             Spacer(modifier = Modifier.weight(1f)) // This spacer will push the OutlinedCard to the right
             if (match) {
