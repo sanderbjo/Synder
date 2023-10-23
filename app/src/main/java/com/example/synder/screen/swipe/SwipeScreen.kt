@@ -1,5 +1,6 @@
 package com.example.synder.screen.swipe
 
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -110,15 +111,12 @@ fun SwipeScreen() {
 
     @Composable
     fun profileCard(userProfile: UserProfile, swipeOffset: Int, modifier: Modifier) {
-
         val offsetXState by animateIntOffsetAsState(
-            targetValue = IntOffset(swipeOffset, 0))
-
+            targetValue = IntOffset(swipeOffset, 0),
+            animationSpec = TweenSpec(durationMillis = 250))
         val swipeableState = rememberSwipeableState(0)
         val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
-
         val anchors = mapOf(0f to 0, -sizePx to 1, sizePx to -1)
-
 
         Box(
             modifier = Modifier
@@ -131,7 +129,6 @@ fun SwipeScreen() {
                     thresholds = { _, _ -> FractionalThreshold(0.3f) },
                     orientation = Orientation.Horizontal
                 )
-
         )
         {
             Card(
@@ -150,7 +147,6 @@ fun SwipeScreen() {
                         delay(200)
                         currentIndex ++
                     }
-
                 }
                 Column(
                     modifier = Modifier
