@@ -43,10 +43,10 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun Message(it: Message) {
         val shape = RoundedCornerShape(
-                topStart = if (it.sentbyuser) 8.dp else 0.dp,
-                topEnd = if (it.sentbyuser) 0.dp else 8.dp,
-                bottomStart = 0.dp,
-                bottomEnd = if (it.sentbyuser) 0.dp else 8.dp
+                topStart = 15.dp,
+                topEnd =  15.dp,
+                bottomStart = if (it.sentbyuser) 15.dp else 0.dp,
+                bottomEnd = if (it.sentbyuser) 0.dp else 15.dp
         )
 
         OutlinedCard(
@@ -58,7 +58,7 @@ fun Message(it: Message) {
                 shape = shape,
                 modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(15.dp)
         ) {
                 Column(modifier = Modifier.padding(5.dp)) {
                         if (!it.sentbyuser) {
