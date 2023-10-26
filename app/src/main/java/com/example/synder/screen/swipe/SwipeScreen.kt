@@ -1,10 +1,7 @@
 package com.example.synder.screen.swipe
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,16 +47,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.synder.R
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -68,14 +61,13 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
-    //val profiles by remember { mutableStateOf(testprofiles()) }
+
     var currentUserIndex by viewModel.currentUserIndex
+    var nextValueIndex by viewModel.nextUserIndex
 
-    //var currentUserIndex by remember {mutableIntStateOf(0)}
     val profiles by viewModel.users.collectAsState()
-
-
     val currentUser = profiles.getOrNull(currentUserIndex)
+    val nextUser = profiles.getOrNull(nextValueIndex)
 
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
@@ -174,29 +166,52 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(currentUser?.profileImageUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "profilbilde",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .background(MaterialTheme.colorScheme.background)
-                            .graphicsLayer {
-                                translationX = 0f
-                            })
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    currentUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    currentUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (userProfile == profiles[currentUserIndex]){
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(currentUser?.profileImageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "profilbilde",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .graphicsLayer {
+                                    translationX = 0f
+                                })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        currentUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        currentUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    else if (userProfile == profiles[nextValueIndex]){
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(nextUser?.profileImageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "profilbilde",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .graphicsLayer {
+                                    translationX = 0f
+                                })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        nextUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        nextUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        nextUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -212,21 +227,22 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
 
                 if (index == currentUserIndex) {
                     profileCard(
-                        userProfile = profiles[index + 1],
+                        userProfile = profiles[nextValueIndex],
                         swipeOffset = 0,
                         modifier = Modifier.zIndex(0f)
                     )
 
                     profileCard(
-                        userProfile = profiles[index],
+                        userProfile = profiles[currentUserIndex],
                         swipeOffset = swipeOffset,
                         modifier = Modifier.zIndex(1f)
                     )
 
-                    println(currentUserIndex)
-                    println(currentUserIndex + 1)
+
                 }
+
             }
+
 
 
         }
@@ -263,10 +279,11 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             delayIncrement = false
         }
     }
+
+    LaunchedEffect(currentUserIndex){
+        nextValueIndex++
+    }
 }
-
-
-
 
 
 @Composable
@@ -277,24 +294,6 @@ fun getScreenWidthInt(): Int {
 }
 
 
-/*
-private fun testprofiles(): List<UserProfile> {
-    return listOf(
-        UserProfile("1", "Katinka", "18", "I love hiking and traveling.", "https://example.com/alice.jpg"),
-        UserProfile("2", "Kari", "25", "Passionate about photography.", "https://example.com/bob.jpg"),
-        UserProfile("3", "Eline", "28", "Foodie and adventurer.", "https://example.com/charlie.jpg"),
-        UserProfile("4", "Marie", "27", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Helene", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Josefine", "19", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Sandra", "20", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Hedda", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Charlotte", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Caroline", "21", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Kristine", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Elisa", "18", "Tech enthusiast.", "https://example.com/david.jpg"),
-    )
-
-}*/
 @Composable
 @Preview
 fun Previewpage() {
