@@ -1,5 +1,7 @@
 package com.example.synder.screen.swipe
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
@@ -36,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +55,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.synder.R
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
@@ -59,17 +64,29 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SwipeScreen() {
-    val profiles by remember { mutableStateOf(testprofiles()) }
-    var currentIndex by remember { mutableIntStateOf(0) }
+fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
+    //val profiles by remember { mutableStateOf(testprofiles()) }
+    var currentUserIndex by viewModel.currentUserIndex
+
+    //var currentUserIndex by remember {mutableIntStateOf(0)}
+    val profiles by viewModel.users.collectAsState()
+
+
+    val currentUser = profiles.getOrNull(currentUserIndex)
+
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
     var delayIncrement by remember {mutableStateOf(false) }
 
 
+
+
+
+
+
     @Composable
     fun likeDislikeButtons(onLike: () -> Unit, onSuperLike: () -> Unit, onDislike: () -> Unit) {
-        if (currentIndex < profiles.size) {
+        if (currentUserIndex < profiles.size) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -141,11 +158,12 @@ fun SwipeScreen() {
                 LaunchedEffect(swipeableState.targetValue){
                     if (swipeableState.targetValue.toFloat() == -1f){
                         delay(200)
-                        currentIndex ++
+                        currentUserIndex ++
+
 
                     } else if (swipeableState.targetValue.toFloat() == 1f){
                         delay(200)
-                        currentIndex ++
+                        currentUserIndex ++
                     }
                 }
                 Column(
@@ -166,11 +184,11 @@ fun SwipeScreen() {
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = userProfile.name, style = MaterialTheme.typography.headlineSmall)
+                    currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Age: ${userProfile.age}", style = MaterialTheme.typography.bodyMedium)
+                    currentUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = userProfile.bio, style = MaterialTheme.typography.bodyMedium)
+                    currentUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -183,25 +201,31 @@ fun SwipeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(profiles.size) { index ->
-            Box(){
-                if (index == currentIndex) {
+            Box() {
+
+                if (index == currentUserIndex) {
                     profileCard(
                         userProfile = profiles[index + 1],
                         swipeOffset = 0,
                         modifier = Modifier.zIndex(0f)
                     )
+
                     profileCard(
-                        userProfile = profiles[index + 0],
+                        userProfile = profiles[index],
                         swipeOffset = swipeOffset,
                         modifier = Modifier.zIndex(1f)
-                        )
+                    )
 
+                    println(currentUserIndex)
+                    println(currentUserIndex + 1)
                 }
-
             }
+
+
         }
+
         item {
-            Card (
+            Card(
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth()
@@ -215,23 +239,25 @@ fun SwipeScreen() {
 
                     onDislike = {
                         delayIncrement = true
-                    }
-                    ,
+                    },
                     onSuperLike = {
                         delayIncrement = true
                     })
             }
         }
+
     }
     LaunchedEffect(delayIncrement){
         if (delayIncrement) {
             delay(200)
-            currentIndex ++
+            currentUserIndex ++
+
             swipeOffset = 0
             delayIncrement = false
         }
     }
 }
+
 
 
 
@@ -244,7 +270,7 @@ fun getScreenWidthInt(): Int {
 }
 
 
-
+/*
 private fun testprofiles(): List<UserProfile> {
     return listOf(
         UserProfile("1", "Katinka", "18", "I love hiking and traveling.", "https://example.com/alice.jpg"),
@@ -261,7 +287,7 @@ private fun testprofiles(): List<UserProfile> {
         UserProfile("4", "Elisa", "18", "Tech enthusiast.", "https://example.com/david.jpg"),
     )
 
-}
+}*/
 @Composable
 @Preview
 fun Previewpage() {
