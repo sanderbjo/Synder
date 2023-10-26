@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.synder.R
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
@@ -171,18 +174,22 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = userProfile.name,
+
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(currentUser?.profileImageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "profilbilde",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
                             .background(MaterialTheme.colorScheme.background)
                             .graphicsLayer {
                                 translationX = 0f
-                            },
-                        contentScale = ContentScale.Crop
-                    )
+                            })
+                    
                     Spacer(modifier = Modifier.height(16.dp))
                     currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
                     Spacer(modifier = Modifier.height(8.dp))
