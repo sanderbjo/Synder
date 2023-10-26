@@ -2,7 +2,6 @@ package com.example.synder.screen.swipe
 
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +33,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,30 +45,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.synder.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SwipeScreen() {
-    val profiles by remember { mutableStateOf(testprofiles()) }
-    var currentIndex by remember { mutableIntStateOf(0) }
+fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
+
+    var currentUserIndex by viewModel.currentUserIndex
+    var nextValueIndex by viewModel.nextUserIndex
+
+    val profiles by viewModel.users.collectAsState()
+    val currentUser = profiles.getOrNull(currentUserIndex)
+    val nextUser = profiles.getOrNull(nextValueIndex)
+
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
     var delayIncrement by remember {mutableStateOf(false) }
 
 
+
+
+
+
+
     @Composable
     fun likeDislikeButtons(onLike: () -> Unit, onSuperLike: () -> Unit, onDislike: () -> Unit) {
-        if (currentIndex < profiles.size) {
+        if (currentUserIndex < profiles.size) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -141,11 +153,12 @@ fun SwipeScreen() {
                 LaunchedEffect(swipeableState.targetValue){
                     if (swipeableState.targetValue.toFloat() == -1f){
                         delay(200)
-                        currentIndex ++
+                        currentUserIndex ++
+
 
                     } else if (swipeableState.targetValue.toFloat() == 1f){
                         delay(200)
-                        currentIndex ++
+                        currentUserIndex ++
                     }
                 }
                 Column(
@@ -153,25 +166,52 @@ fun SwipeScreen() {
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentDescription = userProfile.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .background(MaterialTheme.colorScheme.background)
-                            .graphicsLayer {
-                                translationX = 0f
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = userProfile.name, style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Age: ${userProfile.age}", style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = userProfile.bio, style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (userProfile == profiles[currentUserIndex]){
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(currentUser?.profileImageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "profilbilde",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .graphicsLayer {
+                                    translationX = 0f
+                                })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        currentUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        currentUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    else if (userProfile == profiles[nextValueIndex]){
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(nextUser?.profileImageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "profilbilde",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .graphicsLayer {
+                                    translationX = 0f
+                                })
+                        Spacer(modifier = Modifier.height(16.dp))
+                        nextUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        nextUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        nextUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -183,25 +223,32 @@ fun SwipeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         items(profiles.size) { index ->
-            Box(){
-                if (index == currentIndex) {
+            Box() {
+
+                if (index == currentUserIndex) {
                     profileCard(
-                        userProfile = profiles[index + 1],
+                        userProfile = profiles[nextValueIndex],
                         swipeOffset = 0,
                         modifier = Modifier.zIndex(0f)
                     )
+
                     profileCard(
-                        userProfile = profiles[index + 0],
+                        userProfile = profiles[currentUserIndex],
                         swipeOffset = swipeOffset,
                         modifier = Modifier.zIndex(1f)
-                        )
+                    )
+
 
                 }
 
             }
+
+
+
         }
+
         item {
-            Card (
+            Card(
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth()
@@ -215,25 +262,28 @@ fun SwipeScreen() {
 
                     onDislike = {
                         delayIncrement = true
-                    }
-                    ,
+                    },
                     onSuperLike = {
                         delayIncrement = true
                     })
             }
         }
+
     }
     LaunchedEffect(delayIncrement){
         if (delayIncrement) {
             delay(200)
-            currentIndex ++
+            currentUserIndex ++
+
             swipeOffset = 0
             delayIncrement = false
         }
     }
+
+    LaunchedEffect(currentUserIndex){
+        nextValueIndex++
+    }
 }
-
-
 
 
 @Composable
@@ -244,24 +294,6 @@ fun getScreenWidthInt(): Int {
 }
 
 
-
-private fun testprofiles(): List<UserProfile> {
-    return listOf(
-        UserProfile("1", "Katinka", "18", "I love hiking and traveling.", "https://example.com/alice.jpg"),
-        UserProfile("2", "Kari", "25", "Passionate about photography.", "https://example.com/bob.jpg"),
-        UserProfile("3", "Eline", "28", "Foodie and adventurer.", "https://example.com/charlie.jpg"),
-        UserProfile("4", "Marie", "27", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Helene", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Josefine", "19", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Sandra", "20", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Hedda", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Charlotte", "25", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Caroline", "21", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Kristine", "24", "Tech enthusiast.", "https://example.com/david.jpg"),
-        UserProfile("4", "Elisa", "18", "Tech enthusiast.", "https://example.com/david.jpg"),
-    )
-
-}
 @Composable
 @Preview
 fun Previewpage() {
