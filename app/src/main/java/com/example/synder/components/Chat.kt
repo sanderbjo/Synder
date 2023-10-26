@@ -63,16 +63,20 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Bo
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            Monogram(name = it.name)
+            if (it.imageurl != "") {
+                ProfilePicture(ulr = it.imageurl)
+            } else {
+                Monogram(name = it.name)
+            }
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
-                Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
+                Text(text = it./*latestChat*/name, fontSize = 16.sp) // Adjust text size as needed
                 if (!match) {
                     Card(
                         modifier = Modifier.padding(top = 10.dp)
                     ) {
-                        Text(text = it.latestRecieved, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = it./*latestRecieved*/name, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                     }
                 }
             }

@@ -45,6 +45,7 @@ import com.example.synder.R
 fun ProfileScreen(modifier: Modifier = Modifier,
                   viewModel: ProfileViewModel = hiltViewModel()
 ) {
+    viewModel.getUserById("U1qsiWskZX37ckROWRtA")
     val user by viewModel.user
     /*val images = listOf(
         painterResource(id = R.drawable.ic_launcher_foreground),

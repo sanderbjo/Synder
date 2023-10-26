@@ -9,16 +9,31 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.request.ImageRequest
+import coil.compose.AsyncImage
 
-/*
-* @Composable
-fun ProfilePicture () {
-* }
-* */
+
+@Composable
+fun ProfilePicture (ulr: String) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(ulr)
+            .crossfade(true)
+            .build(),
+
+        contentDescription = "profilbilde",
+        modifier = Modifier.size(50.dp)
+            .clip(CircleShape), // Set the size to create a circle
+
+    )
+}
 @Composable
 fun Monogram(name: String) {
     Card(
@@ -30,7 +45,7 @@ fun Monogram(name: String) {
         )
     ) {
         Text(
-            text = name.substring(0, 1),
+            text = "O"/*name.substring(0, 1)*/,
             color = Color.White, // Set text color to white
             fontSize = 24.sp, // Adjust the font size as needed
             modifier = Modifier

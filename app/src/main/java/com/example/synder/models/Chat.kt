@@ -6,5 +6,5 @@ data class Chat (
     val name: String,
     val latestChat: String,
     val latestRecieved: String,
-    val icon: ImageVector
+    val imageurl: String = ""
 )
