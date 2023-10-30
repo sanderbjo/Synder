@@ -76,7 +76,7 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Bo
                     Card(
                         modifier = Modifier.padding(top = 10.dp)
                     ) {
-                        Text(text = it./*latestRecieved*/name, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = it.latestRecieved, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                     }
                 }
             }
