@@ -56,6 +56,7 @@ import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.swipe.SwipeScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
+import com.example.synder.screen.login.LoginScreen
 import com.example.synder.ui.theme.SynderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -84,7 +85,8 @@ enum class Screen {
     Swipe,
     Chats,
     Matches,
-    Chat
+    Chat,
+    Login
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,7 +188,7 @@ fun Navigation() {
 
     ) {innerPadding ->
         NavHost(navController = navController,
-            startDestination = Screen.Swipe.name,
+            startDestination = Screen.Login.name,
             modifier = Modifier.padding(innerPadding))
         {
             composable(Screen.Profile.name){
@@ -217,6 +219,11 @@ fun Navigation() {
                     ChatTopNavigation(curRoute = curRoute, navController = navController)
                     conversationWindow()
                 }
+            }
+            composable(Screen.Login.name){
+                LoginScreen(loggedIn = { navController.navigate("profileScreen") },
+                            onSignupClick = {navController.navigate("signup")})
+                isVisible = false;
             }
 
             when (curRoute) {

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : AccountService {
@@ -27,7 +28,7 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         password: String,
         onResult: (Throwable?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { onResult(it.exception) }.await()
     }
 
     override suspend fun linkAccount(
@@ -35,7 +36,8 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         password: String,
         onResult: (Throwable?) -> Unit
     ) {
-        TODO("Not yet implemented")
+        auth.createUserWithEmailAndPassword(email,password)
+            .addOnCompleteListener { onResult(it.exception) }.await()
     }
 
     override suspend fun signOut() {
