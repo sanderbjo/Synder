@@ -71,7 +71,7 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Bo
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
-                Text(text = it./*latestChat*/name, fontSize = 16.sp) // Adjust text size as needed
+                Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
                 if (!match) {
                     Card(
                         modifier = Modifier.padding(top = 10.dp)

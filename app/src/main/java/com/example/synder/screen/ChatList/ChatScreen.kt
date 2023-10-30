@@ -32,13 +32,18 @@ import com.example.synder.models.ChatAndParticipant
 
 @Composable
 fun chatScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
-               chatViewModel: ChatViewModel = hiltViewModel(), profileViewModel: ProfileViewModel = hiltViewModel() //skal ikke være profile viewmodel
+               chatViewModel: ChatViewModel = hiltViewModel() //skal ikke være profile viewmodel
 ) {
+    chatViewModel.getChatById("tilfeldigIdher")
     val chat by chatViewModel.chat //bytt til chats etterhvert
-    profileViewModel.getUserById(chat.id1)
-    val user1 by profileViewModel.user
-    profileViewModel.getUserById(chat.id2)
-    val user2 by profileViewModel.user
+    Log.d("CHAT fra firebase;", "${chat}")
+    Log.d("Første bruker", "${chat.userId1}")
+    Log.d("Andre bruker", "${chat.userId2}")
+    chatViewModel.getUserById(chat.userId1)
+    val user1 by chatViewModel.user
+    Log.d("BRUKER 1 fra firebase", "${user1}")
+    chatViewModel.getUserById(chat.userId2)
+    val user2 by chatViewModel.user
     val testmessage = Message(
         name = "This is a test message",
         message = "senderUserId", // Replace with the sender's user ID
@@ -48,12 +53,15 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
     val chat1AndParticipant = ChatAndParticipant(
         id = chat.id, // Set the ID from the chat
         chat = chat,
-        user1 = user1,
-        user2 = user2,
+        userId1 = user1,
+        userId2 = user2,
         latestmessage = testmessage // Replace with the actual Message object
     )
+    Log.d("Første bruker", "${chat1AndParticipant.userId1}")
+    /**/
     val userChats = listOf(
-        Chat(chat1AndParticipant.user1.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user1.profileImageUrl),
+        //Chat(chat1AndParticipant.userId1.name.toString(), chat1AndParticipant.latestmessage.message.toString(), "4:00PM", chat1AndParticipant.userId1.profileImageUrl.toString()),
+        //Chat(chat1AndParticipant.userId2.name.toString(), chat1AndParticipant.latestmessage.message.toString(), "4:00PM", chat1AndParticipant.userId1.profileImageUrl.toString()),
         Chat("Emma 28", "Emma: Hei der! Hvordan har dagen din vært?", "Sendt 10:15" ),
         Chat("Sophie 32", "Sophie: Hei, hva skjer? :)", "Sendt 11:30" ),
         Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45" ),
@@ -65,8 +73,8 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten jeg pratet med på byen sist lørdag:)", "Sendt 15:20" ),
         Chat("Mia 29", "Mia: Hei har du hatt en fin dag:)", "Sendt 16:45" )
     )
-    val bug = userChats[0]
-    Log.d("Første bruker", "$bug")
+    //val bug = userChats[0]
+    //Log.d("Første bruker", "$bug")
     //Column
     LazyColumn(
         modifier = Modifier
