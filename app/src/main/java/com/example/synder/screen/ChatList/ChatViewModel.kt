@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.synder.models.Chat // Make sure to import the correct Chat model
+import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.ChatsFromFirebase
+import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +23,7 @@ class ChatViewModel @Inject constructor(
         val user2 = mutableStateOf(UserProfile())
 
         private val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
+        private val chatsCache: MutableMap<String, ChatsFromFirebase> = mutableMapOf()
 
         init {
                 viewModelScope.launch {
@@ -29,6 +32,13 @@ class ChatViewModel @Inject constructor(
                                         usersCache[user.id] = user
                                         Log.d("Users: ", user.toString())
                                         Log.d("Users: ", usersCache.toString())
+                                }
+                        }
+                        storageService.chats.collect { chatList ->
+                                chatList.forEach { chat ->
+                                        chatsCache[chat.id] = chat
+                                        Log.d("Chats: ", chat.toString())
+                                        Log.d("Chats: ", chatsCache.toString())
                                 }
                         }
                 }
@@ -55,6 +65,26 @@ class ChatViewModel @Inject constructor(
                         Log.d("Bruker fra firebase", user1.value.toString())
                 }
         }
+
+        fun getChatAndParticipants(): List<ChatAndParticipant> {
+                return chatsCache.values.map { chat ->
+                        val user1 = usersCache[chat.userId1] ?: UserProfile()
+                        val user2 = usersCache[chat.userId2] ?: UserProfile()
+                        ChatAndParticipant(
+                                id = chat.id,
+                                chat = chat,
+                                user1 = user1,
+                                user2 = user2,
+                                latestmessage = chat.messages.firstOrNull() ?: Message(
+                                        name = "Default Name",
+                                        message = "Default Message",
+                                        date = System.currentTimeMillis().toString(),
+                                        sentbyuser = false
+                                )
+                        )
+                }
+        }
+
 
         /*
         init {

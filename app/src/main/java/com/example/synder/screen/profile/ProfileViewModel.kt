@@ -14,11 +14,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val storageService: StorageService
-    ) : ViewModel() {
+) : ViewModel() {
     val user = mutableStateOf(UserProfile())
 
-    // Function to get a user by their userId
-    fun getUserById(userId: String) {
+    init {
+        val userId = "y2WkZrrGc77zQgw4Wp5a"
         viewModelScope.launch {
             user.value = storageService.getUser(userId) ?: UserProfile()
         }
