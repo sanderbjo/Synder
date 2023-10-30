@@ -8,6 +8,7 @@ interface StorageService {
     val users: Flow<List<UserProfile>>
     val chats: Flow<List<ChatsFromFirebase>>
     suspend fun getUser(userId: String): UserProfile?
+
     suspend fun saveUser(user: UserProfile): String
     suspend fun getChat(chatId: String): ChatsFromFirebase?
 }

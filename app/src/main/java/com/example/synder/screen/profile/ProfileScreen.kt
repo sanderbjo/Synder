@@ -57,7 +57,9 @@ fun ProfileScreen(modifier: Modifier = Modifier,
     Column(
         modifier
             .fillMaxSize()
-            .padding(12.dp)) {
+            .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         /*LazyRow {
             items(images) {image ->
                 Image(painter = image,
@@ -78,11 +80,13 @@ fun ProfileScreen(modifier: Modifier = Modifier,
             modifier = Modifier
                 .size(160.dp)
                 .clip(CircleShape)
+                .fillMaxWidth(),
+            alignment = Alignment.TopEnd
         )
 
-        Card(modifier.padding(12.dp)) {
-            Column(modifier.padding(12.dp,), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = user.name + " - " + user.age + " år",Modifier.padding(top = 12.dp))
+        Card(modifier.padding(12.dp).fillMaxWidth(0.9f)) {
+            Column(modifier.padding(12.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = user.name + " - " + user.age + " år",)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = user.bio)
             }
