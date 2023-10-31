@@ -50,6 +50,7 @@ import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
 import com.example.synder.screen.profile.ProfileScreen
+import com.example.synder.screen.settings.SettingsScreen
 import com.example.synder.screen.swipe.SwipeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -185,6 +186,10 @@ fun Navigation() {
         {
             composable(Screen.Profile.name){
                 ProfileScreen(navController = navController)
+                isVisible = true
+            }
+            composable(Screen.Settings.name){
+                SettingsScreen()
                 isVisible = true
             }
             composable(Screen.Swipe.name){
