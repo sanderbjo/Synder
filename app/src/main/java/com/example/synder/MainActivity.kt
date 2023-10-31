@@ -184,7 +184,7 @@ fun Navigation() {
             modifier = Modifier.padding(innerPadding))
         {
             composable(Screen.Profile.name){
-                ProfileScreen()
+                ProfileScreen(navController = navController)
                 isVisible = true
             }
             composable(Screen.Swipe.name){

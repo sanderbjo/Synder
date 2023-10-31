@@ -28,13 +28,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.compose.SynderTheme
+import com.example.synder.Screen
+import com.example.synder.screen.settings.SettingsScreen
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier,
-                  viewModel: ProfileViewModel = hiltViewModel()
+                  viewModel: ProfileViewModel = hiltViewModel(), navController: NavHostController
 ) {
     val user by viewModel.user
     /*val images = listOf(
@@ -99,7 +102,7 @@ fun ProfileScreen(modifier: Modifier = Modifier,
         Spacer(modifier = Modifier.height(40.dp))
         Row(Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceBetween) {
-            Button(onClick = { /*TODO*/ },
+            Button(onClick = { navController.navigate(Screen.Settings.name) },
                 Modifier
                     .width(160.dp)
                     .height(60.dp)
@@ -160,6 +163,6 @@ fun ProfileScreen(modifier: Modifier = Modifier,
 @Composable
 fun PreviewProfile(){
     SynderTheme {
-        ProfileScreen()
+        //ProfileScreen()
     }
 }
