@@ -51,6 +51,7 @@ import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
 import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.settings.SettingsScreen
+import com.example.synder.screen.settings.SettingsViewModel
 import com.example.synder.screen.swipe.SwipeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -197,7 +198,7 @@ fun Navigation() {
                     isVisible = true
                 }
                 composable(Screen.Settings.name){
-                    SettingsScreen (isDarkTheme) { toggleTheme() }
+                    SettingsScreen (SettingsViewModel(), isDarkTheme) { toggleTheme() }
                     isVisible = true
                 }
                 composable(Screen.Swipe.name){
