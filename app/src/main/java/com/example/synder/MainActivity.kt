@@ -59,6 +59,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             SynderTheme {
                 // A surface container using the 'background' color from the theme
@@ -87,148 +88,158 @@ enum class Screen {
 fun Navigation() {
     var isVisible by remember { mutableStateOf(false) }
 
+    var isDarkTheme by remember { mutableStateOf(false) }
+
     val navController = rememberNavController()
     val curRoute by rememberUpdatedState(newValue = navController.currentBackStackEntryAsState().value?.destination?.route ?: Screen.Swipe.name)
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = md_theme_light_primary ,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Row(
+    fun toggleTheme(){
+        isDarkTheme = !isDarkTheme
+    }
+
+    SynderTheme(useDarkTheme = isDarkTheme) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = md_theme_light_primary ,
+                        titleContentColor = md_theme_light_primary,
+                    ),
+                    title = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Synder",
+                                fontFamily = FontFamily(Font(R.font.pacifico_regular)),
+                                fontSize = 24.sp,
+                                color = md_theme_light_onPrimary
+                            )
+                        }
+                    }
+                )
+            },
+
+            bottomBar = {
+                if (isVisible == true) {
+                    BottomNavigation (
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Synder",
-                            fontFamily = FontFamily(Font(R.font.pacifico_regular)),
-                            fontSize = 24.sp,
-                            color = md_theme_light_onPrimary
+                        backgroundColor = md_theme_light_primary
+                    ){
+                        //Profil screen
+                        BottomNavigationItem(
+                            icon = { Icon(Icons.Default.Person, contentDescription = null, tint = md_theme_light_onPrimary)},
+                            selected = curRoute == Screen.Profile.name,
+                            onClick = {
+                                if (curRoute != Screen.Profile.name) {
+                                    navController.navigate(Screen.Profile.name){
+                                        popUpTo(navController.graph.findStartDestination().id){
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            },
+                            label = { Text(text = Screen.Profile.name, color = md_theme_light_onPrimary)},
+                            alwaysShowLabel = true
+                        )
+
+                        // Swipe screen
+                        BottomNavigationItem(
+                            icon = { Icon(Icons.Default.Home, contentDescription = null, tint = md_theme_light_onPrimary) },
+                            selected = curRoute == Screen.Swipe.name,
+                            onClick = {
+                                if (curRoute != Screen.Swipe.name) {
+                                    navController.navigate(Screen.Swipe.name){
+                                        popUpTo(navController.graph.findStartDestination().id){
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            },
+                            label = { Text(text = Screen.Swipe.name, color = md_theme_light_onPrimary)},
+                            alwaysShowLabel = true
+                        )
+
+                        // Chat screen
+                        BottomNavigationItem(
+                            icon = { Icon(Icons.Default.Email, contentDescription = null, tint = md_theme_light_onPrimary)},
+                            selected = curRoute == Screen.Chats.name,
+                            onClick = {
+                                if (curRoute != Screen.Chats.name) {
+                                    navController.navigate(Screen.Chats.name){
+                                        popUpTo(navController.graph.findStartDestination().id){
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            },
+                            label = { Text(text = Screen.Chats.name, color = md_theme_light_onPrimary)},
+                            alwaysShowLabel = true
                         )
                     }
+                } else {
+                    Chatbar()
                 }
-            )
-        },
 
-        bottomBar = {
-            if (isVisible == true) {
-                BottomNavigation (
-                    modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = md_theme_light_primary
-                ){
-                    //Profil screen
-                    BottomNavigationItem(
-                        icon = { Icon(Icons.Default.Person, contentDescription = null, tint = md_theme_light_onPrimary)},
-                        selected = curRoute == Screen.Profile.name,
-                        onClick = {
-                            if (curRoute != Screen.Profile.name) {
-                                navController.navigate(Screen.Profile.name){
-                                    popUpTo(navController.graph.findStartDestination().id){
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            }
-                        },
-                        label = { Text(text = Screen.Profile.name, color = md_theme_light_onPrimary)},
-                        alwaysShowLabel = true
-                    )
-
-                    // Swipe screen
-                    BottomNavigationItem(
-                        icon = { Icon(Icons.Default.Home, contentDescription = null, tint = md_theme_light_onPrimary) },
-                        selected = curRoute == Screen.Swipe.name,
-                        onClick = {
-                            if (curRoute != Screen.Swipe.name) {
-                                navController.navigate(Screen.Swipe.name){
-                                    popUpTo(navController.graph.findStartDestination().id){
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            }
-                        },
-                        label = { Text(text = Screen.Swipe.name, color = md_theme_light_onPrimary)},
-                        alwaysShowLabel = true
-                    )
-
-                    // Chat screen
-                    BottomNavigationItem(
-                        icon = { Icon(Icons.Default.Email, contentDescription = null, tint = md_theme_light_onPrimary)},
-                        selected = curRoute == Screen.Chats.name,
-                        onClick = {
-                            if (curRoute != Screen.Chats.name) {
-                                navController.navigate(Screen.Chats.name){
-                                    popUpTo(navController.graph.findStartDestination().id){
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            }
-                        },
-                        label = { Text(text = Screen.Chats.name, color = md_theme_light_onPrimary)},
-                        alwaysShowLabel = true
-                    )
-                }
-            } else {
-                Chatbar()
             }
 
+        ) {innerPadding ->
+            NavHost(navController = navController,
+                startDestination = Screen.Swipe.name,
+                modifier = Modifier.padding(innerPadding))
+            {
+                composable(Screen.Profile.name){
+                    ProfileScreen(navController = navController)
+                    isVisible = true
+                }
+                composable(Screen.Settings.name){
+                    SettingsScreen (isDarkTheme) { toggleTheme() }
+                    isVisible = true
+                }
+                composable(Screen.Swipe.name){
+                    SwipeScreen()
+                    isVisible = true
+                }
+                composable(Screen.Chats.name){
+                    Column {
+                        isVisible = true
+                        SegmentedButton(curRoute = curRoute, navController = navController, 1)
+                        chatScreen(curRoute, navController)
+                    }
+                }
+                composable(Screen.Matches.name){
+                    Column {
+                        isVisible = true
+                        SegmentedButton(curRoute = curRoute, navController = navController, 2)
+                        matchScreen(curRoute, navController)
+                    }
+                }
+                composable(Screen.Chat.name){
+                    Column {
+                        isVisible = false
+                        ChatTopNavigation(curRoute = curRoute, navController = navController)
+                        conversationWindow()
+                    }
+                }
+
+                when (curRoute) {
+                    Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
+                        isVisible = true
+                    }
+                    else -> {
+                        isVisible = false
+                    }
+                }
+
+            }
         }
 
-    ) {innerPadding ->
-        NavHost(navController = navController,
-            startDestination = Screen.Swipe.name,
-            modifier = Modifier.padding(innerPadding))
-        {
-            composable(Screen.Profile.name){
-                ProfileScreen(navController = navController)
-                isVisible = true
-            }
-            composable(Screen.Settings.name){
-                SettingsScreen()
-                isVisible = true
-            }
-            composable(Screen.Swipe.name){
-                SwipeScreen()
-                isVisible = true
-            }
-            composable(Screen.Chats.name){
-                Column {
-                    isVisible = true
-                    SegmentedButton(curRoute = curRoute, navController = navController, 1)
-                    chatScreen(curRoute, navController)
-                }
-            }
-            composable(Screen.Matches.name){
-                Column {
-                    isVisible = true
-                    SegmentedButton(curRoute = curRoute, navController = navController, 2)
-                    matchScreen(curRoute, navController)
-                }
-            }
-            composable(Screen.Chat.name){
-                Column {
-                    isVisible = false
-                    ChatTopNavigation(curRoute = curRoute, navController = navController)
-                    conversationWindow()
-                }
-            }
-
-            when (curRoute) {
-                Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
-                    isVisible = true
-                }
-                else -> {
-                    isVisible = false
-                }
-            }
-
-        }
     }
+
 }
 
 
