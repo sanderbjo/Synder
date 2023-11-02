@@ -18,7 +18,7 @@ class ProfileViewModel @Inject constructor(
     val user = mutableStateOf(UserProfile())
 
     init {
-        val userId = "y2WkZrrGc77zQgw4Wp5a"
+        val userId = "U1qsiWskZX37ckROWRtA"
         viewModelScope.launch {
             user.value = storageService.getUser(userId) ?: UserProfile()
         }
