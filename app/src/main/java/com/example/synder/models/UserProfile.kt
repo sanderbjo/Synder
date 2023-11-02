@@ -2,6 +2,7 @@ package com.example.synder.models
 
 import com.google.firebase.firestore.DocumentId
 
+
 data class UserProfile(
     @DocumentId val id: String = "",
     val name: String = "",

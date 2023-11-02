@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val storageService: StorageService
-    ) : ViewModel() {
+) : ViewModel() {
     val user = mutableStateOf(UserProfile())
 
     init {
