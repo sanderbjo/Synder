@@ -8,5 +8,7 @@ data class UserProfile(
     val name: String = "",
     val age: String = "",
     val bio: String = "",
-    val profileImageUrl: String = ""
+    val profileImageUrl: String = "",
+    val kjonn: String = "",
+    val serEtter: String = ""
 )

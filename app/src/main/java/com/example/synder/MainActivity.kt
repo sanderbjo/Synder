@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,11 +51,9 @@ import com.example.synder.components.SegmentedButton
 import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
-import com.example.synder.screen.profile.ProfileScreen
-import com.example.synder.screen.settings.SettingsScreen
-import com.example.synder.screen.settings.SettingsViewModel
-import com.example.synder.screen.swipe.SwipeScreen
-
+import com.example.synder.screen.login.LoginScreen
+import com.example.synder.screen.sign_up.SignUpScreen
+import com.example.synder.ui.theme.SynderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -83,7 +82,9 @@ enum class Screen {
     Swipe,
     Chats,
     Matches,
-    Chat
+    Chat,
+    Login,
+    SignUp
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -222,8 +223,6 @@ fun Navigation() {
                     }
                 } else if (showChatInput) {
                     Chatbar()
-                } else {
-
                 }
             }
         ) { innerPadding ->
@@ -277,17 +276,15 @@ fun Navigation() {
                         conversationWindow()
                     }
                 }
-
-                when (curRoute) {
-                    Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
-                        isVisible = true
-                    }
-
-                    else -> {
-                        isVisible = false
-                    }
+                composable(Screen.Login.name){
+                LoginScreen(loggedIn = { navController.navigate("profile") },
+                            onSignupClick = {navController.navigate("signup")})
+                isVisible = false;
                 }
-
+                composable(Screen.SignUp.name){
+                    SignUpScreen(loggedIn = { navController.navigate("profile") })
+                    isVisible = false;
+                }
             }
         }
     }
