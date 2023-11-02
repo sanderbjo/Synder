@@ -52,8 +52,10 @@ import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
 import com.example.synder.screen.login.LoginScreen
+import com.example.synder.screen.profile.ProfileScreen
+import com.example.synder.screen.settings.SettingsScreen
 import com.example.synder.screen.sign_up.SignUpScreen
-import com.example.synder.ui.theme.SynderTheme
+import com.example.synder.screen.swipe.SwipeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -228,7 +230,7 @@ fun Navigation() {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Screen.Swipe.name,
+                startDestination = Screen.Login.name,
                 modifier = Modifier.padding(innerPadding)
             )
             {

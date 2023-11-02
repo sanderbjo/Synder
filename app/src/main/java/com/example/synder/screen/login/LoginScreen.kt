@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +64,12 @@ fun LoginScreen(
                 Modifier.padding(vertical = 8.dp)
             )
         }
-
+            Text(text = "Vi har lagd en anonym bruker som kan brukes for testing",
+                modifier = Modifier.padding(horizontal = 16.dp),
+                textAlign = TextAlign.Center)
+            Text(text = "email = anonym@bruker.no")
+            Text(text = "passord = Anonym123",
+                modifier = modifier.padding(bottom = 24.dp))
             EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
             PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
 
