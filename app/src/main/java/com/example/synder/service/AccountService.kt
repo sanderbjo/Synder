@@ -11,7 +11,16 @@ val  hasUser: Boolean
 val currentUser: Flow<UserProfile>
 
 suspend fun authenticate(email: String, password: String, onResult: (Throwable?) -> Unit)
-suspend fun linkAccount(email: String, password: String, onResult: (Throwable?) -> Unit)
+suspend fun linkAccount(
+    email: String,
+    password: String,
+    name: String,
+    age: Float,
+    bio: String,
+    profileImageUrl: String,
+    kjonn: String,
+    serEtter: String,
+    onResult: (Throwable?) -> Unit)
 suspend fun signOut()
 
 }

@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.synder.common.ext.isValidEmail
 import com.example.synder.common.ext.isValidPassword
 import com.example.synder.service.AccountService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class LoginViewModel @Inject constructor(private val accountService: AccountService) : ViewModel() {
 
     var uiState = mutableStateOf(LoginUiState())

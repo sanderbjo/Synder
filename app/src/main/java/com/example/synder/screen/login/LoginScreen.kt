@@ -62,6 +62,7 @@ fun LoginScreen(
                 text = uiState.errorMessage,
                 Modifier.padding(vertical = 8.dp)
             )
+        }
 
             EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
             PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
@@ -75,16 +76,16 @@ fun LoginScreen(
                 ) {
                     Text(text = "login", fontSize = 16.sp)
                 }
-                Button(onClick = onSignupClick) {
-                    Text(text = "Sign up")
-                }
+
             }
-        }
+            Text(text = "Har du ikke bruker? Sign up nå!")
+            Button(onClick = onSignupClick) {
+                Text(text = "Sign up")
+            }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
     OutlinedTextField(
@@ -103,7 +104,6 @@ fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifie
 }
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun PasswordField(
         value: String,

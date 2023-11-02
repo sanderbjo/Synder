@@ -3,6 +3,7 @@ package com.example.synder.service.impl
 import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -34,10 +35,20 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
     override suspend fun linkAccount(
         email: String,
         password: String,
+        name: String,
+        age: Float,
+        bio: String,
+        profileImageUrl: String,
+        kjonn: String,
+        serEtter: String,
         onResult: (Throwable?) -> Unit
     ) {
+
         auth.createUserWithEmailAndPassword(email,password)
             .addOnCompleteListener { onResult(it.exception) }.await()
+        //UserProfile user = new UserProfile(currentUserId, name, age.toString(),bio, profileImageUrl, kjonn, serEtter)
+        FirebaseFirestore.getInstance().collection("users").document(currentUserId).set(UserProfile(currentUserId, name, age.toInt().toString(),bio, profileImageUrl, kjonn, serEtter))
+        //auth.createUserWithEmailAndPassword(email, password).
     }
 
     override suspend fun signOut() {

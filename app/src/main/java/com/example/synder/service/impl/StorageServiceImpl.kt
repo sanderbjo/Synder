@@ -18,7 +18,7 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
     override suspend fun getUser(userId: String): UserProfile? =
         firestore.collection(USERS).document(userId).get().await().toObject()
 
-    override suspend fun saveUser(user: UserProfile): String =
+    override suspend fun createUser(user: UserProfile): String =
         firestore.collection(USERS).add(user).await().id
 
     companion object {

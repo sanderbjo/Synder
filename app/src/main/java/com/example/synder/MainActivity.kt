@@ -2,7 +2,6 @@ package com.example.synder
 
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -11,15 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,12 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -57,6 +51,7 @@ import com.example.synder.screen.swipe.SwipeScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
 import com.example.synder.screen.login.LoginScreen
+import com.example.synder.screen.sign_up.SignUpScreen
 import com.example.synder.ui.theme.SynderTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -86,7 +81,8 @@ enum class Screen {
     Chats,
     Matches,
     Chat,
-    Login
+    Login,
+    SignUp
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,8 +176,6 @@ fun Navigation() {
                         alwaysShowLabel = true
                     )
                 }
-            } else {
-                Chatbar()
             }
 
         }
@@ -218,22 +212,28 @@ fun Navigation() {
                     isVisible = false;
                     ChatTopNavigation(curRoute = curRoute, navController = navController)
                     conversationWindow()
+                    Chatbar()
+
                 }
             }
             composable(Screen.Login.name){
-                LoginScreen(loggedIn = { navController.navigate("profileScreen") },
+                LoginScreen(loggedIn = { navController.navigate("profile") },
                             onSignupClick = {navController.navigate("signup")})
                 isVisible = false;
             }
-
-            when (curRoute) {
-                Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
-                    isVisible = true
-                }
-                else -> {
-                    isVisible = false
-                }
+            composable(Screen.SignUp.name){
+                SignUpScreen(loggedIn = { navController.navigate("profile") })
+                isVisible = false;
             }
+
+            //when (curRoute) {
+            //    Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
+            //        isVisible = true
+            //    }
+            //    else -> {
+            //        isVisible = false
+            //    }
+            //}
 
         }
     }
