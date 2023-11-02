@@ -34,64 +34,21 @@ import java.util.Date
 
 
 @Composable
-fun chatScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
-               chatViewModel: ChatViewModel = hiltViewModel() //skal ikke være profile viewmodel
+fun chatScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
+               chatViewModel: ChatViewModel = hiltViewModel()
+
 ) {
-    /*HARDKODE CHATS
-    *
-    chatViewModel.getChatAndUsersById("YhsAJ6tRK4S4QDOcaZ2n")
-    val chat by chatViewModel.chat //bytt til chats etterhvert
-    val user1_ by chatViewModel.user1
-    Log.d("CHAT fra firebase;", "${chat}")
-    val testmessage = Message(
-        name = "senderUserId",
-        message = "This is a test message", // Replace with the sender's user ID
-        date = System.currentTimeMillis().toString(), // You can set the timestamp as needed
-        sentbyuser = false
-    )
-    val user1 = chatViewModel.user1.value
-    val user2 = chatViewModel.user2.value
-    val chat1AndParticipant = ChatAndParticipant(
-        id = chat.id, // Set the ID from the chat
-        chat = chat,
-        user1 = user1,
-        user2 = user2,
-        latestmessage = testmessage // Replace with the actual Message object
-    )
-    Log.d("Bruker fra firebase;", "${user1_}")
-    Log.d("Bruker fra firebase;", "${user2}")
-    Log.d("Første bruker", "${chat1AndParticipant.userId1}") */
     val chatsList = chatViewModel.chatsCache.values.toList()
 
-    val userChats = listOf(chatsList) // If you don't want to populate this right now
+    val userChats = listOf(chatsList)
 
 
     Log.d("Liste med chats:", "$chatsList")
 
-
-
-    /*
-        val userChats = listOf(
-            Chat(user1_.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user1.profileImageUrl),
-            Chat(chat1AndParticipant.user2.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user2.profileImageUrl),
-            /*Chat("Emma 28", "Emma: Hei der! Hvordan har dagen din vært?", "Sendt 10:15" ),
-            Chat("Sophie 32", "Sophie: Hei, hva skjer? :)", "Sendt 11:30" ),
-            Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45" ),
-            Chat("Nora 25", "Nora: Hei! Hvordan har du det?", "Sendt 15:20" ),
-            Chat("Mia 29", "Mia: Håper du har det bra! :)", "Sendt 16:45" ),
-            Chat("Emma 28", "Du: Vil du ha bli med ut på date :)", "Sendt 10:15" ),
-            Chat("Sophie 32", "Sophie: Hei jeg liker bicepen din >-<", "Sendt 11:30" ),
-            Chat("Olivia 22", "Olivia: Hei kjekken ;)", "Sendt 13:45" ),
-            Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten jeg pratet med på byen sist lørdag:)", "Sendt 15:20" ),
-            Chat("Mia 29", "Mia: Hei har du hatt en fin dag:)", "Sendt 16:45" )*/
-        )*/
-    //val bug = userChats[0]
-    //Log.d("Første bruker", "$bug")
-    //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            //.background(Color.White)
     ) {
         item {
             PageStart(title = "Chats")
@@ -100,9 +57,6 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         items(chatsList) { it ->
             Chat(it, curRoute, navController)
         }
-        /*items(userChats) { it ->
-            Chat(it, curRoute, navController)
-        }*/
 
         item {
             PageEnd(textcontent = "Ingen flere Chats!")
@@ -111,7 +65,7 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
 
 }
 @Composable
-fun matchScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
+fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
                 chatViewModel: ChatViewModel = hiltViewModel()) {
 
     val userList = chatViewModel.usersCache.values.toList()
@@ -126,7 +80,6 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
     ) {
         item {
             PageStart(title = "Syndere")
@@ -160,7 +113,6 @@ fun conversationWindow(modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
     ) {
 
         items(messages) { it ->
@@ -177,10 +129,11 @@ fun conversationWindow(modifier: Modifier = Modifier) {
 fun PageStart (title: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)) {
-        Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp))
+        Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp),
+            /*color = Color.Black*/)
         Divider(
-            color = Color.Black,
             thickness = 2.dp,
+            /*color = Color.Black,*/
             modifier = Modifier
                 .fillMaxWidth() // 80% total width
         )
@@ -191,12 +144,13 @@ fun PageEnd (textcontent: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(20.dp)) {
         Divider(
-            color = Color.Black,
+            /*color = Color.Black,*/
             thickness = 2.dp,
             modifier = Modifier
                 .fillMaxWidth() // 80% total width
         )
         Text(
+            /*color = Color.Black,*/
             text = textcontent,
             fontSize = 17.sp,
             modifier = Modifier

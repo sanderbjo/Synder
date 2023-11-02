@@ -252,9 +252,10 @@ fun Navigation() {
                         SegmentedButton(
                             curRoute = curRoute,
                             navController = navController,
-                            1
+                            1,
+                            isDarkTheme = isDarkTheme,
                         )
-                        chatScreen(curRoute, navController)
+                        chatScreen(isDarkTheme, curRoute, navController)
                     }
                 }
                 composable(Screen.Matches.name) {
@@ -263,9 +264,10 @@ fun Navigation() {
                         SegmentedButton(
                             curRoute = curRoute,
                             navController = navController,
-                            2
+                            2,
+                            isDarkTheme = isDarkTheme,
                         )
-                        matchScreen(curRoute, navController)
+                        matchScreen(isDarkTheme, curRoute, navController)
                     }
                 }
                 composable(Screen.Chat.name) {

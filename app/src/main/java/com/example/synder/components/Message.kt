@@ -101,9 +101,10 @@ fun Message(it: Message) {
                                                 textAlign = if (it.sentbyuser) TextAlign.End else TextAlign.Start // Align the name text to the right
                                         )
                                 }
+                                /*
                                 if (it.sentbyuser) {
                                         Monogram(name = it.name)
-                                }
+                                }*/
                         }
                 }
 

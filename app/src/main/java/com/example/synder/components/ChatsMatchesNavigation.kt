@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.AlertDialogDefaults.shape
@@ -41,13 +42,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.compose.md_theme_dark_onTertiary
+import com.example.compose.md_theme_dark_tertiary
+import com.example.compose.md_theme_light_secondary
+import com.example.compose.md_theme_light_tertiary
 import com.example.synder.R
 
 @Composable
-fun SegmentedButton(curRoute: String, navController: NavHostController, checked: Number) {
+fun SegmentedButton(curRoute: String, navController: NavHostController, checked: Number, isDarkTheme: Boolean) {
     // Define colors for active and inactive buttons
-    val activeColor = Color.Blue
+    val activeColor = if (isDarkTheme) md_theme_dark_tertiary else md_theme_light_tertiary;
     val inactiveColor = Color.Transparent // Transparent background for unselected button
+    /*val textColorChecked = if (isDarkTheme)
+    val textColorUnChecked = if (isDarkTheme)*/
+    val text1Color = if (checked == 1) Color.White else Color.Black
+    val text2Color = if (checked == 2) Color.White else Color.Black
 
     val leftcard = RoundedCornerShape(
         topStart = 20.dp,
@@ -62,10 +71,6 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
         bottomEnd = 20.dp
     )
 
-    val icon1Color = if (checked == 1) Color.White else Color.Black
-    val text1Color = if (checked == 1) Color.White else Color.Black
-    val icon2Color = if (checked == 2) Color.White else Color.Black
-    val text2Color = if (checked == 2) Color.White else Color.Black
 
     val iconSize = 20.dp // Increase the icon size
     val buttonHeight = 40.dp // Increase the button height
@@ -108,7 +113,7 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
                     painter = painterResource(id = R.drawable.baseline_chat_bubble_outline_24), // Replace R.drawable with your resource name
                     contentDescription = null,
                     modifier = Modifier.size(iconSize),
-                    tint = icon1Color,
+                    tint = text1Color,
                 )
                 Text(
                     text = "Chats",
@@ -150,7 +155,7 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
                     painter = painterResource(id = R.drawable.baseline_perm_identity_24), // Replace R.drawable with your resource name
                     contentDescription = null,
                     modifier = Modifier.size(iconSize),
-                    tint = icon2Color
+                    tint = text2Color
                 )
                 Text(
                     text = "Syndere",
@@ -184,7 +189,7 @@ fun SegmentedButton(curRoute: String, navController: NavHostController, checked:
                 .padding(4.dp)
                 .padding(end = 6.dp) // Add some additional right padding
         ) {
-            Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(iconSize), tint = icon2Color)
+            Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(iconSize), tint = text2Color)
             Text(
                 text = "Syndere",
                 color = text2Color,

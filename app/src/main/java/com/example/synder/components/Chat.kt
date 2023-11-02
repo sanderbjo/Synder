@@ -44,7 +44,7 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navCon
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
-            .background(Color.White)
+            /*.background(Color.White)*/
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(8.dp)
@@ -78,7 +78,7 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navCon
                 Card(
                     modifier = Modifier.padding(top = 10.dp)
                 ) {
-                    Text(text = it.latestmessage, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                    Text(text = it.latestmessage, fontSize = 12.sp /*, color = Color.Black*/, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                 }
             }
         }
@@ -90,7 +90,7 @@ fun Chat(it: UserProfile, curRoute: String, navController: NavHostController) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
-            .background(Color.White)
+            /*.background(Color.White)*/
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(8.dp)

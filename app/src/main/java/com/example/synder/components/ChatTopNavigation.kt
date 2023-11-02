@@ -32,7 +32,7 @@ fun ChatTopNavigation(curRoute: String, navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth(1f)
             .padding(bottom = 5.dp)
-            .background(Color(0xFFE4E4E4)),
+            /*.background(Color(0xFFE4E4E4))*/,
         verticalAlignment = Alignment.CenterVertically, // Align vertically centered
         horizontalArrangement = Arrangement.Start // Align the icon button to the left
     ) {
@@ -55,6 +55,7 @@ fun ChatTopNavigation(curRoute: String, navController: NavHostController) {
             fontSize = 22.sp,
         )
         Spacer(modifier = Modifier.weight(1f)) // This spacer will push the Icon to the right
-        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(40.dp).padding(end = 10.dp))
+        Monogram(name = "Cathrine")
+        //Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(40.dp).padding(end = 10.dp))
     }
 }
