@@ -89,7 +89,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(md_theme_light_secondary),
+                    /*.background(md_theme_light_secondary)*/,
                 horizontalArrangement = Arrangement.Center
             ) {
                 IconButton(
@@ -99,7 +99,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Clear, contentDescription = "Dislike",
-                        tint = md_theme_light_onSecondary,
+                        //tint = md_theme_light_onSecondary,
                         modifier = Modifier.size(50.dp))
                 }
                 Spacer(modifier = Modifier.width(32.dp))
@@ -110,8 +110,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         swipeOffset = screenWidth},
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = "Super Like",
-                        tint = md_theme_light_onSecondary,
+                    Icon(imageVector = Icons.Default.Star, contentDescription = "Super Like"/*,
+                        tint = md_theme_light_onSecondary*/,
                         modifier = Modifier.size(50.dp))
                 }
                 Spacer(modifier = Modifier.width(32.dp))
@@ -123,7 +123,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(imageVector = Icons.Default.Favorite, contentDescription = "Like",
-                        tint = md_theme_light_onSecondary,
+                        /*tint = md_theme_light_onSecondary,*/
                         modifier = Modifier.size(50.dp))
                 }
             }
@@ -156,8 +156,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .padding(16.dp)
-                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
-                colors = CardDefaults.cardColors(containerColor = md_theme_light_secondary)
+                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }/*,
+                colors = CardDefaults.cardColors(containerColor = md_theme_light_secondary)*/
 
                 ) {
                 LaunchedEffect(swipeableState.targetValue){

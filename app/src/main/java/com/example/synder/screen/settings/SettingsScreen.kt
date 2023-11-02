@@ -24,11 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
+
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel(), isDarkTheme: Boolean, toggleTheme: () -> Unit){
+fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit){
+    val viewModel: SettingsViewModel = hiltViewModel()
+
 
     val volumeLevel by viewModel.volumeLevel
     LazyColumn(){

@@ -1,6 +1,7 @@
 package com.example.synder
 
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -103,7 +104,7 @@ fun Navigation() {
             topBar = {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = md_theme_light_primary ,
+                        containerColor =  md_theme_light_primary,
                         titleContentColor = md_theme_light_primary,
                     ),
                     title = {
@@ -198,7 +199,7 @@ fun Navigation() {
                     isVisible = true
                 }
                 composable(Screen.Settings.name){
-                    SettingsScreen (SettingsViewModel(), isDarkTheme) { toggleTheme() }
+                    SettingsScreen (isDarkTheme) { toggleTheme() }
                     isVisible = true
                 }
                 composable(Screen.Swipe.name){
