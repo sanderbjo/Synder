@@ -54,6 +54,7 @@ import com.example.synder.screen.profile.ProfileScreen
 import com.example.synder.screen.settings.SettingsScreen
 import com.example.synder.screen.settings.SettingsViewModel
 import com.example.synder.screen.swipe.SwipeScreen
+
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -89,13 +90,17 @@ enum class Screen {
 @Composable
 fun Navigation() {
     var isVisible by remember { mutableStateOf(false) }
+    var showChatInput by remember { mutableStateOf(false) }
 
     var isDarkTheme by remember { mutableStateOf(false) }
 
     val navController = rememberNavController()
-    val curRoute by rememberUpdatedState(newValue = navController.currentBackStackEntryAsState().value?.destination?.route ?: Screen.Swipe.name)
+    val curRoute by rememberUpdatedState(
+        newValue = navController.currentBackStackEntryAsState().value?.destination?.route
+            ?: Screen.Swipe.name
+    )
 
-    fun toggleTheme(){
+    fun toggleTheme() {
         isDarkTheme = !isDarkTheme
     }
 
@@ -104,7 +109,7 @@ fun Navigation() {
             topBar = {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor =  md_theme_light_primary,
+                        containerColor = md_theme_light_primary,
                         titleContentColor = md_theme_light_primary,
                     ),
                     title = {
@@ -122,108 +127,153 @@ fun Navigation() {
                     }
                 )
             },
-
             bottomBar = {
                 if (isVisible == true) {
-                    BottomNavigation (
+                    BottomNavigation(
                         modifier = Modifier.fillMaxWidth(),
                         backgroundColor = md_theme_light_primary
-                    ){
+                    ) {
                         //Profil screen
                         BottomNavigationItem(
-                            icon = { Icon(Icons.Default.Person, contentDescription = null, tint = md_theme_light_onPrimary)},
+                            icon = {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = md_theme_light_onPrimary
+                                )
+                            },
                             selected = curRoute == Screen.Profile.name,
                             onClick = {
                                 if (curRoute != Screen.Profile.name) {
-                                    navController.navigate(Screen.Profile.name){
-                                        popUpTo(navController.graph.findStartDestination().id){
+                                    navController.navigate(Screen.Profile.name) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
                                         launchSingleTop = true
                                     }
                                 }
                             },
-                            label = { Text(text = Screen.Profile.name, color = md_theme_light_onPrimary)},
+                            label = {
+                                Text(
+                                    text = Screen.Profile.name,
+                                    color = md_theme_light_onPrimary
+                                )
+                            },
                             alwaysShowLabel = true
                         )
 
                         // Swipe screen
                         BottomNavigationItem(
-                            icon = { Icon(Icons.Default.Home, contentDescription = null, tint = md_theme_light_onPrimary) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Home,
+                                    contentDescription = null,
+                                    tint = md_theme_light_onPrimary
+                                )
+                            },
                             selected = curRoute == Screen.Swipe.name,
                             onClick = {
                                 if (curRoute != Screen.Swipe.name) {
-                                    navController.navigate(Screen.Swipe.name){
-                                        popUpTo(navController.graph.findStartDestination().id){
+                                    navController.navigate(Screen.Swipe.name) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
                                         launchSingleTop = true
                                     }
                                 }
                             },
-                            label = { Text(text = Screen.Swipe.name, color = md_theme_light_onPrimary)},
+                            label = {
+                                Text(
+                                    text = Screen.Swipe.name,
+                                    color = md_theme_light_onPrimary
+                                )
+                            },
                             alwaysShowLabel = true
                         )
 
                         // Chat screen
                         BottomNavigationItem(
-                            icon = { Icon(Icons.Default.Email, contentDescription = null, tint = md_theme_light_onPrimary)},
+                            icon = {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = null,
+                                    tint = md_theme_light_onPrimary
+                                )
+                            },
                             selected = curRoute == Screen.Chats.name,
                             onClick = {
                                 if (curRoute != Screen.Chats.name) {
-                                    navController.navigate(Screen.Chats.name){
-                                        popUpTo(navController.graph.findStartDestination().id){
+                                    navController.navigate(Screen.Chats.name) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
                                         launchSingleTop = true
                                     }
                                 }
                             },
-                            label = { Text(text = Screen.Chats.name, color = md_theme_light_onPrimary)},
+                            label = {
+                                Text(
+                                    text = Screen.Chats.name,
+                                    color = md_theme_light_onPrimary
+                                )
+                            },
                             alwaysShowLabel = true
                         )
                     }
-                } else {
+                } else if (showChatInput) {
                     Chatbar()
+                } else {
+
                 }
-
             }
-
-        ) {innerPadding ->
-            NavHost(navController = navController,
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
                 startDestination = Screen.Swipe.name,
-                modifier = Modifier.padding(innerPadding))
+                modifier = Modifier.padding(innerPadding)
+            )
             {
-                composable(Screen.Profile.name){
+                composable(Screen.Profile.name) {
                     ProfileScreen(navController = navController)
                     isVisible = true
                 }
-                composable(Screen.Settings.name){
-                    SettingsScreen (isDarkTheme) { toggleTheme() }
+                composable(Screen.Settings.name) {
+                    SettingsScreen(isDarkTheme) { toggleTheme() }
                     isVisible = true
                 }
-                composable(Screen.Swipe.name){
+                composable(Screen.Swipe.name) {
                     SwipeScreen()
                     isVisible = true
                 }
-                composable(Screen.Chats.name){
+                composable(Screen.Chats.name) {
                     Column {
                         isVisible = true
-                        SegmentedButton(curRoute = curRoute, navController = navController, 1)
+                        SegmentedButton(
+                            curRoute = curRoute,
+                            navController = navController,
+                            1
+                        )
                         chatScreen(curRoute, navController)
                     }
                 }
-                composable(Screen.Matches.name){
+                composable(Screen.Matches.name) {
                     Column {
                         isVisible = true
-                        SegmentedButton(curRoute = curRoute, navController = navController, 2)
+                        SegmentedButton(
+                            curRoute = curRoute,
+                            navController = navController,
+                            2
+                        )
                         matchScreen(curRoute, navController)
                     }
                 }
-                composable(Screen.Chat.name){
+                composable(Screen.Chat.name) {
                     Column {
                         isVisible = false
-                        ChatTopNavigation(curRoute = curRoute, navController = navController)
+                        ChatTopNavigation(
+                            curRoute = curRoute,
+                            navController = navController
+                        )
                         conversationWindow()
                     }
                 }
@@ -232,6 +282,7 @@ fun Navigation() {
                     Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
                         isVisible = true
                     }
+
                     else -> {
                         isVisible = false
                     }
@@ -239,12 +290,10 @@ fun Navigation() {
 
             }
         }
-
     }
 
+
 }
-
-
 @Preview(showBackground = true)
 @Composable
 fun SynderPreview() {

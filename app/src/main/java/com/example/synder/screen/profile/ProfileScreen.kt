@@ -51,7 +51,7 @@ fun ProfileScreen(modifier: Modifier = Modifier,
         modifier
             .fillMaxSize()
             .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         /*LazyRow {
             items(images) {image ->
