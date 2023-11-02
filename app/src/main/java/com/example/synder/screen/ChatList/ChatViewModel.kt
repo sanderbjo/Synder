@@ -11,8 +11,10 @@ import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -21,28 +23,67 @@ class ChatViewModel @Inject constructor(
         val chat = mutableStateOf(ChatsFromFirebase())
         val user1 = mutableStateOf(UserProfile())
         val user2 = mutableStateOf(UserProfile())
+        val chats = MutableStateFlow<List<ChatsFromFirebase>>(emptyList())
 
-        private val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
-        private val chatsCache: MutableMap<String, ChatsFromFirebase> = mutableMapOf()
+        val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
+        val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
 
         init {
                 viewModelScope.launch {
                         storageService.users.collect { userList ->
                                 userList.forEach { user ->
                                         usersCache[user.id] = user
-                                        Log.d("Users: ", user.toString())
-                                        Log.d("Users: ", usersCache.toString())
-                                }
-                        }
-                        storageService.chats.collect { chatList ->
-                                chatList.forEach { chat ->
-                                        chatsCache[chat.id] = chat
-                                        Log.d("Chats: ", chat.toString())
-                                        Log.d("Chats: ", chatsCache.toString())
+                                        Log.d("ID1: ", user.toString())
+                                        Log.d("ID2: ", usersCache.toString())
                                 }
                         }
                 }
+                viewModelScope.launch {
+                        storageService.chats.collect { chatList ->
+                                chatList.forEach { chat ->
+                                        val chot = ChatAndParticipant(
+                                                id = chat.id,
+                                                chat = chat,
+                                                user1 = usersCache[chat.userId1] ?: UserProfile(),
+                                                user2 = usersCache[chat.userId2] ?: UserProfile(),
+                                                latestmessage = chat.latestmessage.toString()
+                                        )
+
+                                        // Legg til i cache om nødvendig
+                                        chatsCache[chat.id] = chot
+                                        Log.d("ID3: ", chat.toString())
+                                        Log.d("ID3: ", chatsCache.toString())
+                                }
+                        }
+
+
+
+                }
         }
+
+        suspend fun getChatList(): List<ChatAndParticipant> {
+                val chatAndParticipantList = mutableListOf<ChatAndParticipant>()
+
+                storageService.chats.collect { chatList ->
+                        chatList.forEach { chat ->
+                                val chot = ChatAndParticipant(
+                                        id = chat.id,
+                                        chat = chat,
+                                        user1 = usersCache[chat.userId1] ?: UserProfile(),
+                                        user2 = usersCache[chat.userId2] ?: UserProfile(),
+                                        latestmessage = chat.latestmessage.toString()
+                                )
+                                chatAndParticipantList.add(chot)
+
+                                // Legg til i cache om nødvendig
+                                chatsCache[chat.id] = chot
+                        }
+                }
+
+                return chatAndParticipantList
+        }
+
+
         fun getUserById(userId: String) {
                 //val userId = "7gM3MG2HlhELDG3pTYqu"
                 viewModelScope.launch {
@@ -66,6 +107,7 @@ class ChatViewModel @Inject constructor(
                 }
         }
 
+        /*ENDRET OG FUNKER IKKE LENGER
         fun getChatAndParticipants(): List<ChatAndParticipant> {
                 return chatsCache.values.map { chat ->
                         val user1 = usersCache[chat.userId1] ?: UserProfile()
@@ -83,7 +125,7 @@ class ChatViewModel @Inject constructor(
                                 )
                         )
                 }
-        }
+        }*/
 
 
         /*

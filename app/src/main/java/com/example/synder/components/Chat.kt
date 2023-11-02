@@ -36,9 +36,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.Chat
+import com.example.synder.models.ChatAndParticipant
+import com.example.synder.models.UserProfile
 
 @Composable
-fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Boolean = false) {
+fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navController: NavHostController) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
@@ -63,37 +65,81 @@ fun Chat(it: Chat, curRoute: String, navController: NavHostController, match: Bo
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (it.imageurl != "") {
-                ProfilePicture(ulr = it.imageurl)
+            if (it.user1.profileImageUrl != "") {
+                ProfilePicture(ulr = it.user1.profileImageUrl)
+            } else {
+                Monogram(name = it.user1.name)
+            }
+
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text(text = it.user1.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
+                Text(text = it.latestmessage, fontSize = 16.sp) // Adjust text size as needed
+
+                Card(
+                    modifier = Modifier.padding(top = 10.dp)
+                ) {
+                    Text(text = it.latestmessage, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Chat(it: UserProfile, curRoute: String, navController: NavHostController) {
+    OutlinedCard(
+        modifier = Modifier
+            .wrapContentHeight()
+            .background(Color.White)
+            .fillMaxWidth()
+            .clip(
+                RoundedCornerShape(8.dp)
+            )
+            .clickable {
+                navController.navigate(Screen.Chat.name) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+    ) {
+        Row (
+            modifier = Modifier
+                .padding(start = 15.dp, top = 2.dp, bottom = 2.dp)
+                .fillMaxSize(), // Center text both vertically and horizontally
+            verticalAlignment = Alignment.CenterVertically
+
+        ) {
+            if (it.profileImageUrl != "") {
+                ProfilePicture(ulr = it.profileImageUrl)
             } else {
                 Monogram(name = it.name)
             }
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
-                Text(text = it.latestChat, fontSize = 16.sp) // Adjust text size as needed
-                if (!match) {
-                    Card(
-                        modifier = Modifier.padding(top = 10.dp)
-                    ) {
-                        Text(text = it.latestRecieved, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
-                    }
+                Text(text = it.bio, fontSize = 16.sp) // Adjust text size as needed
+
+                Card(
+                    modifier = Modifier.padding(top = 10.dp)
+                ) {
+                    Text(text = it.name, fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                 }
             }
             Spacer(modifier = Modifier.weight(1f)) // This spacer will push the OutlinedCard to the right
-            if (match) {
-                OutlinedCard(
-                    shape = RoundedCornerShape(10.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Transparent, // Set background to transparent
-                        contentColor = Color.White, // Set content color to white
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFFFFC700)), // Set border color to #FFC700
-                    modifier = Modifier.padding(end = 10.dp)
 
-                ) {
-                    Text(text = "Ny!", color = Color(0xFFFFC700), modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)) // Set text color to #FFC700
-                }
+            OutlinedCard(
+                shape = RoundedCornerShape(10.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent, // Set background to transparent
+                    contentColor = Color.White, // Set content color to white
+                ),
+                border = BorderStroke(1.dp, Color(0xFFFFC700)), // Set border color to #FFC700
+                modifier = Modifier.padding(end = 10.dp)
+
+            ) {
+                Text(text = "Ny!", color = Color(0xFFFFC700), modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)) // Set text color to #FFC700
             }
         }
     }

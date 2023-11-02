@@ -92,6 +92,7 @@ enum class Screen {
 @Composable
 fun Navigation() {
     var isVisible by remember { mutableStateOf(false) }
+    var showChatInput by remember { mutableStateOf(false) }
 
     val navController = rememberNavController()
     val curRoute by rememberUpdatedState(newValue = navController.currentBackStackEntryAsState().value?.destination?.route ?: Screen.Swipe.name)
@@ -179,8 +180,10 @@ fun Navigation() {
                         alwaysShowLabel = true
                     )
                 }
-            } else {
+            } else if (showChatInput) {
                 Chatbar()
+            } else {
+
             }
 
         }
@@ -193,14 +196,17 @@ fun Navigation() {
             composable(Screen.Profile.name){
                 ProfileScreen()
                 isVisible = true;
+                showChatInput = false
             }
             composable(Screen.Swipe.name){
                 SwipeScreen()
                 isVisible = true;
+                showChatInput = false
             }
             composable(Screen.Chats.name){
                 Column {
                     isVisible = true;
+                    showChatInput = false
                     SegmentedButton(curRoute = curRoute, navController = navController, 1)
                     chatScreen(curRoute, navController)
                 }
@@ -208,6 +214,7 @@ fun Navigation() {
             composable(Screen.Matches.name){
                 Column {
                     isVisible = true;
+                    showChatInput = false
                     SegmentedButton(curRoute = curRoute, navController = navController, 2)
                     matchScreen(curRoute, navController)
                 }
@@ -215,6 +222,7 @@ fun Navigation() {
             composable(Screen.Chat.name){
                 Column {
                     isVisible = false;
+                    showChatInput = true
                     ChatTopNavigation(curRoute = curRoute, navController = navController)
                     conversationWindow()
                 }
@@ -223,9 +231,11 @@ fun Navigation() {
             when (curRoute) {
                 Screen.Profile.name, Screen.Swipe.name, Screen.Chats.name -> {
                     isVisible = true
+                    showChatInput = false
                 }
                 else -> {
                     isVisible = false
+                    showChatInput = false
                 }
             }
 

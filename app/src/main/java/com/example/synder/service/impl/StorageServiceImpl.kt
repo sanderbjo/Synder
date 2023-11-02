@@ -18,7 +18,6 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         get() = firestore.collection(USERS).dataObjects()
     override val chats: Flow<List<ChatsFromFirebase>>
         get() = firestore.collection(CHATS).dataObjects()
-
     override suspend fun getUser(userId: String): UserProfile? =
         firestore.collection(USERS).document(userId).get().await().toObject()
 

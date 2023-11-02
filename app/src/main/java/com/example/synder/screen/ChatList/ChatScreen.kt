@@ -27,6 +27,7 @@ import com.example.synder.components.Message
 import com.example.synder.models.Message
 import com.example.synder.screen.profile.ProfileViewModel
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import com.example.synder.models.ChatAndParticipant
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,33 +61,30 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
     Log.d("Bruker fra firebase;", "${user1_}")
     Log.d("Bruker fra firebase;", "${user2}")
     Log.d("Første bruker", "${chat1AndParticipant.userId1}") */
+    val chatsList = chatViewModel.chatsCache.values.toList()
 
-    val chatAndParticipants = chatViewModel.getChatAndParticipants()
-    val userChats = chatAndParticipants.map {
-        Chat(
-            it.user1.name,
-            it.latestmessage.message,
-            SimpleDateFormat("h:mm a").format(Date(it.latestmessage.date.toLong())),
-            it.user1.profileImageUrl
-        )
-    }
+    val userChats = listOf(chatsList) // If you don't want to populate this right now
 
 
-/*
-    val userChats = listOf(
-        Chat(user1_.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user1.profileImageUrl),
-        Chat(chat1AndParticipant.user2.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user2.profileImageUrl),
-        /*Chat("Emma 28", "Emma: Hei der! Hvordan har dagen din vært?", "Sendt 10:15" ),
-        Chat("Sophie 32", "Sophie: Hei, hva skjer? :)", "Sendt 11:30" ),
-        Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45" ),
-        Chat("Nora 25", "Nora: Hei! Hvordan har du det?", "Sendt 15:20" ),
-        Chat("Mia 29", "Mia: Håper du har det bra! :)", "Sendt 16:45" ),
-        Chat("Emma 28", "Du: Vil du ha bli med ut på date :)", "Sendt 10:15" ),
-        Chat("Sophie 32", "Sophie: Hei jeg liker bicepen din >-<", "Sendt 11:30" ),
-        Chat("Olivia 22", "Olivia: Hei kjekken ;)", "Sendt 13:45" ),
-        Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten jeg pratet med på byen sist lørdag:)", "Sendt 15:20" ),
-        Chat("Mia 29", "Mia: Hei har du hatt en fin dag:)", "Sendt 16:45" )*/
-    )*/
+    Log.d("Liste med chats:", "$chatsList")
+
+
+
+    /*
+        val userChats = listOf(
+            Chat(user1_.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user1.profileImageUrl),
+            Chat(chat1AndParticipant.user2.name, chat1AndParticipant.latestmessage.message, "4:00PM", chat1AndParticipant.user2.profileImageUrl),
+            /*Chat("Emma 28", "Emma: Hei der! Hvordan har dagen din vært?", "Sendt 10:15" ),
+            Chat("Sophie 32", "Sophie: Hei, hva skjer? :)", "Sendt 11:30" ),
+            Chat("Olivia 22", "Olivia: Wow, fremgangen din innen trening er fantastisk!", "Sendt 13:45" ),
+            Chat("Nora 25", "Nora: Hei! Hvordan har du det?", "Sendt 15:20" ),
+            Chat("Mia 29", "Mia: Håper du har det bra! :)", "Sendt 16:45" ),
+            Chat("Emma 28", "Du: Vil du ha bli med ut på date :)", "Sendt 10:15" ),
+            Chat("Sophie 32", "Sophie: Hei jeg liker bicepen din >-<", "Sendt 11:30" ),
+            Chat("Olivia 22", "Olivia: Hei kjekken ;)", "Sendt 13:45" ),
+            Chat("Nora 25", "Nora: Har jeg sett deg før? Er du han gutten jeg pratet med på byen sist lørdag:)", "Sendt 15:20" ),
+            Chat("Mia 29", "Mia: Hei har du hatt en fin dag:)", "Sendt 16:45" )*/
+        )*/
     //val bug = userChats[0]
     //Log.d("Første bruker", "$bug")
     //Column
@@ -99,9 +97,12 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
             PageStart(title = "Chats")
         }
 
-        items(userChats) { it ->
+        items(chatsList) { it ->
             Chat(it, curRoute, navController)
         }
+        /*items(userChats) { it ->
+            Chat(it, curRoute, navController)
+        }*/
 
         item {
             PageEnd(textcontent = "Ingen flere Chats!")
@@ -110,7 +111,11 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
 
 }
 @Composable
-fun matchScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+fun matchScreen(curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
+                chatViewModel: ChatViewModel = hiltViewModel()) {
+
+    val userList = chatViewModel.usersCache.values.toList()
+    Log.d("Liste med USERS:", "$userList")
     val matches = listOf(
         Chat("Christine 21", "Matchet 4 dager siden", "" ),
         Chat("Monica 45", "Matchet 4 dager siden", "" ),
@@ -127,8 +132,8 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
             PageStart(title = "Syndere")
         }
 
-        items(matches) { it ->
-            Chat(it, curRoute, navController, true)
+        items(userList) { it ->
+            Chat(it, curRoute, navController)
         }
 
         item {
