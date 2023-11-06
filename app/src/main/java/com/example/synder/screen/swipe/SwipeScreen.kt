@@ -83,6 +83,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
 
 
 
+
     @Composable
     fun likeDislikeButtons(onLike: () -> Unit, onSuperLike: () -> Unit, onDislike: () -> Unit) {
         if (currentUserIndex < profiles.size) {
@@ -162,11 +163,17 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 ) {
                 LaunchedEffect(swipeableState.targetValue){
                     if (swipeableState.targetValue.toFloat() == -1f){
+                        if (currentUser != null){
+                            currentUser?.id?.let { viewModel.likeUser(it) }
+                        }
                         delay(200)
                         currentUserIndex ++
 
 
                     } else if (swipeableState.targetValue.toFloat() == 1f){
+                        if (currentUser != null){
+                            currentUser?.id?.let { viewModel.dislikeUser(it) }
+                        }
                         delay(200)
                         currentUserIndex ++
                     }
@@ -266,14 +273,24 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             ) {
                 likeDislikeButtons(
                     onLike = {
+                        if (currentUser != null){
+                            currentUser?.id?.let { viewModel.likeUser(it) }
+                        }
                         delayIncrement = true
+
 
                     },
 
                     onDislike = {
+                        if (currentUser != null){
+                            currentUser?.id?.let { viewModel.dislikeUser(it)}
+                        }
                         delayIncrement = true
                     },
                     onSuperLike = {
+                        if (currentUser != null){
+                            currentUser?.id?.let { viewModel.likeUser(it) }
+                        }
                         delayIncrement = true
                     })
             }
