@@ -11,4 +11,7 @@ interface StorageService {
 
     suspend fun createUser(user: UserProfile): String
     suspend fun getChat(chatId: String): ChatsFromFirebase?
+
+    suspend fun saveLikedUser(userId: String, likedUserId: String)
+    suspend fun saveDislikedUser(userId: String, dislikedUserId: String)
 }
