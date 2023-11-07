@@ -1,5 +1,8 @@
 package com.example.synder.screen.swipe
 
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +11,10 @@ import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+import kotlin.io.path.fileVisitor
 
 
 @HiltViewModel
@@ -20,7 +24,7 @@ class SwipeViewModel @Inject constructor(
 ) : ViewModel() {
     val users = MutableStateFlow<List<UserProfile>>(emptyList())
     var currentUserIndex = mutableIntStateOf(0)
-    var nextUserIndex = mutableIntStateOf(0)
+    var nextUserIndex = mutableIntStateOf(currentUserIndex.value + 1)
 
 
 
@@ -43,17 +47,44 @@ class SwipeViewModel @Inject constructor(
         }
     }
 
+    /*suspend fun loadSortedProfiles(){
+        val currentUserId = accountService.currentUserId
+        if (currentUserId != null){
+            val profileList = storageService.users.collect(users.value)
+            val currentUser = storageService.getUser(currentUserId)
 
+            val lookingForPreference = currentUser?.serEtter?: ""
 
+            val filteredProfiles = profileList.filter { profile ->
+                profile.
+            }
+        }
+    }*/
 
+    suspend fun getLookingForPreference(): String? {
+        val currentUserId = accountService.currentUserId
+        val currentUser = storageService.getUser(currentUserId)
+        return currentUser?.serEtter
+
+    }
     init {
         viewModelScope.launch {
+            val lookingForPreference = getLookingForPreference()
+            storageService.users.collect { profiles ->
+                val filteredAndSortedProfiles = profiles
+                    .filter { profile ->
+                        profile.kjonn == lookingForPreference
+                    }
+                users.value = filteredAndSortedProfiles
 
-            storageService.users.collect {
-                users.value = it
-                if (currentUserIndex.value >= it.size){
-                    currentUserIndex.value = 0
-                }
+                /*if (filteredAndSortedProfiles.isNotEmpty()){
+                    if (nextUserIndex.value >= filteredAndSortedProfiles.size - 1){
+                        currentUserIndex.value = 0
+                        nextUserIndex.value = 0
+
+
+                    }
+                }*/
             }
 
         }

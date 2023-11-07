@@ -1,5 +1,6 @@
 package com.example.synder.screen.swipe
 
+import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.rememberSwipeableState
@@ -49,6 +51,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -75,13 +78,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
 
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
-    var delayIncrement by remember {mutableStateOf(false) }
-
-
-
-
-
-
+    var delayIncrement by remember { mutableStateOf(false) }
 
 
     @Composable
@@ -90,42 +87,51 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    /*.background(md_theme_light_secondary)*/,
+                /*.background(md_theme_light_secondary)*/,
                 horizontalArrangement = Arrangement.Center
             ) {
                 IconButton(
                     onClick = {
                         onDislike()
-                        swipeOffset = -screenWidth},
+                        swipeOffset = -screenWidth
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Dislike",
+                    Icon(
+                        imageVector = Icons.Default.Clear, contentDescription = "Dislike",
                         //tint = md_theme_light_onSecondary,
-                        modifier = Modifier.size(50.dp))
+                        modifier = Modifier.size(50.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.width(32.dp))
 
                 IconButton(
                     onClick = {
                         onSuperLike()
-                        swipeOffset = screenWidth},
+                        swipeOffset = screenWidth
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = "Super Like"/*,
+                    Icon(
+                        imageVector = Icons.Default.Star, contentDescription = "Super Like"/*,
                         tint = md_theme_light_onSecondary*/,
-                        modifier = Modifier.size(50.dp))
+                        modifier = Modifier.size(50.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.width(32.dp))
 
                 IconButton(
                     onClick = {
                         onLike()
-                        swipeOffset = screenWidth},
+                        swipeOffset = screenWidth
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Like",
+                    Icon(
+                        imageVector = Icons.Default.Favorite, contentDescription = "Like",
                         /*tint = md_theme_light_onSecondary,*/
-                        modifier = Modifier.size(50.dp))
+                        modifier = Modifier.size(50.dp)
+                    )
                 }
             }
         }
@@ -135,7 +141,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     fun profileCard(userProfile: UserProfile, swipeOffset: Int, modifier: Modifier) {
         val offsetXState by animateIntOffsetAsState(
             targetValue = IntOffset(swipeOffset, 0),
-            animationSpec = TweenSpec(durationMillis = 250))
+            animationSpec = TweenSpec(durationMillis = 250)
+        )
         val swipeableState = rememberSwipeableState(0)
         val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
         val anchors = mapOf(0f to 0, -sizePx to 1, sizePx to -1)
@@ -160,22 +167,24 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }/*,
                 colors = CardDefaults.cardColors(containerColor = md_theme_light_secondary)*/
 
-                ) {
-                LaunchedEffect(swipeableState.targetValue){
-                    if (swipeableState.targetValue.toFloat() == -1f){
-                        if (currentUser != null){
+            ) {
+                LaunchedEffect(swipeableState.targetValue) {
+                    if (swipeableState.targetValue.toFloat() == -1f) {
+                        if (currentUser != null) {
                             currentUser?.id?.let { viewModel.likeUser(it) }
                         }
                         delay(200)
-                        currentUserIndex ++
+                        currentUserIndex++
+                        nextValueIndex++
 
 
-                    } else if (swipeableState.targetValue.toFloat() == 1f){
-                        if (currentUser != null){
+                    } else if (swipeableState.targetValue.toFloat() == 1f) {
+                        if (currentUser != null) {
                             currentUser?.id?.let { viewModel.dislikeUser(it) }
                         }
                         delay(200)
-                        currentUserIndex ++
+                        currentUserIndex++
+                        nextValueIndex++
                     }
                 }
                 Column(
@@ -183,7 +192,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    if (userProfile == profiles[currentUserIndex]){
+                    if (userProfile == profiles[currentUserIndex]) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(currentUser?.profileImageUrl)
@@ -199,14 +208,28 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                                     translationX = 0f
                                 })
                         Spacer(modifier = Modifier.height(16.dp))
-                        currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        currentUser?.name?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
-                        currentUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        currentUser?.age?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
-                        currentUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        currentUser?.bio?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
-                    }
-                    else if (userProfile == profiles[nextValueIndex]){
+                    } else if (userProfile == profiles[nextValueIndex]) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(nextUser?.profileImageUrl)
@@ -222,11 +245,26 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                                     translationX = 0f
                                 })
                         Spacer(modifier = Modifier.height(16.dp))
-                        nextUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
+                        nextUser?.name?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
-                        nextUser?.age?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        nextUser?.age?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
-                        nextUser?.bio?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium) }
+                        nextUser?.bio?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
@@ -234,84 +272,116 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
         }
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        items(profiles.size) { index ->
-            Box() {
+    if (profiles.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            items(profiles.size) { index ->
+                Box {
+                    if (index == currentUserIndex && index <= profiles.size) {
 
-                if (index == currentUserIndex) {
-                    profileCard(
-                        userProfile = profiles[nextValueIndex],
-                        swipeOffset = 0,
-                        modifier = Modifier.zIndex(0f)
-                    )
+                        if (index <= profiles.size - 2) {
+                            profileCard(
+                                userProfile = profiles[nextValueIndex],
+                                swipeOffset = 0,
+                                modifier = Modifier.zIndex(0f)
+                            )
+                        }
+                        profileCard(
+                            userProfile = profiles[currentUserIndex],
+                            swipeOffset = swipeOffset,
+                            modifier = Modifier.zIndex(1f)
+                        )
 
-                    profileCard(
-                        userProfile = profiles[currentUserIndex],
-                        swipeOffset = swipeOffset,
-                        modifier = Modifier.zIndex(1f)
-                    )
-
-
+                        if (index >= profiles.size - 1) {
+                            nextValueIndex = 0
+                        }
+                    }
                 }
-
+            }
+            item {
+                if (currentUserIndex == profiles.size) {
+                    endOfListCard()
+                }
             }
 
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                ) {
+                    likeDislikeButtons(
+                        onLike = {
+                            if (currentUser != null) {
+                                currentUser?.id?.let { viewModel.likeUser(it) }
+                            }
+                            delayIncrement = true
+                        },
 
-
-        }
-
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                likeDislikeButtons(
-                    onLike = {
-                        if (currentUser != null){
-                            currentUser?.id?.let { viewModel.likeUser(it) }
-                        }
-                        delayIncrement = true
-
-
-                    },
-
-                    onDislike = {
-                        if (currentUser != null){
-                            currentUser?.id?.let { viewModel.dislikeUser(it)}
-                        }
-                        delayIncrement = true
-                    },
-                    onSuperLike = {
-                        if (currentUser != null){
-                            currentUser?.id?.let { viewModel.likeUser(it) }
-                        }
-                        delayIncrement = true
-                    })
+                        onDislike = {
+                            if (currentUser != null) {
+                                currentUser?.id?.let { viewModel.dislikeUser(it) }
+                            }
+                            delayIncrement = true
+                        },
+                        onSuperLike = {
+                            if (currentUser != null) {
+                                currentUser?.id?.let { viewModel.likeUser(it) }
+                            }
+                            delayIncrement = true
+                        })
+                }
             }
         }
 
     }
+
     LaunchedEffect(delayIncrement){
         if (delayIncrement) {
             delay(200)
             currentUserIndex ++
+            nextValueIndex++
 
             swipeOffset = 0
             delayIncrement = false
         }
     }
 
-    LaunchedEffect(currentUserIndex){
+    /*LaunchedEffect(currentUserIndex){
         nextValueIndex++
-    }
+    }*/
 }
 
+
+@Composable
+fun endOfListCard(){
+    Card(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Column (
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Icon(
+                imageVector = Icons.Default.Face,
+                contentDescription = "Face Icon",
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "You have swiped through all people, Please try again later.",
+                textAlign = TextAlign.Center
+            )
+
+        }
+    }
+
+}
 
 @Composable
 fun getScreenWidthInt(): Int {
