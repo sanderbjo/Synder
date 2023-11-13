@@ -34,6 +34,7 @@ class SwipeViewModel @Inject constructor(
         if (currentUserId != null){
             viewModelScope.launch {
                 storageService.saveLikedUser(currentUserId, targetUserId)
+                checkForMatch(targetUserId)
             }
         }
     }
@@ -43,7 +44,9 @@ class SwipeViewModel @Inject constructor(
         if (currentUserId != null){
             viewModelScope.launch {
                 storageService.saveDislikedUser(currentUserId, targetUserId)
+
             }
+
         }
     }
 
@@ -60,6 +63,17 @@ class SwipeViewModel @Inject constructor(
             }
         }
     }*/
+
+    suspend fun checkForMatch(targetUserId: String){
+        val currentUserId = accountService.currentUserId
+        val targetUser = storageService.getUser(targetUserId)
+
+        if (targetUser?.likedUsers?.contains(currentUserId) == true){
+            Log.d("Matching", "Match found between $currentUserId and $targetUserId")
+            
+        }
+
+    }
 
     suspend fun getLookingForPreference(): String? {
         val currentUserId = accountService.currentUserId
