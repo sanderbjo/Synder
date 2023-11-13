@@ -4,6 +4,9 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.synder.Screen
 import com.example.synder.models.Chat // Make sure to import the correct Chat model
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.ChatsFromFirebase
@@ -12,6 +15,7 @@ import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,12 +24,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
         private val storageService: StorageService,
-        private val accountService: AccountService
+        val accountService: AccountService
         ) : ViewModel() {
         val chat = mutableStateOf(ChatsFromFirebase())
         val user1 = mutableStateOf(UserProfile())
         val user2 = mutableStateOf(UserProfile())
         val chats = MutableStateFlow<List<ChatsFromFirebase>>(emptyList())
+
+        var currentChatClicked = mutableStateOf<ChatAndParticipant?>(null)
 
         val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
         val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
@@ -56,7 +62,7 @@ class ChatViewModel @Inject constructor(
                                                 chat = chat,
                                                 user1 = usersCache[chat.userId1] ?: UserProfile(),
                                                 user2 = usersCache[chat.userId2] ?: UserProfile(),
-                                                latestmessage = chat.latestmessage.toString()
+                                                latestmessage = chat.latestmessage.toString(),
                                         )
 
                                         // Update the cache with the relevant chats only
@@ -116,32 +122,32 @@ class ChatViewModel @Inject constructor(
                 }
         }
 
-        /*ENDRET OG FUNKER IKKE LENGER
-        fun getChatAndParticipants(): List<ChatAndParticipant> {
-                return chatsCache.values.map { chat ->
-                        val user1 = usersCache[chat.userId1] ?: UserProfile()
-                        val user2 = usersCache[chat.userId2] ?: UserProfile()
-                        ChatAndParticipant(
-                                id = chat.id,
-                                chat = chat,
-                                user1 = user1,
-                                user2 = user2,
-                                latestmessage = chat.messages.firstOrNull() ?: Message(
-                                        name = "Default Name",
-                                        message = "Default Message",
-                                        date = System.currentTimeMillis().toString(),
-                                        sentbyuser = false
-                                )
-                        )
+        suspend fun getChatByIdAndCurrentUserId(userId: String) {
+                // Hent currentUserId asynkront om nødvendig
+                val currentUserId = accountService.currentUserId
+
+                // Bruk en coroutine for å utføre søket asynkront
+                coroutineScope {
+                        // Finn og tilordne den første chatten som matcher betingelsene
+                        currentChatClicked.value = chatsCache.values.firstOrNull { chatAndParticipant ->
+                                (chatAndParticipant.user1.id == userId && chatAndParticipant.user2.id == currentUserId) ||
+                                        (chatAndParticipant.user2.id == userId && chatAndParticipant.user1.id == currentUserId)
+                        }
                 }
-        }*/
+        }
 
-
-        /*
-        init {
-                val chatId = "7gM3MG2HlhELDG3pTYqu" // Replace with your chat ID
+        // Denne funksjonen starter en coroutine og utfører de nødvendige operasjonene
+        fun onChatClicked(chatId: String, navController: NavController, currentChatAndParticipant: ChatAndParticipant) {
                 viewModelScope.launch {
-                        chat.value = storageService.getChat(chatId) ?: ChatsFromFirebase()
+                        getChatByIdAndCurrentUserId(chatId)
+                        currentChatAndParticipant = currentChatClicked.value
+                        navController.navigate(Screen.Chat.name) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                }
+                                launchSingleTop = true
+                        }
                 }
-        }*/
+        }
+
 }

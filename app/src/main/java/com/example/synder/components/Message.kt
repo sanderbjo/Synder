@@ -41,28 +41,29 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.synder.models.UserProfile
 
 @Composable
-fun Message(it: Message) {
+fun Message(it: Message, name: String) {
         val shape = RoundedCornerShape(
                 topStart = 15.dp,
                 topEnd =  15.dp,
-                bottomStart = if (it.sentbyuser) 15.dp else 0.dp,
-                bottomEnd = if (it.sentbyuser) 0.dp else 15.dp
+                bottomStart = if (it.sentByUser) 15.dp else 0.dp,
+                bottomEnd = if (it.sentByUser) 0.dp else 15.dp
         )
         Row {
-                if (it.sentbyuser) {
+                if (it.sentByUser) {
                         Spacer(modifier = Modifier.weight(1f))
                 }
 
                 OutlinedCard(
                         colors = CardDefaults.cardColors(
-                                containerColor = if (it.sentbyuser) Color(0xFF4F378B) else Color(0xFF901D1D),
+                                containerColor = if (it.sentByUser) Color(0xFF4F378B) else Color(0xFF901D1D),
                                 contentColor = Color.White,
                         ),
                         border = BorderStroke(
                                 width = 2.dp,
-                                color = if (it.sentbyuser) Color(0xFF8B6CE3) else Color(0xFFD3454E),
+                                color = if (it.sentByUser) Color(0xFF8B6CE3) else Color(0xFFD3454E),
                         ),
                         shape = shape,
                         modifier = Modifier
@@ -75,8 +76,8 @@ fun Message(it: Message) {
                                         .padding(start = 15.dp, end = 15.dp, top = 2.dp, bottom = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically
                         ) {
-                                if (!it.sentbyuser) {
-                                        Monogram(name = it.name)
+                                if (!it.sentByUser) {
+                                        Monogram(name = name)
                                 }
 
                                 Column(
@@ -85,30 +86,30 @@ fun Message(it: Message) {
                                                 .weight(1f) // Allow the column to take up the available space
                                 ) {
                                         Text(
-                                                text = it.name + "(${it.date})",
+                                                text = name + "(${it.sent})",
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 20.sp,
                                                 color = Color.White,
-                                                textAlign = if (it.sentbyuser) TextAlign.End else TextAlign.Start // Align the name text to the right
+                                                textAlign = if (it.sentByUser) TextAlign.End else TextAlign.Start // Align the name text to the right
                                         )
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
-                                                text = it.message,
+                                                text = it.text,
                                                 fontSize = 16.sp,
                                                 color = Color.White,
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis,
-                                                textAlign = if (it.sentbyuser) TextAlign.End else TextAlign.Start // Align the name text to the right
+                                                textAlign = if (it.sentByUser) TextAlign.End else TextAlign.Start // Align the name text to the right
                                         )
                                 }
                                 /*
-                                if (it.sentbyuser) {
+                                if (it.sentByUser) {
                                         Monogram(name = it.name)
                                 }*/
                         }
                 }
 
-                if (!it.sentbyuser) {
+                if (!it.sentByUser) {
                         Spacer(modifier = Modifier.weight(1f))
                 }
         }

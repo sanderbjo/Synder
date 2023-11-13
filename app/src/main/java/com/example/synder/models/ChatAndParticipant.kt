@@ -5,5 +5,5 @@ data class ChatAndParticipant(
     val chat: ChatsFromFirebase = ChatsFromFirebase(),
     val user1: UserProfile = UserProfile(),
     val user2: UserProfile = UserProfile(),
-    val latestmessage: String = ""//Message
+    val latestmessage: String = "",     //Message
 )

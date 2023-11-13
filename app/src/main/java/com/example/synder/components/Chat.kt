@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,30 +33,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.Chat
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.UserProfile
+import com.example.synder.screen.ChatList.ChatViewModel
 
 @Composable
-fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navController: NavHostController) {
+fun Chat(it: ChatAndParticipant = ChatAndParticipant(), currentChatAndParticipant: ChatAndParticipant,
+         curRoute: String, navController: NavHostController,
+         chatViewModel: ChatViewModel = hiltViewModel()
+) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
-            /*.background(Color.White)*/
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(8.dp)
             )
             .clickable {
-                navController.navigate(Screen.Chat.name) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                chatViewModel.onChatClicked(it.id, navController, currentChatAndParticipant)
+                // Starter en coroutine når klikkbare er aktivert
+                /*LaunchedEffect(Unit) {
+                    chatViewModel.getChatByIdAndCurrentUserId(it.id)
+                    currentChatAndParticipant = chatViewModel.currentChatClicked.value
+                    navController.navigate(Screen.Chat.name) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
                     }
-                    launchSingleTop = true
-                }
+                }*/
             }
     ) {
         Row (
@@ -86,11 +97,10 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navCon
 }
 
 @Composable
-fun Chat(it: UserProfile, curRoute: String, navController: NavHostController) {
+fun Chat(it: UserProfile, currentChatAndParticipant: ChatAndParticipant, curRoute: String, navController: NavHostController) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
-            /*.background(Color.White)*/
             .fillMaxWidth()
             .clip(
                 RoundedCornerShape(8.dp)

@@ -48,6 +48,8 @@ import com.example.compose.md_theme_light_primary
 import com.example.synder.components.ChatTopNavigation
 import com.example.synder.components.Chatbar
 import com.example.synder.components.SegmentedButton
+import com.example.synder.models.ChatAndParticipant
+import com.example.synder.models.UserProfile
 import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.ChatList.conversationWindow
 import com.example.synder.screen.ChatList.matchScreen
@@ -94,6 +96,8 @@ enum class Screen {
 fun Navigation() {
     var isVisible by remember { mutableStateOf(false) }
     var showChatInput by remember { mutableStateOf(false) }
+    var currentChatAndParticipant by remember { mutableStateOf(ChatAndParticipant()) }
+
 
     var isDarkTheme by remember { mutableStateOf(false) }
 
@@ -255,7 +259,7 @@ fun Navigation() {
                             1,
                             isDarkTheme = isDarkTheme,
                         )
-                        chatScreen(isDarkTheme, curRoute, navController)
+                        chatScreen(isDarkTheme, curRoute, navController, currentChatAndParticipant)
                     }
                 }
                 composable(Screen.Matches.name) {
@@ -267,17 +271,18 @@ fun Navigation() {
                             2,
                             isDarkTheme = isDarkTheme,
                         )
-                        matchScreen(isDarkTheme, curRoute, navController)
+                        matchScreen(isDarkTheme, curRoute, navController, currentChatAndParticipant)
                     }
                 }
                 composable(Screen.Chat.name) {
                     Column {
                         isVisible = false
+                        showChatInput = true
                         ChatTopNavigation(
                             curRoute = curRoute,
                             navController = navController
                         )
-                        conversationWindow()
+                        conversationWindow(currentChatAndParticipant, )
                     }
                 }
                 composable(Screen.Login.name){

@@ -28,14 +28,17 @@ import com.example.synder.models.Message
 import com.example.synder.screen.profile.ProfileViewModel
 import android.util.Log
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import com.example.synder.models.ChatAndParticipant
+import com.example.synder.models.UserProfile
 import java.text.SimpleDateFormat
 import java.util.Date
 
 
 @Composable
-fun chatScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
-               chatViewModel: ChatViewModel = hiltViewModel()
+fun chatScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController,
+               userInChat: ChatAndParticipant,
+               chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
 
 ) {
     val chatsList = chatViewModel.chatsCache.values.toList()
@@ -65,8 +68,10 @@ fun chatScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostCon
 
 }
 @Composable
-fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController, modifier: Modifier = Modifier,
-                chatViewModel: ChatViewModel = hiltViewModel()) {
+fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController,
+                userInChat: ChatAndParticipant,
+                chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
+) {
 
     val userList = chatViewModel.usersCache.values.toList()
     Log.d("Liste med USERS:", "$userList")
@@ -97,33 +102,45 @@ fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostCo
 
 
 @Composable
-fun conversationWindow(modifier: Modifier = Modifier) {
-    val messages = listOf(
-        Message("Christine", "Hello", "4:00PM", false),
-        Message("Du", "Hvordan går det?", "4:01PM", true),
-        Message("Christine", "Ja", "4:00PM", false),
-        Message("Du", "Ser du er interessert i å ha en samtale ass", " 4:01PM", true),
-        Message("Christine", "Ja", "4:00PM", false),
-        Message("Du", ":|", "4:01PM", true),
-        Message("Christine", "Ok", "4:00PM", false),
-        Message("Du", "...", "4:01PM", true),
-        Message("Christine", "hade", "4:00PM", false),
-        )
-    //Column
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+fun conversationWindow(userInChat: ChatAndParticipant,
+                       modifier: Modifier = Modifier,
+                       chatViewModel: ChatViewModel = hiltViewModel()) {
+    // Mapp meldinger fra ChatAndParticipant til Message objekter og sjekk hvem som sendte dem
+    val messages = userInChat.chat.messages.map { firebaseMessage ->
+        // Finn brukerprofilen i cachen ved hjelp av userId fra meldingen
+        val userProfile = chatViewModel.usersCache[firebaseMessage.userId]
 
-        items(messages) { it ->
-            Message(it)
+        // Sjekk om den innloggede brukeren sendte meldingen
+        val sentByUser = firebaseMessage.userId == chatViewModel.accountService.currentUserId
+        // Opprett et Message objekt med informasjonen
+        Message(
+            id = firebaseMessage.id,
+            userId = userProfile?.name ?: "Ukjent bruker",
+            userProfile = userInChat.user1,
+            text = firebaseMessage.text,
+            sent = firebaseMessage.sent,
+            sentByUser = sentByUser
+        )
+    }
+
+    // LazyColumn for å vise listen over meldinger
+    LazyColumn(modifier = modifier.fillMaxSize()) {
+        items(messages) { message ->
+            Message(message, if (message.userId === userInChat.user1.id) userInChat.user1.name else userInChat.user2.name) // Pass på å bruke de riktige parameterne for MessageCard
         }
 
         item {
-            PageEnd(textcontent = "Siste melding4:00PM")
+            // Vis en footer med tidspunktet for den siste meldingen, eller en annen beskjed hvis det ikke er noen meldinger
+            val textContent = if (messages.isNotEmpty()) {
+                "Siste melding ${messages.last().sent}"
+            } else {
+                "Ingen meldinger enda"
+            }
+            PageEnd(textcontent = textContent)
         }
     }
 }
+
 
 @Composable
 fun PageStart (title: String) {
