@@ -14,4 +14,6 @@ interface StorageService {
 
     suspend fun saveLikedUser(userId: String, likedUserId: String)
     suspend fun saveDislikedUser(userId: String, dislikedUserId: String)
+
+    suspend fun updateMatches(userId: String, matchedUserId: String)
 }

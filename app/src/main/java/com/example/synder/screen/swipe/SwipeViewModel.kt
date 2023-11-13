@@ -50,27 +50,14 @@ class SwipeViewModel @Inject constructor(
         }
     }
 
-    /*suspend fun loadSortedProfiles(){
-        val currentUserId = accountService.currentUserId
-        if (currentUserId != null){
-            val profileList = storageService.users.collect(users.value)
-            val currentUser = storageService.getUser(currentUserId)
-
-            val lookingForPreference = currentUser?.serEtter?: ""
-
-            val filteredProfiles = profileList.filter { profile ->
-                profile.
-            }
-        }
-    }*/
-
     suspend fun checkForMatch(targetUserId: String){
         val currentUserId = accountService.currentUserId
         val targetUser = storageService.getUser(targetUserId)
 
         if (targetUser?.likedUsers?.contains(currentUserId) == true){
             Log.d("Matching", "Match found between $currentUserId and $targetUserId")
-            
+            storageService.updateMatches(currentUserId, targetUserId)
+
         }
 
     }

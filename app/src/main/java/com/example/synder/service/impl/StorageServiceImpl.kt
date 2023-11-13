@@ -38,6 +38,14 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         userDoc.update("dislikedUsers", FieldValue.arrayUnion(dislikedUserId)).await()
     }
 
+    override suspend fun updateMatches(userId: String, matchedUserId: String){
+        val userDoc = firestore.collection(USERS).document(userId)
+        userDoc.update("matches", FieldValue.arrayUnion(matchedUserId)).await()
+
+        val matchedUserDoc = firestore.collection(USERS).document(matchedUserId)
+        matchedUserDoc.update("matches", FieldValue.arrayUnion(userId)).await()
+    }
+
 
 
     companion object {

@@ -12,5 +12,6 @@ data class UserProfile(
     val kjonn: String = "",
     val serEtter: String = "",
     val likedUsers: List<String> = emptyList(),
-    val dislikedUsers: List<String> = emptyList()
+    val dislikedUsers: List<String> = emptyList(),
+    val matches: List<String> = emptyList()
 )
