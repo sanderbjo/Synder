@@ -1,5 +1,7 @@
 package com.example.synder.screen.sign_up
 
+import android.util.Size
+
 data class SignUpUiState(
     val email: String = "",
     val password: String = "",
@@ -12,4 +14,6 @@ data class SignUpUiState(
     val kjonn: String  = "",
     val serEtter: String = "",
 
-)
+    val kjonnDropdownEnabled: Boolean = false,
+    val serEtterDropdownEnabled: Boolean = false
+    )

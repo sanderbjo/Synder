@@ -2,7 +2,9 @@ package com.example.synder.screen.sign_up
 
 import android.view.Display
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,17 +12,24 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -82,8 +92,8 @@ fun SignUpScreen(
         NameField(uiState.name, viewModel::onNameChange, fieldModifier )
         AgeField(uiState.age, viewModel::onAgeChange, fieldModifier )
         BioField(uiState.bio, viewModel::onBioChange, fieldModifier )
-        KjonnField(uiState.kjonn, viewModel::onKjonnChange, fieldModifier )
-        SerEtterField(uiState.serEtter, viewModel::onSerEtterChange, fieldModifier )
+        KjonnField(uiState.kjonn, uiState.kjonnDropdownEnabled ,viewModel::onKjonnEnabledChange,viewModel::onKjonnChange , fieldModifier )
+        SerEtterField(uiState.serEtter, uiState.serEtterDropdownEnabled,viewModel::onSerEtterEnabledChange, viewModel::onSerEtterChange, fieldModifier )
 
         Spacer(modifier = Modifier.padding(bottom = 80.dp))
         Text(text = "Du må ha fylt ut alle feltene med * for å lage konto")
@@ -223,26 +233,104 @@ fun BioField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = M
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun KjonnField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-    OutlinedTextField(
-        singleLine = true,
-        modifier = modifier,
-        value = value,
-        onValueChange = { onNewValue(it) },
-        placeholder = { Text(text = "kjønn*") },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") }
-    )
+fun KjonnField(value: String, enabled: Boolean ,onEnabledChange: (Boolean) -> Unit, onNewValue: (String) -> Unit , modifier: Modifier = Modifier) {
+
+    //for enkelhets skyld bare mann og kvinne
+    val kjonn = listOf("Mann", "Kvinne")
+
+    ExposedDropdownMenuBox(
+        expanded = enabled,
+        onExpandedChange = { newValue ->
+            onEnabledChange(!enabled)
+        },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            singleLine = true,
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = enabled)
+                    },
+            placeholder = { Text(text = "kjønn*") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+
+        )
+        ExposedDropdownMenu(
+            expanded = enabled,
+            onDismissRequest = { onEnabledChange(!enabled) },
+        ) {
+            kjonn.forEach{
+                DropdownMenuItem(
+                    text = { Text(text = it) },
+                    onClick = {
+                        onNewValue(it)
+                        onEnabledChange(!enabled)
+                    }
+                )
+            }
+        }
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SerEtterField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-    OutlinedTextField(
+fun SerEtterField(value: String, enabled: Boolean ,onEnabledChange: (Boolean) -> Unit, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
+
+    /*OutlinedTextField(
         singleLine = true,
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
         placeholder = { Text(text = "hvem kjønn ser du etter?*") },
         leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") }
-    )
+    )*/
+
+
+    //for enkelhets skyld bare mann og kvinne
+    val kjonn = listOf("Mann", "Kvinne")
+
+    ExposedDropdownMenuBox(
+        expanded = enabled,
+        onExpandedChange = { newValue ->
+            onEnabledChange(!enabled)
+        },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            singleLine = true,
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = enabled)
+            },
+            placeholder = { Text(text = "hvem kjønn ser du etter?*") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+
+        )
+        ExposedDropdownMenu(
+            expanded = enabled,
+            onDismissRequest = { onEnabledChange(!enabled) },
+        ) {
+            kjonn.forEach{
+                DropdownMenuItem(
+                    text = { Text(text = it) },
+                    onClick = {
+                        onNewValue(it)
+                        onEnabledChange(!enabled)
+                    }
+                )
+            }
+        }
+    }
 }

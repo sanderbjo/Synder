@@ -32,8 +32,6 @@ class SignUpViewModel @Inject constructor( private val accountService: AccountSe
     private val serEtter
         get() = uiState.value.serEtter
 
-    var active by mutableStateOf(false)
-
 
     fun onEmailChange(newValue: String) {
         uiState.value = uiState.value.copy(email = newValue)
@@ -63,8 +61,16 @@ class SignUpViewModel @Inject constructor( private val accountService: AccountSe
         uiState.value = uiState.value.copy(kjonn = newValue)
     }
 
+    fun onKjonnEnabledChange(newValue: Boolean) {
+        uiState.value = uiState.value.copy(kjonnDropdownEnabled = newValue)
+    }
+
     fun onSerEtterChange(newValue: String) {
         uiState.value = uiState.value.copy(serEtter = newValue)
+    }
+
+    fun onSerEtterEnabledChange(newValue: Boolean) {
+        uiState.value = uiState.value.copy(serEtterDropdownEnabled = newValue)
     }
 
     fun onProfileImageUrisChange(newValue: String) {
