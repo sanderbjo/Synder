@@ -9,6 +9,7 @@ import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.ChatsFromFirebase
 import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
+import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-        private val storageService: StorageService
+        private val storageService: StorageService,
+        private val accountService: AccountService
         ) : ViewModel() {
         val chat = mutableStateOf(ChatsFromFirebase())
         val user1 = mutableStateOf(UserProfile())
@@ -39,9 +41,17 @@ class ChatViewModel @Inject constructor(
                         }
                 }
                 viewModelScope.launch {
+                        // Fetch the current user ID
+                        val currentUserId = accountService.currentUserId
+
                         storageService.chats.collect { chatList ->
-                                chatList.forEach { chat ->
-                                        val chot = ChatAndParticipant(
+                                // Filter the chatList to only include chats where the current user is either user1 or user2
+                                val relevantChats = chatList.filter { chat ->
+                                        chat.userId1 == currentUserId || chat.userId2 == currentUserId
+                                }
+
+                                relevantChats.forEach { chat ->
+                                        val chatWithParticipant = ChatAndParticipant(
                                                 id = chat.id,
                                                 chat = chat,
                                                 user1 = usersCache[chat.userId1] ?: UserProfile(),
@@ -49,15 +59,14 @@ class ChatViewModel @Inject constructor(
                                                 latestmessage = chat.latestmessage.toString()
                                         )
 
-                                        // Legg til i cache om nødvendig
-                                        chatsCache[chat.id] = chot
-                                        Log.d("ID3: ", chat.toString())
-                                        Log.d("ID3: ", chatsCache.toString())
+                                        // Update the cache with the relevant chats only
+                                        chatsCache[chat.id] = chatWithParticipant
+                                        Log.d("ID3: ", chatWithParticipant.toString())
                                 }
+
+                                // If you need to log the entire cache, do it outside the forEach loop
+                                Log.d("ChatsCache: ", chatsCache.toString())
                         }
-
-
-
                 }
         }
 
