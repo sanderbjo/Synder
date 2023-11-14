@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -81,8 +82,10 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     val currentUser = profiles.getOrNull(currentUserIndex)
     val nextUser = profiles.getOrNull(nextValueIndex)
 
-    var swipeOffset by remember { mutableIntStateOf(0) }
+    var swipeOffsetX by remember { mutableIntStateOf(0) }
+    var swipeOffsetY by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
+    val screenHeight = getScreenHeightInt()
     var delayIncrement by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -109,7 +112,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 IconButton(
                     onClick = {
                         onDislike()
-                        swipeOffset = -screenWidth
+                        swipeOffsetX = -screenWidth
+                        swipeOffsetY = 50
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
@@ -124,7 +128,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 IconButton(
                     onClick = {
                         onSuperLike()
-                        swipeOffset = screenWidth
+                        swipeOffsetY = -screenHeight
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
@@ -139,7 +143,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 IconButton(
                     onClick = {
                         onLike()
-                        swipeOffset = screenWidth
+                        swipeOffsetX = screenWidth
+                        swipeOffsetY = 50
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
@@ -154,9 +159,9 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     }
 
     @Composable
-    fun profileCard(userProfile: UserProfile, swipeOffset: Int, modifier: Modifier) {
-        val offsetXState by animateIntOffsetAsState(
-            targetValue = IntOffset(swipeOffset, 0),
+    fun profileCard(userProfile: UserProfile, swipeOffsetX: Int, swipeOffsetY: Int, modifier: Modifier) {
+        val offsetState by animateIntOffsetAsState(
+            targetValue = IntOffset(swipeOffsetX, swipeOffsetY),
             animationSpec = TweenSpec(durationMillis = 250)
         )
         val swipeableState = rememberSwipeableState(0)
@@ -167,7 +172,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxHeight()
                 .padding(16.dp)
-                .offset { offsetXState }
+                .offset { offsetState }
                 .swipeable(
                     state = swipeableState,
                     anchors = anchors,
@@ -305,13 +310,15 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                             if (index <= profiles.size - 2) {
                                 profileCard(
                                     userProfile = profiles[nextValueIndex],
-                                    swipeOffset = 0,
+                                    swipeOffsetX = 0,
+                                    swipeOffsetY = 0,
                                     modifier = Modifier.zIndex(0f)
                                 )
                             }
                             profileCard(
                                 userProfile = profiles[currentUserIndex],
-                                swipeOffset = swipeOffset,
+                                swipeOffsetX = swipeOffsetX,
+                                swipeOffsetY = swipeOffsetY,
                                 modifier = Modifier.zIndex(1f)
                             )
 
@@ -367,7 +374,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             currentUserIndex ++
             nextValueIndex++
 
-            swipeOffset = 0
+            swipeOffsetX = 0
+            swipeOffsetY = 0
             delayIncrement = false
         }
     }
@@ -416,6 +424,13 @@ fun getScreenWidthInt(): Int {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current.density
     return (configuration.screenWidthDp * density).toInt()
+}
+
+@Composable
+fun getScreenHeightInt(): Int {
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current.density
+    return (configuration.screenHeightDp * density).toInt()
 }
 
 
