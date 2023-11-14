@@ -1,5 +1,6 @@
 package com.example.synder.screen.swipe
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -22,6 +23,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Face
@@ -30,10 +34,10 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,10 +46,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -59,12 +63,13 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.compose.md_theme_light_onSecondary
-import com.example.compose.md_theme_light_secondary
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
@@ -79,6 +84,17 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     var swipeOffset by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
     var delayIncrement by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = viewModel.snackbarHostState
+
+
+    viewModel.onSnackbarTriggered = {
+        scope.launch {
+            triggerSnackbar(snackbarHostState = snackbarHostState)
+        }
+    }
+
 
 
     @Composable
@@ -273,72 +289,77 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     }
 
     if (profiles.isNotEmpty()) {
-        LazyColumn(
+        Scaffold(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
         ) {
-            items(profiles.size) { index ->
-                Box {
-                    if (index == currentUserIndex && index <= profiles.size) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(profiles.size) { index ->
+                    Box {
+                        if (index == currentUserIndex && index <= profiles.size) {
 
-                        if (index <= profiles.size - 2) {
+                            if (index <= profiles.size - 2) {
+                                profileCard(
+                                    userProfile = profiles[nextValueIndex],
+                                    swipeOffset = 0,
+                                    modifier = Modifier.zIndex(0f)
+                                )
+                            }
                             profileCard(
-                                userProfile = profiles[nextValueIndex],
-                                swipeOffset = 0,
-                                modifier = Modifier.zIndex(0f)
+                                userProfile = profiles[currentUserIndex],
+                                swipeOffset = swipeOffset,
+                                modifier = Modifier.zIndex(1f)
                             )
-                        }
-                        profileCard(
-                            userProfile = profiles[currentUserIndex],
-                            swipeOffset = swipeOffset,
-                            modifier = Modifier.zIndex(1f)
-                        )
 
-                        if (index >= profiles.size - 1) {
-                            nextValueIndex = 0
+                            if (index >= profiles.size - 1) {
+                                nextValueIndex = 0
+                            }
                         }
                     }
                 }
-            }
-            item {
-                if (currentUserIndex == profiles.size) {
-                    endOfListCard()
+                item {
+                    if (currentUserIndex == profiles.size) {
+                        endOfListCard()
+                    }
                 }
-            }
 
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                ) {
-                    likeDislikeButtons(
-                        onLike = {
-                            if (currentUser != null) {
-                                currentUser?.id?.let { viewModel.likeUser(it) }
-                            }
-                            delayIncrement = true
-                        },
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    ) {
+                        likeDislikeButtons(
+                            onLike = {
+                                if (currentUser != null) {
+                                    currentUser?.id?.let { viewModel.likeUser(it) }
+                                }
+                                delayIncrement = true
+                            },
 
-                        onDislike = {
-                            if (currentUser != null) {
-                                currentUser?.id?.let { viewModel.dislikeUser(it) }
-                            }
-                            delayIncrement = true
-                        },
-                        onSuperLike = {
-                            if (currentUser != null) {
-                                currentUser?.id?.let { viewModel.likeUser(it) }
-                            }
-                            delayIncrement = true
-                        })
+                            onDislike = {
+                                if (currentUser != null) {
+                                    currentUser?.id?.let { viewModel.dislikeUser(it) }
+                                }
+                                delayIncrement = true
+                            },
+                            onSuperLike = {
+                                if (currentUser != null) {
+                                    currentUser?.id?.let { viewModel.likeUser(it) }
+                                }
+                                delayIncrement = true
+                            })
+                    }
                 }
             }
         }
-
     }
+
 
     LaunchedEffect(delayIncrement){
         if (delayIncrement) {
@@ -381,6 +402,13 @@ fun endOfListCard(){
         }
     }
 
+}
+
+suspend fun triggerSnackbar(snackbarHostState: SnackbarHostState){
+    snackbarHostState.showSnackbar(
+        message = "Du har matchet med en Synder!",
+        duration = SnackbarDuration.Short
+    )
 }
 
 @Composable

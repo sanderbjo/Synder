@@ -1,8 +1,7 @@
 package com.example.synder.screen.swipe
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,11 +10,8 @@ import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.io.path.fileVisitor
-
 
 @HiltViewModel
 class SwipeViewModel @Inject constructor(
@@ -25,6 +21,9 @@ class SwipeViewModel @Inject constructor(
     val users = MutableStateFlow<List<UserProfile>>(emptyList())
     var currentUserIndex = mutableIntStateOf(0)
     var nextUserIndex = mutableIntStateOf(currentUserIndex.value + 1)
+
+    val snackbarHostState = SnackbarHostState()
+    var onSnackbarTriggered: (() -> Unit)? = null
 
 
 
@@ -50,6 +49,15 @@ class SwipeViewModel @Inject constructor(
         }
     }
 
+
+
+    /*suspend fun triggerSnackbar(){
+        snackbarHostState.showSnackbar(
+            message = "Du har matchet med en Synder!",
+            duration = SnackbarDuration.Short
+        )
+    }*/
+
     suspend fun checkForMatch(targetUserId: String){
         val currentUserId = accountService.currentUserId
         val targetUser = storageService.getUser(targetUserId)
@@ -57,6 +65,7 @@ class SwipeViewModel @Inject constructor(
         if (targetUser?.likedUsers?.contains(currentUserId) == true){
             Log.d("Matching", "Match found between $currentUserId and $targetUserId")
             storageService.updateMatches(currentUserId, targetUserId)
+            onSnackbarTriggered?.invoke()
 
         }
 
@@ -68,6 +77,8 @@ class SwipeViewModel @Inject constructor(
         return currentUser?.serEtter
 
     }
+
+
     init {
         viewModelScope.launch {
             val lookingForPreference = getLookingForPreference()
