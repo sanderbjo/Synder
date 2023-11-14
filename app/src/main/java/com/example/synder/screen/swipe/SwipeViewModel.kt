@@ -78,25 +78,34 @@ class SwipeViewModel @Inject constructor(
 
     }
 
+    suspend fun getUsersLiked(): List<String>? {
+        val currentUserId = accountService.currentUserId
+        val currentUser = storageService.getUser(currentUserId)
+        return currentUser?.likedUsers
+    }
+
+    suspend fun getUsersDisliked(): List<String>? {
+        val currentUserId = accountService.currentUserId
+        val currentUser = storageService.getUser(currentUserId)
+        return currentUser?.dislikedUsers
+    }
+
+
 
     init {
         viewModelScope.launch {
             val lookingForPreference = getLookingForPreference()
+            val likedUsers = getUsersLiked() ?: emptyList()
+            val dislikedUsers = getUsersDisliked() ?: emptyList()
             storageService.users.collect { profiles ->
                 val filteredAndSortedProfiles = profiles
                     .filter { profile ->
-                        profile.kjonn == lookingForPreference
+                        profile.kjonn == lookingForPreference /*&&
+                                profile.id !in likedUsers &&
+                                profile.id !in dislikedUsers                Add this to implement filter based on people liked/disliked*/
                     }
                 users.value = filteredAndSortedProfiles
 
-                /*if (filteredAndSortedProfiles.isNotEmpty()){
-                    if (nextUserIndex.value >= filteredAndSortedProfiles.size - 1){
-                        currentUserIndex.value = 0
-                        nextUserIndex.value = 0
-
-
-                    }
-                }*/
             }
 
         }
