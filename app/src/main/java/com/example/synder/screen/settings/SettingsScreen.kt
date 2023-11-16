@@ -33,8 +33,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit){
     val viewModel: SettingsViewModel = hiltViewModel()
 
-
-    val volumeLevel by viewModel.volumeLevel
+    val volumeLevel by remember { mutableStateOf(viewModel.volumeLevel).value }
     LazyColumn(){
         item{
             SwitchSettingItem(
@@ -60,10 +59,6 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit){
                     viewModel.setVolumeLevel(newVolumeLevel)
                 })
         }
-
-
-
-
     }
 
 }
@@ -162,9 +157,3 @@ fun SettingItem(
     }
 }
 
-/*@Preview
-@Composable
-fun previewSettings(){
-    SynderTheme {
-        SettingsScreen()
-    }*/

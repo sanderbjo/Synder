@@ -16,7 +16,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(private val context : Context) : ViewModel(){
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    private val _volumeLevel = mutableIntStateOf(50)
+    private val _volumeLevel = mutableIntStateOf(getMediaVolume())
     val volumeLevel: State<Int> = _volumeLevel
 
     fun setVolumeLevel(newVolumeLevel: Int){
@@ -25,30 +25,12 @@ class SettingsViewModel @Inject constructor(private val context : Context) : Vie
     }
 
 
-    fun increaseVolume() {
-        val currentVolume = getMediaVolume()
-        if (currentVolume < 100) {
-            val newVolume = currentVolume + 10
-            setMediaVolume(newVolume)
-            _volumeLevel.value = newVolume
-        }
-    }
-
-    fun decreaseVolume() {
-        val currentVolume = getMediaVolume()
-        if (currentVolume > 0) {
-            val newVolume = currentVolume - 10
-            setMediaVolume(newVolume)
-            _volumeLevel.value = newVolume
-        }
-    }
-
     private fun setMediaVolume(volumelevel: Int){
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val scaledVolume = (volumelevel * maxVolume) / 100
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, scaledVolume, 0)
     }
-    private fun getMediaVolume(): Int {
+    fun getMediaVolume(): Int {
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         return (currentVolume * 100) / maxVolume
