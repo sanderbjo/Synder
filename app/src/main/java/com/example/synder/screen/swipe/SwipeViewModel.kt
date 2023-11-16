@@ -20,7 +20,7 @@ class SwipeViewModel @Inject constructor(
 ) : ViewModel() {
     val users = MutableStateFlow<List<UserProfile>>(emptyList())
     var currentUserIndex = mutableIntStateOf(0)
-    var nextUserIndex = mutableIntStateOf(currentUserIndex.value + 1)
+    var nextUserIndex = mutableIntStateOf(currentUserIndex.intValue + 1)
 
     val snackbarHostState = SnackbarHostState()
     var onSnackbarTriggered: (() -> Unit)? = null
@@ -30,35 +30,21 @@ class SwipeViewModel @Inject constructor(
 
     fun likeUser(targetUserId: String){
         val currentUserId = accountService.currentUserId
-        if (currentUserId != null){
-            viewModelScope.launch {
-                storageService.saveLikedUser(currentUserId, targetUserId)
-                checkForMatch(targetUserId)
-            }
+        viewModelScope.launch {
+            storageService.saveLikedUser(currentUserId, targetUserId)
+            checkForMatch(targetUserId)
         }
     }
 
     fun dislikeUser(targetUserId: String){
         val currentUserId = accountService.currentUserId
-        if (currentUserId != null){
-            viewModelScope.launch {
-                storageService.saveDislikedUser(currentUserId, targetUserId)
-
-            }
+        viewModelScope.launch {
+            storageService.saveDislikedUser(currentUserId, targetUserId)
 
         }
     }
 
-
-
-    /*suspend fun triggerSnackbar(){
-        snackbarHostState.showSnackbar(
-            message = "Du har matchet med en Synder!",
-            duration = SnackbarDuration.Short
-        )
-    }*/
-
-    suspend fun checkForMatch(targetUserId: String){
+    private suspend fun checkForMatch(targetUserId: String){
         val currentUserId = accountService.currentUserId
         val targetUser = storageService.getUser(targetUserId)
 
@@ -71,20 +57,20 @@ class SwipeViewModel @Inject constructor(
 
     }
 
-    suspend fun getLookingForPreference(): String? {
+    private suspend fun getLookingForPreference(): String? {
         val currentUserId = accountService.currentUserId
         val currentUser = storageService.getUser(currentUserId)
         return currentUser?.serEtter
 
     }
 
-    suspend fun getUsersLiked(): List<String>? {
+    private suspend fun getUsersLiked(): List<String>? {
         val currentUserId = accountService.currentUserId
         val currentUser = storageService.getUser(currentUserId)
         return currentUser?.likedUsers
     }
 
-    suspend fun getUsersDisliked(): List<String>? {
+    private suspend fun getUsersDisliked(): List<String>? {
         val currentUserId = accountService.currentUserId
         val currentUser = storageService.getUser(currentUserId)
         return currentUser?.dislikedUsers

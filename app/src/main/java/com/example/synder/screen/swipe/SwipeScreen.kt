@@ -105,8 +105,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
         if (currentUserIndex < profiles.size) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                /*.background(md_theme_light_secondary)*/,
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 IconButton(
@@ -119,7 +118,6 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear, contentDescription = "Dislike",
-                        //tint = md_theme_light_onSecondary,
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -133,8 +131,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Star, contentDescription = "Super Like"/*,
-                        tint = md_theme_light_onSecondary*/,
+                        imageVector = Icons.Default.Star, contentDescription = "Super Like",
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -150,7 +147,6 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Favorite, contentDescription = "Like",
-                        /*tint = md_theme_light_onSecondary,*/
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -162,7 +158,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     fun profileCard(userProfile: UserProfile, swipeOffsetX: Int, swipeOffsetY: Int, modifier: Modifier) {
         val offsetState by animateIntOffsetAsState(
             targetValue = IntOffset(swipeOffsetX, swipeOffsetY),
-            animationSpec = TweenSpec(durationMillis = 250)
+            animationSpec = TweenSpec(durationMillis = 250), label = "animation"
         )
         val swipeableState = rememberSwipeableState(0)
         val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
@@ -185,24 +181,19 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .padding(16.dp)
-                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }/*,
-                colors = CardDefaults.cardColors(containerColor = md_theme_light_secondary)*/
+                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) },
 
             ) {
                 LaunchedEffect(swipeableState.targetValue) {
                     if (swipeableState.targetValue.toFloat() == -1f) {
-                        if (currentUser != null) {
-                            currentUser?.id?.let { viewModel.likeUser(it) }
-                        }
+                        currentUser?.id?.let { viewModel.likeUser(it) }
                         delay(200)
                         currentUserIndex++
                         nextValueIndex++
 
 
                     } else if (swipeableState.targetValue.toFloat() == 1f) {
-                        if (currentUser != null) {
-                            currentUser?.id?.let { viewModel.dislikeUser(it) }
-                        }
+                        currentUser?.id?.let { viewModel.dislikeUser(it) }
                         delay(200)
                         currentUserIndex++
                         nextValueIndex++
@@ -330,7 +321,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                 }
                 item {
                     if (currentUserIndex == profiles.size) {
-                        endOfListCard()
+                        EndOfListCard()
                     }
                 }
 
@@ -343,22 +334,16 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     ) {
                         likeDislikeButtons(
                             onLike = {
-                                if (currentUser != null) {
-                                    currentUser?.id?.let { viewModel.likeUser(it) }
-                                }
+                                currentUser?.id?.let { viewModel.likeUser(it) }
                                 delayIncrement = true
                             },
 
                             onDislike = {
-                                if (currentUser != null) {
-                                    currentUser?.id?.let { viewModel.dislikeUser(it) }
-                                }
+                                currentUser?.id?.let { viewModel.dislikeUser(it) }
                                 delayIncrement = true
                             },
                             onSuperLike = {
-                                if (currentUser != null) {
-                                    currentUser?.id?.let { viewModel.likeUser(it) }
-                                }
+                                currentUser?.id?.let { viewModel.likeUser(it) }
                                 delayIncrement = true
                             })
                     }
@@ -366,7 +351,6 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             }
         }
     }
-
 
     LaunchedEffect(delayIncrement){
         if (delayIncrement) {
@@ -379,15 +363,11 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
             delayIncrement = false
         }
     }
-
-    /*LaunchedEffect(currentUserIndex){
-        nextValueIndex++
-    }*/
 }
 
 
 @Composable
-fun endOfListCard(){
+fun EndOfListCard(){
     Card(
         modifier = Modifier
             .padding(16.dp)
