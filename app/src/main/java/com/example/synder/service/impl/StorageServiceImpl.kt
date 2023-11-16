@@ -4,6 +4,7 @@ import com.example.synder.models.Chat
 import com.example.synder.models.ChatsFromFirebase
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
@@ -26,6 +27,27 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
 
     override suspend fun getChat(chatId: String): ChatsFromFirebase? =
         firestore.collection(CHATS).document(chatId).get().await().toObject()
+
+
+    override suspend fun saveLikedUser(userId: String, likedUserId: String) {
+        val userDoc = firestore.collection(USERS).document(userId)
+        userDoc.update("likedUsers", FieldValue.arrayUnion(likedUserId)).await()
+    }
+    override suspend fun saveDislikedUser(userId: String, dislikedUserId: String) {
+        val userDoc = firestore.collection(USERS).document(userId)
+        userDoc.update("dislikedUsers", FieldValue.arrayUnion(dislikedUserId)).await()
+    }
+
+    override suspend fun updateMatches(userId: String, matchedUserId: String){
+        val userDoc = firestore.collection(USERS).document(userId)
+        userDoc.update("matches", FieldValue.arrayUnion(matchedUserId)).await()
+
+        val matchedUserDoc = firestore.collection(USERS).document(matchedUserId)
+        matchedUserDoc.update("matches", FieldValue.arrayUnion(userId)).await()
+    }
+
+
+
     companion object {
         private const val USERS = "users"
         private const val CHATS = "chats"
