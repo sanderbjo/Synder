@@ -1,5 +1,6 @@
 package com.example.synder.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,10 +44,12 @@ import com.example.synder.models.UserProfile
 import com.example.synder.screen.ChatList.ChatViewModel
 
 @Composable
-fun Chat(it: ChatAndParticipant = ChatAndParticipant(), currentChatAndParticipant: ChatAndParticipant,
+fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit, it: ChatAndParticipant = ChatAndParticipant(),
          curRoute: String, navController: NavHostController,
          chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val usertoshow = if (it.user1.id != chatViewModel.userId) it.user1 else it.user2
+
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
@@ -55,18 +58,16 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), currentChatAndParticipan
                 RoundedCornerShape(8.dp)
             )
             .clickable {
-                chatViewModel.onChatClicked(it.id, navController, currentChatAndParticipant)
-                // Starter en coroutine når klikkbare er aktivert
-                /*LaunchedEffect(Unit) {
-                    chatViewModel.getChatByIdAndCurrentUserId(it.id)
-                    currentChatAndParticipant = chatViewModel.currentChatClicked.value
+                val path = chatViewModel.updateCurrentChat(it)
+                if (path) {
+                    onChatClick(it.id, it)
                     navController.navigate(Screen.Chat.name) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
                         launchSingleTop = true
                     }
-                }*/
+                }
             }
     ) {
         Row (
@@ -76,14 +77,14 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), currentChatAndParticipan
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (it.user1.profileImageUrl != "") {
-                ProfilePicture(ulr = it.user1.profileImageUrl)
+            if (usertoshow.profileImageUrl != "") {
+                ProfilePicture(url = usertoshow.profileImageUrl)
             } else {
-                Monogram(name = it.user1.name)
+                Monogram(name = usertoshow.name)
             }
 
             Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = it.user1.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
+                Text(text = usertoshow.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
                 Text(text = it.latestmessage, fontSize = 16.sp) // Adjust text size as needed
 
                 Card(
@@ -122,7 +123,7 @@ fun Chat(it: UserProfile, currentChatAndParticipant: ChatAndParticipant, curRout
 
         ) {
             if (it.profileImageUrl != "") {
-                ProfilePicture(ulr = it.profileImageUrl)
+                ProfilePicture(url = it.profileImageUrl)
             } else {
                 Monogram(name = it.name)
             }

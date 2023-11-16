@@ -1,5 +1,7 @@
 package com.example.synder.models
 
+import com.example.synder.models.FromFirebase.ChatsFromFirebase
+
 data class ChatAndParticipant(
     val id: String = "",
     val chat: ChatsFromFirebase = ChatsFromFirebase(),

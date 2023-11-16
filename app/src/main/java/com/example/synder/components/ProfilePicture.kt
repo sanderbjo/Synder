@@ -21,10 +21,10 @@ import coil.compose.AsyncImage
 
 
 @Composable
-fun ProfilePicture (ulr: String) {
+fun ProfilePicture (url: String) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(ulr)
+            .data(url)
             .crossfade(true)
             .build(),
 
@@ -45,7 +45,7 @@ fun Monogram(name: String) {
         )
     ) {
         Text(
-            text = "O"/*name.substring(0, 1)*/,
+            text = name.substring(0, 1)/*name.substring(0, 1)*/,
             color = Color.White, // Set text color to white
             fontSize = 24.sp, // Adjust the font size as needed
             modifier = Modifier

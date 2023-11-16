@@ -25,9 +25,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.synder.Screen
+import com.example.synder.models.ChatAndParticipant
 
 @Composable
-fun ChatTopNavigation(curRoute: String, navController: NavHostController) {
+fun ChatTopNavigation(it: ChatAndParticipant, senderId: String, curRoute: String, navController: NavHostController) {
+    val usertoshow = if (it.user1.id != senderId) it.user1 else it.user2
+
     Row(
         modifier = Modifier
             .fillMaxWidth(1f)
@@ -51,11 +54,11 @@ fun ChatTopNavigation(curRoute: String, navController: NavHostController) {
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "Chat med Cathrine 25",
+            text = "Chat med ${usertoshow.name} ${usertoshow.age}",
             fontSize = 22.sp,
         )
         Spacer(modifier = Modifier.weight(1f)) // This spacer will push the Icon to the right
-        Monogram(name = "Cathrine")
+        Monogram(name = usertoshow.name)
         //Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(40.dp).padding(end = 10.dp))
     }
 }

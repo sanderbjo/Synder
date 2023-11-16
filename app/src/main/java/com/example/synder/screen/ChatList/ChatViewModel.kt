@@ -4,18 +4,13 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.example.synder.Screen
-import com.example.synder.models.Chat // Make sure to import the correct Chat model
 import com.example.synder.models.ChatAndParticipant
-import com.example.synder.models.ChatsFromFirebase
-import com.example.synder.models.Message
+import com.example.synder.models.FromFirebase.ChatsFromFirebase
+import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,36 +22,42 @@ class ChatViewModel @Inject constructor(
         val accountService: AccountService
         ) : ViewModel() {
         val chat = mutableStateOf(ChatsFromFirebase())
-        val user1 = mutableStateOf(UserProfile())
-        val user2 = mutableStateOf(UserProfile())
+
         val chats = MutableStateFlow<List<ChatsFromFirebase>>(emptyList())
 
-        var currentChatClicked = mutableStateOf<ChatAndParticipant?>(null)
+        val userId = accountService.currentUserId
+
+        val user1 = mutableStateOf(UserProfile())
+        val user2 = mutableStateOf(UserProfile())
+        private val currentChatIdClicked = mutableStateOf("")
+
+        private val currentChatClicked = mutableStateOf(ChatAndParticipant())
 
         val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
         val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
+        val messagesCache: MutableMap<String, List<MessagesFromFirebase>> = mutableMapOf()
 
         init {
                 viewModelScope.launch {
                         storageService.users.collect { userList ->
                                 userList.forEach { user ->
                                         usersCache[user.id] = user
-                                        Log.d("ID1: ", user.toString())
-                                        Log.d("ID2: ", usersCache.toString())
+                                        Log.d("TESTBR1: ", user.toString())
+                                        Log.d("TESTBR2: ", usersCache.toString())
                                 }
                         }
                 }
                 viewModelScope.launch {
-                        // Fetch the current user ID
                         val currentUserId = accountService.currentUserId
 
                         storageService.chats.collect { chatList ->
-                                // Filter the chatList to only include chats where the current user is either user1 or user2
-                                val relevantChats = chatList.filter { chat ->
-                                        chat.userId1 == currentUserId || chat.userId2 == currentUserId
+                                val relevantChats = chatList.filter {
+                                        it.userId1 == currentUserId || it.userId2 == currentUserId
                                 }
 
                                 relevantChats.forEach { chat ->
+                                        // Anta at storageService har en funksjon for å hente meldinger for en gitt chat
+                                        val messages = storageService.getMessagesForChat(chat.id)
                                         val chatWithParticipant = ChatAndParticipant(
                                                 id = chat.id,
                                                 chat = chat,
@@ -65,15 +66,51 @@ class ChatViewModel @Inject constructor(
                                                 latestmessage = chat.latestmessage.toString(),
                                         )
 
-                                        // Update the cache with the relevant chats only
                                         chatsCache[chat.id] = chatWithParticipant
-                                        Log.d("ID3: ", chatWithParticipant.toString())
+                                        Log.d("TESTCHC11: ", chatWithParticipant.toString())
+                                        Log.d("TESTCHSPES5: ", messages.toString())
                                 }
-
-                                // If you need to log the entire cache, do it outside the forEach loop
                                 Log.d("ChatsCache: ", chatsCache.toString())
                         }
                 }
+
+        }
+
+        suspend fun getMessages(chatId: String): List<MessagesFromFirebase> {
+                // Returnerer cachede meldinger hvis tilgjengelig
+                messagesCache[chatId]?.let { cachedMessages ->
+                        return cachedMessages
+                }
+
+                // Henter meldinger asynkront hvis de ikke er cachet
+                return try {
+                        val messages = storageService.getMessagesForChat(chatId)
+                        messagesCache[chatId] = messages // Oppdaterer cachen
+                        messages // Returnerer de nye meldingene
+                } catch (e: Exception) {
+                        // Logg feilen eller håndter den som nødvendig
+                        emptyList() // Returnerer en tom liste hvis det oppstår en feil
+                }
+        }
+
+        fun getCurrentId(): String {
+                Log.d("TEST HAS HORE1: ", "${currentChatIdClicked.value}")
+                return currentChatIdClicked.value;
+        }
+        fun getCurrentChat(): ChatAndParticipant {
+                Log.d("TEST HAS HORE2: ", "${currentChatClicked.value}")
+                return currentChatClicked.value;
+        }
+        fun updateCurrentChat(newCurrentChat: ChatAndParticipant): Boolean {
+                Log.d("TEST HAS CLICKED: ", "${currentChatClicked.value}")
+                Log.d("TEST HAS CLICKED: ", "${currentChatIdClicked.value}")
+                currentChatClicked.value = newCurrentChat
+                currentChatIdClicked.value = newCurrentChat.id
+
+                Log.d("TEST HAS CLICKED: ", "TRUE")
+                Log.d("TEST HAS CLICKED: ", "${currentChatClicked.value}")
+                Log.d("TEST HAS CLICKED: ", "${currentChatIdClicked.value}")
+                return true;
         }
 
         suspend fun getChatList(): List<ChatAndParticipant> {
@@ -121,8 +158,18 @@ class ChatViewModel @Inject constructor(
                         Log.d("Bruker fra firebase", user1.value.toString())
                 }
         }
+        fun getChatByIdAndCurrentUserId(userId: String): ChatAndParticipant? {
+                val currentUserId = accountService.currentUserId
 
-        suspend fun getChatByIdAndCurrentUserId(userId: String) {
+                // Returnerer første chat som matcher betingelsene, eller null hvis ingen matcher
+                return chatsCache.values.firstOrNull { chatAndParticipant ->
+                        // Sjekker om gitt userId matcher enten user1 eller user2, og om currentUserId matcher den andre brukeren
+                        (chatAndParticipant.user1.id == userId && chatAndParticipant.user2.id == currentUserId) ||
+                                (chatAndParticipant.user2.id == userId && chatAndParticipant.user1.id == currentUserId)
+                }
+        }
+
+        /*suspend fun getChatByIdAndCurrentUserId(userId: String) {
                 // Hent currentUserId asynkront om nødvendig
                 val currentUserId = accountService.currentUserId
 
@@ -134,20 +181,26 @@ class ChatViewModel @Inject constructor(
                                         (chatAndParticipant.user2.id == userId && chatAndParticipant.user1.id == currentUserId)
                         }
                 }
-        }
+        }*/
+
+
 
         // Denne funksjonen starter en coroutine og utfører de nødvendige operasjonene
-        fun onChatClicked(chatId: String, navController: NavController, currentChatAndParticipant: ChatAndParticipant) {
+        /*fun onChatClicked(chatId: String, navController: NavController, currentChatAndParticipant: ChatAndParticipant) {
                 viewModelScope.launch {
                         getChatByIdAndCurrentUserId(chatId)
-                        currentChatAndParticipant = currentChatClicked.value
-                        navController.navigate(Screen.Chat.name) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                        val chatAndParticipant = currentChatClicked.value
+                        if (chatAndParticipant != null) {
+                                currentChatAndParticipant = chatAndParticipant
+                                navController.navigate(Screen.Chat.name) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                        }
+                                        launchSingleTop = true
                                 }
-                                launchSingleTop = true
                         }
                 }
-        }
+        }*/
+
 
 }

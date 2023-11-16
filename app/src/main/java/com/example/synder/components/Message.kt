@@ -44,7 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.example.synder.models.UserProfile
 
 @Composable
-fun Message(it: Message, name: String) {
+fun Message(it: Message) {
         val shape = RoundedCornerShape(
                 topStart = 15.dp,
                 topEnd =  15.dp,
@@ -77,7 +77,11 @@ fun Message(it: Message, name: String) {
                                 verticalAlignment = Alignment.CenterVertically
                         ) {
                                 if (!it.sentByUser) {
-                                        Monogram(name = name)
+                                        if (it.userProfile.profileImageUrl === "") {
+                                                Monogram(name = it.userProfile.name)
+                                        } else {
+                                                ProfilePicture(url = it.userProfile.profileImageUrl)
+                                        }
                                 }
 
                                 Column(
@@ -86,7 +90,7 @@ fun Message(it: Message, name: String) {
                                                 .weight(1f) // Allow the column to take up the available space
                                 ) {
                                         Text(
-                                                text = name + "(${it.sent})",
+                                                text = it.userProfile.name,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 20.sp,
                                                 color = Color.White,
@@ -96,6 +100,15 @@ fun Message(it: Message, name: String) {
                                         Text(
                                                 text = it.text,
                                                 fontSize = 16.sp,
+                                                color = Color.White,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = if (it.sentByUser) TextAlign.End else TextAlign.Start // Align the name text to the right
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                                text = it.sent,
+                                                fontSize = 10.sp,
                                                 color = Color.White,
                                                 maxLines = 2,
                                                 overflow = TextOverflow.Ellipsis,
