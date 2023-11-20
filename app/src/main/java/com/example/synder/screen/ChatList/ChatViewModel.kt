@@ -47,6 +47,10 @@ class ChatViewModel @Inject constructor(
                                         usersCache[user.id] = user
                                         Log.d("TESTBR1: ", user.toString())
                                         Log.d("TESTBR2: ", usersCache.toString())
+                                        if (accountService.currentUserId === user.id) {
+                                                Log.d("TEST userloggedin: ", accountService.currentUserId)
+                                                Log.d("TEST userloggedin: ", userId)
+                                        }
                                 }
                         }
                 }
@@ -68,7 +72,7 @@ class ChatViewModel @Inject constructor(
                                                 user2 = usersCache[chat.userId2] ?: UserProfile(),
                                                 latestmessage = chat.latestmessage.toString(),
                                         )
-
+                                        messagesCache[chat.id] = messages
                                         chatsCache[chat.id] = chatWithParticipant
                                         Log.d("TESTCHC11: ", chatWithParticipant.toString())
                                         Log.d("TESTCHC12: ", chat.id)
@@ -77,16 +81,6 @@ class ChatViewModel @Inject constructor(
                                 Log.d("ChatsCache: ", chatsCache.toString())
                         }
                 }
-
-                /*
-                viewModelScope.launch {
-                        storageService.messages.collect { messageList ->
-                                chatsCache.forEach { (chatId, chat) ->
-                                        val messages = storageService.getMessagesForChat(chatId)
-                                        messagesCache[chatId] = messages
-                                }
-                        }
-                }*/
 
         }
 
@@ -102,11 +96,12 @@ class ChatViewModel @Inject constructor(
 
                         val message = MessagesFromFirebase(
                                 // Du trenger ikke å sette ID her, fordi Firebase vil automatisk generere den
-                                sent = currentTime.toString(),
+                                sent = timeString.toString(),
                                 text = messageText,
                                 userId = userId
                         )
-                        Log.d("CHAT message to send: ", message.toString())
+                        Log.d("CHAT1 id to send: ", currentChatIdClicked.value.toString())
+                        Log.d("CHAT1 message to send: ", message.toString())
                         val success = storageService.sendMessage(currentChatIdClicked.value, message)
 
                         if(success) {
@@ -116,7 +111,6 @@ class ChatViewModel @Inject constructor(
                                 Log.d("CHAT FAIL:", success.toString())
                                 // Håndter feil
                         }
-                        /**/
                 }
         }
 
@@ -158,6 +152,10 @@ class ChatViewModel @Inject constructor(
                 return true;
         }
 
+        fun upadeCurrentId (newCurrentId: String) {
+                currentChatIdClicked.value = newCurrentId;
+        }
+
         suspend fun getChatList(): List<ChatAndParticipant> {
                 val chatAndParticipantList = mutableListOf<ChatAndParticipant>()
 
@@ -176,7 +174,6 @@ class ChatViewModel @Inject constructor(
                                 chatsCache[chat.id] = chot
                         }
                 }
-
                 return chatAndParticipantList
         }
 
@@ -188,7 +185,7 @@ class ChatViewModel @Inject constructor(
                 }
         }
         fun getChatById(chatId: String) {
-                val chatId = "YhsAJ6tRK4S4QDOcaZ2n"
+                //val chatId = "YhsAJ6tRK4S4QDOcaZ2n"
                 viewModelScope.launch {
                         chat.value = storageService.getChat(chatId) ?: ChatsFromFirebase()
                 }
@@ -213,39 +210,4 @@ class ChatViewModel @Inject constructor(
                                 (chatAndParticipant.user2.id == userId && chatAndParticipant.user1.id == currentUserId)
                 }
         }
-
-        /*suspend fun getChatByIdAndCurrentUserId(userId: String) {
-                // Hent currentUserId asynkront om nødvendig
-                val currentUserId = accountService.currentUserId
-
-                // Bruk en coroutine for å utføre søket asynkront
-                coroutineScope {
-                        // Finn og tilordne den første chatten som matcher betingelsene
-                        currentChatClicked.value = chatsCache.values.firstOrNull { chatAndParticipant ->
-                                (chatAndParticipant.user1.id == userId && chatAndParticipant.user2.id == currentUserId) ||
-                                        (chatAndParticipant.user2.id == userId && chatAndParticipant.user1.id == currentUserId)
-                        }
-                }
-        }*/
-
-
-
-        // Denne funksjonen starter en coroutine og utfører de nødvendige operasjonene
-        /*fun onChatClicked(chatId: String, navController: NavController, currentChatAndParticipant: ChatAndParticipant) {
-                viewModelScope.launch {
-                        getChatByIdAndCurrentUserId(chatId)
-                        val chatAndParticipant = currentChatClicked.value
-                        if (chatAndParticipant != null) {
-                                currentChatAndParticipant = chatAndParticipant
-                                navController.navigate(Screen.Chat.name) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                        }
-                                        launchSingleTop = true
-                                }
-                        }
-                }
-        }*/
-
-
 }

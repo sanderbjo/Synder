@@ -311,6 +311,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                             delay(1000) // Venter i et sekund
                             showConversationWindow.value = true
                             messages.addAll(chatViewModel.getMessages(id))
+                            chatViewModel.upadeCurrentId(id)
                         }
 
                         // Vis lasteikon hvis showConversationWindow er false, ellers vis conversationWindow
