@@ -45,7 +45,7 @@ fun Monogram(name: String) {
         )
     ) {
         Text(
-            text = name.substring(0, 1)/*name.substring(0, 1)*/,
+            text = "O"/*name.substring(0, 1)*/,
             color = Color.White, // Set text color to white
             fontSize = 24.sp, // Adjust the font size as needed
             modifier = Modifier

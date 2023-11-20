@@ -2,6 +2,7 @@ package com.example.synder.service.impl
 
 import com.example.synder.models.FromFirebase.ChatsFromFirebase
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
+import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,6 +19,9 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         get() = firestore.collection(USERS).dataObjects()
     override val chats: Flow<List<ChatsFromFirebase>>
         get() = firestore.collection(CHATS).dataObjects()
+    override val messages: Flow<List<List<MessagesFromFirebase>>>
+        get() = firestore.collection(CHATS).dataObjects() ///FÅ MELDINGENE I EN CACHE; SLIK AT DE AUTOMATISK OPPDATERES MED FIREBASE
+
 
     override suspend fun getMessagesForChat(chatId: String): List<MessagesFromFirebase> {
         val messages = mutableListOf<MessagesFromFirebase>()
@@ -31,6 +35,17 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         }
         return messages
     }
+
+    override suspend fun sendMessage(chatId: String, message: MessagesFromFirebase): Boolean {
+        return try {
+            firestore.collection("chats").document(chatId)
+                .collection("messages").add(message).await()
+            true // Melding ble sendt
+        } catch (e: Exception) {
+            false // error lr no CHATFAIL
+        }
+    }
+
 
 
     override suspend fun getUser(userId: String): UserProfile? =

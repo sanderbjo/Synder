@@ -13,6 +13,9 @@ import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -68,13 +71,55 @@ class ChatViewModel @Inject constructor(
 
                                         chatsCache[chat.id] = chatWithParticipant
                                         Log.d("TESTCHC11: ", chatWithParticipant.toString())
+                                        Log.d("TESTCHC12: ", chat.id)
                                         Log.d("TESTCHSPES5: ", messages.toString())
                                 }
                                 Log.d("ChatsCache: ", chatsCache.toString())
                         }
                 }
 
+                /*
+                viewModelScope.launch {
+                        storageService.messages.collect { messageList ->
+                                chatsCache.forEach { (chatId, chat) ->
+                                        val messages = storageService.getMessagesForChat(chatId)
+                                        messagesCache[chatId] = messages
+                                }
+                        }
+                }*/
+
         }
+
+        fun sendMessage(messageText: String) {
+                viewModelScope.launch {
+
+                        val userId = accountService.currentUserId
+                        val currentTime = System.currentTimeMillis()
+                        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                        val timeString = dateFormat.format(Date(currentTime))
+                        Log.d("CURRTIME: ", timeString)
+
+
+                        val message = MessagesFromFirebase(
+                                // Du trenger ikke å sette ID her, fordi Firebase vil automatisk generere den
+                                sent = currentTime.toString(),
+                                text = messageText,
+                                userId = userId
+                        )
+                        Log.d("CHAT message to send: ", message.toString())
+                        val success = storageService.sendMessage(currentChatIdClicked.value, message)
+
+                        if(success) {
+                                // Meldingen ble sendt suksessfullt
+                                Log.d("CHAT SUKSESS:", success.toString())
+                        } else {
+                                Log.d("CHAT FAIL:", success.toString())
+                                // Håndter feil
+                        }
+                        /**/
+                }
+        }
+
 
         suspend fun getMessages(chatId: String): List<MessagesFromFirebase> {
                 // Returnerer cachede meldinger hvis tilgjengelig
