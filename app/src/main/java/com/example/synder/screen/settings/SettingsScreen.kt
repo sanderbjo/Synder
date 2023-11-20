@@ -1,5 +1,7 @@
 package com.example.synder.screen.settings
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,13 +28,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 
 @Composable
-fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit){
+fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Context){
     val viewModel: SettingsViewModel = hiltViewModel()
+
+    val scope = rememberCoroutineScope()
 
     val volumeLevel by remember { mutableStateOf(viewModel.volumeLevel).value }
     LazyColumn(){
@@ -57,6 +64,18 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit){
                 volumeLevel = volumeLevel,
                 onVolumeChanged = {newVolumeLevel ->
                     viewModel.setVolumeLevel(newVolumeLevel)
+                })
+        }
+        item { 
+            SettingItem(
+                label = "Location",
+                onClick = {
+                    val requestCode = 123
+                    scope.launch {
+                        viewModel.requestLocationPermission(context as Activity, requestCode)
+                    }
+
+
                 })
         }
     }

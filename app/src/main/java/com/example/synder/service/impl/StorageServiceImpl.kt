@@ -46,6 +46,11 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         matchedUserDoc.update("matches", FieldValue.arrayUnion(userId)).await()
     }
 
+    override suspend fun updateUserLocation(userid: String, latitude: Double, longitude: Double){
+        val userDoc = firestore.collection(USERS).document(userid)
+        userDoc.update("latitude", latitude, "longitude", longitude).await()
+    }
+
 
 
     companion object {

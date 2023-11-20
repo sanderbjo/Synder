@@ -13,5 +13,8 @@ data class UserProfile(
     val serEtter: String = "",
     val likedUsers: List<String> = emptyList(),
     val dislikedUsers: List<String> = emptyList(),
-    val matches: List<String> = emptyList()
+    val matches: List<String> = emptyList(),
+
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )

@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,6 +78,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 enum class Screen {
     Profile,
@@ -239,7 +241,7 @@ fun Navigation() {
                     isVisible = true
                 }
                 composable(Screen.Settings.name) {
-                    SettingsScreen(isDarkTheme) { toggleTheme() }
+                    SettingsScreen(isDarkTheme, { toggleTheme() }, context = LocalContext.current)
                     isVisible = true
                 }
                 composable(Screen.Swipe.name) {
