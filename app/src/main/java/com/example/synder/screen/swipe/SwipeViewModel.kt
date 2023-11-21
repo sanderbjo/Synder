@@ -2,12 +2,16 @@ package com.example.synder.screen.swipe
 
 import android.util.Log
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.synder.models.Coordinates
 import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
+import com.example.synder.utilities.GeographicalUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -16,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SwipeViewModel @Inject constructor(
     private val storageService: StorageService,
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val geographicalUtils: GeographicalUtils
 ) : ViewModel() {
     val users = MutableStateFlow<List<UserProfile>>(emptyList())
     var currentUserIndex = mutableIntStateOf(0)
@@ -25,8 +30,21 @@ class SwipeViewModel @Inject constructor(
     val snackbarHostState = SnackbarHostState()
     var onSnackbarTriggered: (() -> Unit)? = null
 
+    suspend fun getActiveUserCoordinates(): Coordinates? {
+        val activeUserId = accountService.currentUserId
+        val activeUser = storageService.getUser(activeUserId)
+        return activeUser?.let { Coordinates(it.coordinates.latitude, it.coordinates.longitude) }
+    }
 
+    suspend fun getCurrentUserCoordinates(): Coordinates? {
+        val currentUserId = users.value.getOrNull(currentUserIndex.value)?.id
+        return currentUserId?.let { storageService.getUser(it)}?.let { Coordinates(it.coordinates.latitude, it.coordinates.longitude) }
+    }
 
+    suspend fun getNextUserCoordinates(): Coordinates? {
+        val nextUserId = users.value.getOrNull(nextUserIndex.value)?.id
+        return nextUserId?.let { storageService.getUser(it)}?.let { Coordinates(it.coordinates.latitude, it.coordinates.longitude) }
+    }
 
     fun likeUser(targetUserId: String){
         val currentUserId = accountService.currentUserId

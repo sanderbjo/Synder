@@ -1,6 +1,7 @@
 package com.example.synder.service
 
 import com.example.synder.models.ChatsFromFirebase
+import com.example.synder.models.Coordinates
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.flow.Flow
 
@@ -16,6 +17,6 @@ interface StorageService {
     suspend fun saveDislikedUser(userId: String, dislikedUserId: String)
 
     suspend fun updateMatches(userId: String, matchedUserId: String)
-    suspend fun updateUserLocation(userid: String, latitude: Double, longitude: Double)
+    suspend fun updateUserLocation(userid: String, coordinates: Coordinates)
 
 }

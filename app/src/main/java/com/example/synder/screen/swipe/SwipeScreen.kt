@@ -1,7 +1,6 @@
 package com.example.synder.screen.swipe
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.background
@@ -45,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -59,12 +59,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.synder.models.UserProfile
+import com.example.synder.utilities.GeographicalUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -164,6 +164,22 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
         val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
         val anchors = mapOf(0f to 0, -sizePx to 1, sizePx to -1)
 
+
+        val distanceToCurrentUser by produceState<Int?>(null){
+            value = viewModel.getActiveUserCoordinates()
+                ?.let { GeographicalUtils.calculateDistance(it,
+                    viewModel.getCurrentUserCoordinates()!!
+                ) }
+        }
+
+        val distanceToNextUser by produceState<Int?>(0){
+            value = viewModel.getActiveUserCoordinates()
+                ?.let { GeographicalUtils.calculateDistance(it,
+                    viewModel.getNextUserCoordinates()!!
+                ) }
+        }
+
+
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -220,19 +236,22 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                                     translationX = 0f
                                 })
                         Spacer(modifier = Modifier.height(16.dp))
-                        currentUser?.name?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.headlineSmall
-                            )
+                        Row {
+                            currentUser?.name?.let {
+                                Text(
+                                    text = "$it, ",
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            currentUser?.age?.let {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        currentUser?.age?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        Text(text = "${distanceToCurrentUser.toString()} Km unna deg")
                         Spacer(modifier = Modifier.height(8.dp))
                         currentUser?.bio?.let {
                             Text(
@@ -257,19 +276,23 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                                     translationX = 0f
                                 })
                         Spacer(modifier = Modifier.height(16.dp))
-                        nextUser?.name?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.headlineSmall
-                            )
+                        Row {
+                            nextUser?.name?.let {
+                                Text(
+                                    text = "$it, ",
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            nextUser?.age?.let {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        nextUser?.age?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        Text(text = "${distanceToNextUser.toString()} Km unna deg")
                         Spacer(modifier = Modifier.height(8.dp))
                         nextUser?.bio?.let {
                             Text(

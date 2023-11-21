@@ -1,4 +1,4 @@
-package com.example.synder.utils
+package com.example.synder.utilities
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager

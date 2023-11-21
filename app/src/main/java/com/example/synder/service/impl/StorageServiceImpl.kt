@@ -2,6 +2,7 @@ package com.example.synder.service.impl
 
 import com.example.synder.models.Chat
 import com.example.synder.models.ChatsFromFirebase
+import com.example.synder.models.Coordinates
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import com.google.firebase.firestore.FieldValue
@@ -46,9 +47,14 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         matchedUserDoc.update("matches", FieldValue.arrayUnion(userId)).await()
     }
 
-    override suspend fun updateUserLocation(userid: String, latitude: Double, longitude: Double){
+    /*override suspend fun updateUserLocation(userid: String, latitude: Double, longitude: Double){
         val userDoc = firestore.collection(USERS).document(userid)
         userDoc.update("latitude", latitude, "longitude", longitude).await()
+    }*/
+
+    override suspend fun updateUserLocation(userid: String, coordinates: Coordinates) {
+        val userdoc = firestore.collection(USERS).document(userid)
+        userdoc.update("coordinates", coordinates).await()
     }
 
 

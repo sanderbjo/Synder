@@ -8,9 +8,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.synder.models.Coordinates
 import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
-import com.example.synder.utils.LocationUtils
+import com.example.synder.utilities.LocationUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,13 +43,15 @@ class SettingsViewModel @Inject constructor(
         if (locationUtils.checkLocationPermission()) {
             locationUtils.getCurrentLocation(
                 onLocationResult = { location ->
+                    val coordinates = Coordinates(location.latitude, location.longitude)
                     viewModelScope.launch {
                         storageService.updateUserLocation(
                             userid,
-                            location.latitude,
-                            location.longitude
+                            coordinates
                         )
+                        locationUtils.stopLocationUpdates()
                     }
+
                 },
                 onFailure = { exception ->
                     Log.e("SettingsViewModel", "Failed to get location ${exception.message}")
