@@ -117,7 +117,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val curRoute by rememberUpdatedState(
         newValue = navController.currentBackStackEntryAsState().value?.destination?.route
-            ?: Screen.Login.name
+            ?: Screen.Swipe.name
     )
 
     fun toggleTheme() {
@@ -248,7 +248,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Screen.Swipe.name, //login
+                startDestination = Screen.Login.name, //login
                 modifier = Modifier.padding(innerPadding)
             )
             {
