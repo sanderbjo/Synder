@@ -9,6 +9,7 @@ import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.ChatsFromFirebase
 import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
+import com.example.synder.service.ImgStorageService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-        private val storageService: StorageService
+        private val storageService: StorageService,
+        private val imgStorageService: ImgStorageService
         ) : ViewModel() {
         val chat = mutableStateOf(ChatsFromFirebase())
         val user1 = mutableStateOf(UserProfile())
@@ -27,6 +29,8 @@ class ChatViewModel @Inject constructor(
 
         val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
         val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
+
+        val storageRef = imgStorageService.storageRef
 
         init {
                 viewModelScope.launch {

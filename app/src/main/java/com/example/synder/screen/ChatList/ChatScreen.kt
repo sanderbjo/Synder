@@ -28,6 +28,7 @@ import com.example.synder.models.Message
 import com.example.synder.screen.profile.ProfileViewModel
 import android.util.Log
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.synder.models.ChatAndParticipant
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -65,6 +66,7 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
 
     val userChats = listOf(chatsList) // If you don't want to populate this right now
 
+    val storageRef = chatViewModel.storageRef
 
     Log.d("Liste med chats:", "$chatsList")
 
@@ -98,7 +100,7 @@ fun chatScreen(curRoute: String, navController: NavHostController, modifier: Mod
         }
 
         items(chatsList) { it ->
-            Chat(it, curRoute, navController)
+            Chat(it, curRoute, storageRef , navController)
         }
         /*items(userChats) { it ->
             Chat(it, curRoute, navController)
@@ -122,6 +124,8 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
         Chat("Dudan 19", "Matchet 2 uker siden", "" ),
         Chat("Polkan 23", "Matchet 4 år siden", "" ),
     )
+
+    val storageRef = chatViewModel.storageRef
     //Column
     LazyColumn(
         modifier = Modifier
@@ -133,7 +137,7 @@ fun matchScreen(curRoute: String, navController: NavHostController, modifier: Mo
         }
 
         items(userList) { it ->
-            Chat(it, curRoute, navController)
+            Chat(it, curRoute, storageRef, navController)
         }
 
         item {

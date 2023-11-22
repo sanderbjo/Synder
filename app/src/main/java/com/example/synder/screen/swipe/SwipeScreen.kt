@@ -1,5 +1,6 @@
 package com.example.synder.screen.swipe
 
+import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.background
@@ -56,13 +57,15 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.compose.md_theme_light_onSecondary
 import com.example.compose.md_theme_light_secondary
 import com.example.synder.models.UserProfile
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
 
@@ -77,6 +80,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     val screenWidth = getScreenWidthInt()
     var delayIncrement by remember {mutableStateOf(false) }
 
+    val storageRef = viewModel.storageRef
 
 
 
@@ -177,20 +181,35 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         .padding(16.dp)
                 ) {
                     if (userProfile == profiles[currentUserIndex]){
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(currentUser?.profileImageUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "profilbilde",
+                        //AsyncImage(
+                        //    model = ImageRequest.Builder(LocalContext.current)
+                        //        .data(currentUser?.profileImageUrl)
+                        //        .crossfade(true)
+                        //        .build(),
+                        //    contentDescription = "profilbilde",
+                        //    contentScale = ContentScale.Crop,
+                        //    modifier = Modifier
+                        //        .fillMaxWidth()
+                        //        .aspectRatio(1f)
+                        //        .background(MaterialTheme.colorScheme.background)
+                        //        .graphicsLayer {
+                        //            translationX = 0f
+                        //        })
+                        Log.d("hei","${storageRef.child("images/${currentUser?.id}.jpg")}" )
+                        Log.d("hei","$storageRef" )
+
+                        GlideImage(
+                            model = storageRef.child("images/${currentUser?.id}.jpg"),
+                            contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .background(MaterialTheme.colorScheme.background)
-                                .graphicsLayer {
-                                    translationX = 0f
-                                })
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f)
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .graphicsLayer {
+                                        translationX = 0f
+                                    }
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         currentUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -200,12 +219,23 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                     else if (userProfile == profiles[nextValueIndex]){
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(nextUser?.profileImageUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = "profilbilde",
+                        //AsyncImage(
+                        //    model = ImageRequest.Builder(LocalContext.current)
+                        //        .data(nextUser?.profileImageUrl)
+                        //        .crossfade(true)
+                        //        .build(),
+                        //    contentDescription = "profilbilde",
+                        //    contentScale = ContentScale.Crop,
+                        //    modifier = Modifier
+                        //        .fillMaxWidth()
+                        //        .aspectRatio(1f)
+                        //        .background(MaterialTheme.colorScheme.background)
+                        //        .graphicsLayer {
+                        //            translationX = 0f
+                        //        })
+                        GlideImage(
+                            model = storageRef.child("images/${nextUser?.id}.jpg"),
+                            contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -213,7 +243,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                                 .background(MaterialTheme.colorScheme.background)
                                 .graphicsLayer {
                                     translationX = 0f
-                                })
+                                }
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         nextUser?.name?.let { Text(text = it, style = MaterialTheme.typography.headlineSmall) }
                         Spacer(modifier = Modifier.height(8.dp))

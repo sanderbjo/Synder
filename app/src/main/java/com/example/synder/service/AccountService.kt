@@ -1,5 +1,6 @@
 package com.example.synder.service
 
+import android.net.Uri
 import com.example.synder.models.UserProfile
 import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ suspend fun linkAccount(
     name: String,
     age: Float,
     bio: String,
-    profileImageUrl: String,
+    profileImageUri: Uri?,
     kjonn: String,
     serEtter: String,
     onResult: (Throwable?) -> Unit)

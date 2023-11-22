@@ -9,17 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,20 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.synder.Screen
-import com.example.synder.models.Chat
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.UserProfile
+import com.google.firebase.storage.StorageReference
 
 @Composable
-fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navController: NavHostController) {
+fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, storageRef: StorageReference, navController: NavHostController) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
@@ -65,11 +56,10 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navCon
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (it.user1.profileImageUrl != "") {
-                ProfilePicture(ulr = it.user1.profileImageUrl)
-            } else {
-                Monogram(name = it.user1.name)
-            }
+                ProfilePicture(imgReferance = storageRef.child("images/${it.user1.id}.jpg"))
+            //} else {
+            //    Monogram(name = it.user1.name)
+            //}
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.user1.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
@@ -86,7 +76,7 @@ fun Chat(it: ChatAndParticipant = ChatAndParticipant(), curRoute: String, navCon
 }
 
 @Composable
-fun Chat(it: UserProfile, curRoute: String, navController: NavHostController) {
+fun Chat(it: UserProfile, curRoute: String, storageRef: StorageReference, navController: NavHostController) {
     OutlinedCard(
         modifier = Modifier
             .wrapContentHeight()
@@ -111,11 +101,13 @@ fun Chat(it: UserProfile, curRoute: String, navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (it.profileImageUrl != "") {
-                ProfilePicture(ulr = it.profileImageUrl)
-            } else {
-                Monogram(name = it.name)
-            }
+
+            ProfilePicture(imgReferance = storageRef.child("images/${it.id}.jpg"))
+            //if (it.profileImageUrl != null) {
+            //    ProfilePicture(ulr = it.profileImageUrl)
+            //} else {
+            //    Monogram(name = it.name)
+            //}
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size

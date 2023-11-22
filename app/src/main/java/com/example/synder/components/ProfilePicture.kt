@@ -11,28 +11,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.request.ImageRequest
 import coil.compose.AsyncImage
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.google.firebase.storage.StorageReference
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfilePicture (ulr: String) {
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(ulr)
-            .crossfade(true)
-            .build(),
-
+fun ProfilePicture (imgReferance: StorageReference) {
+    GlideImage(
+        model = imgReferance,
         contentDescription = "profilbilde",
         modifier = Modifier.size(50.dp)
             .clip(CircleShape), // Set the size to create a circle
 
     )
+    //AsyncImage(
+    //    model = ImageRequest.Builder(LocalContext.current)
+    //        .data(imgReferance)
+    //        .crossfade(true)
+    //        .build(),
+    //
+    //    contentDescription = "profilbilde",
+    //    modifier = Modifier.size(50.dp)
+    //        .clip(CircleShape), // Set the size to create a circle
+    //)
 }
 @Composable
 fun Monogram(name: String) {
