@@ -10,5 +10,6 @@ data class UserProfile(
     val bio: String = "",
     val profileImageUrl: String = "",
     val kjonn: String = "",
-    val serEtter: String = ""
+    val serEtter: String = "",
+    val matches: List<String> = emptyList()
 )

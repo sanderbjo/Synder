@@ -22,12 +22,20 @@ import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.synder.Screen
+import com.example.synder.components.MatchCard
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
 
 @Composable
-fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit, isDarkTheme: Boolean, curRoute: String, navController: NavHostController,
+fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
+               isDarkTheme: Boolean,
+               navController: NavHostController,
                userInChat: ChatAndParticipant,
                chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
 
@@ -49,9 +57,7 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit, isDarkThe
         }
 
         items(chatsList) { it ->
-            Log.d("TESTINDCH11: ", "$it")
-
-            Chat(onChatClick = getChatFromClick, it, curRoute, navController)
+            Chat(onChatClick = getChatFromClick, it, navController)
         }
 
         item {
@@ -62,15 +68,23 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit, isDarkThe
 }
 @Composable
 fun matchScreen(
-    chatId: String,
-    chat: ChatAndParticipant,
-    messages: List<MessagesFromFirebase>,
+    getChatFromClick: (String, ChatAndParticipant) -> Unit,
+    isDarkTheme: Boolean,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
+    /*val matches by chatViewModel.matches.collectAsState()
 
-    val userList = chatViewModel.usersCache.values.toList()
-    Log.d("Liste med USERS:", "$userList")
+    Log.d("Matches: ", matches.toString())
+
+    LaunchedEffect(chatViewModel.userId) {
+        chatViewModel.fetchMatches(chatViewModel.userId)
+    }
+    Log.d("Matches 2:  ", chatViewModel.matchesCache.toString())*/
+    val matchList = chatViewModel.matchesCache.values.toList()
+    val chatMatchCache = chatViewModel.matchChatCache
+    Log.d("P!:Kommer chatter?", chatMatchCache.toString())
 
     //Column
     LazyColumn(
@@ -81,9 +95,38 @@ fun matchScreen(
             PageStart(title = "Syndere")
         }
 
-        /*items(userList) { it ->
-            Chat(it, curRoute, navController)
-        }*/
+        items(matchList) { match ->
+            // Finn matchens ID
+            val matchId = match.id
+            var isNull by remember { mutableStateOf(false) }
+
+            val chatForMatch = chatMatchCache[matchId]
+
+            MatchCard(
+                getChatFromClick = getChatFromClick,
+                ifChatIsNull = { isNull = true },
+                it = match,
+                hasChat = chatForMatch,
+                navController = navController
+            )
+
+            // Hvis shouldCreateChat er true, håndter oppretting av ny chat
+            if (isNull) {
+                LaunchedEffect(match.id) {
+                    val result = chatViewModel.createNewChat(match.id)
+                    result?.let { (chatId, chatAndParticipant) ->
+                        getChatFromClick(chatId, chatAndParticipant)
+                        navController.navigate(Screen.Chat.name) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            }
+        }
+
 
         item {
             PageEnd(textcontent = "Ingen flere Syndere!")
@@ -96,7 +139,6 @@ fun matchScreen(
 fun conversationWindow(
     chatId: String,
     chat: ChatAndParticipant,
-    messages: List<MessagesFromFirebase>,
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {

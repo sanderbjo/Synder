@@ -36,6 +36,7 @@ fun ProfilePicture (url: String, modifierSize: Int = 50) {
 }
 @Composable
 fun Monogram(name: String, modifierSize: Int = 50) {
+    val initial = if (name.isNotEmpty()) name.substring(0, 1) else "?"
     Card(
         modifier = Modifier.size(modifierSize.dp), // Set the size to create a circle
         shape = CircleShape, // Use CircleShape to make the card circular
@@ -45,7 +46,7 @@ fun Monogram(name: String, modifierSize: Int = 50) {
         )
     ) {
         Text(
-            text = name.substring(0, 1)/*name.substring(0, 1)*/,
+            text = initial/*name.substring(0, 1)*/,
             color = Color.White, // Set text color to white
             fontSize = 24.sp, // Adjust the font size as needed
             modifier = Modifier

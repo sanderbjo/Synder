@@ -7,10 +7,12 @@ import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
+import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -67,6 +69,24 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         }
     }
 
+    override fun getMatchesFlowForUser(userId: String): Flow<List<UserProfile>> {
+        return callbackFlow {
+            val subscription = firestore.collection("users").document(userId)
+                .collection("matches") // Antar at det finnes en subcollection "matches"
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        close(e)
+                        return@addSnapshotListener
+                    }
+                    val matchList = snapshot?.documents?.mapNotNull { it.toObject(UserProfile::class.java) }
+                    this.trySend(matchList ?: emptyList()).isSuccess
+                }
+
+            awaitClose { subscription.remove() }
+        }
+    }
+
+
     override suspend fun readChat(chatId: String): Boolean { //viser at bruker har lest chatten
         return try {
             firestore.collection("chats").document(chatId)
@@ -97,6 +117,13 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
             false // error lr no CHATFAIL
         }
     }
+    override suspend fun createChat(newChat: ChatsFromFirebase): String {
+        // Firestore-dokumentet er opprettet og ID-en til det nye dokumentet blir returnert
+        val chatRef = firestore.collection(CHATS).document()
+        chatRef.set(newChat).await() // Lagrer chatten i Firestore
+        return chatRef.id // Returnerer ID-en til det nyopprettede dokumentet
+    }
+
 
     override suspend fun getUser(userId: String): UserProfile? =
         firestore.collection(USERS).document(userId).get().await().toObject()

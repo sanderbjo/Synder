@@ -2,6 +2,7 @@ package com.example.synder
 
 
 import android.os.Bundle
+import android.os.UserHandle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,6 +57,7 @@ import com.example.synder.components.Chatbar
 import com.example.synder.components.SegmentedButton
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
+import com.example.synder.models.UserProfile
 import com.example.synder.screen.ChatList.ChatViewModel
 import com.example.synder.screen.ChatList.chatScreen
 import com.example.synder.screen.ChatList.conversationWindow
@@ -274,7 +276,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                             id = chatId
                             chat = chatData
                         }
-                            , isDarkTheme, curRoute, navController, currentChatAndParticipant)
+                            , isDarkTheme, navController, currentChatAndParticipant)
                     }
                 }
                 composable(Screen.Matches.name) {
@@ -286,7 +288,14 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                             2,
                             isDarkTheme = isDarkTheme,
                         )
-                        matchScreen(isDarkTheme, curRoute, navController, currentChatAndParticipant)
+
+                        matchScreen(getChatFromClick = { chatId, chatData ->
+                            id = chatId
+                            chat = chatData
+                            if (id.equals("")) {
+
+                            }
+                        }, isDarkTheme, navController)
                     }
                 }
                 composable(Screen.Chat.name) {
@@ -294,7 +303,6 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         // State for å kontrollere om conversationWindow skal vises
                         Log.d("TEST UPDATED? string", "${id}")
                         Log.d("TEST UPDATED? ChatAndParticipant", "${chat}")
-                        val messages = remember { mutableStateListOf<MessagesFromFirebase>() }
                         val isLoaded = remember { mutableStateOf(false) }
                         isVisible = false
                         showChatInput = true
@@ -306,7 +314,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                             curRoute = curRoute,
                             navController = navController
                         )
-                        conversationWindow(id, chat, messages)
+                        conversationWindow(id, chat)
                         /*
                         if (showConversationWindow.value) {
                         } else {

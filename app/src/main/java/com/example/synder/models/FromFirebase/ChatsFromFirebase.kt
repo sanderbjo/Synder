@@ -7,5 +7,4 @@ data class ChatsFromFirebase (
         val userId2: String = "",
         val latestmessage: String = "",
         val latestsender: String = "",
-        val messages: List<MessagesFromFirebase> = emptyList()
 )

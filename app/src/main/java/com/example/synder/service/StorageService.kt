@@ -17,5 +17,7 @@ interface StorageService {
     suspend fun getMessagesForChat(chatId: String): List<MessagesFromFirebase>
     suspend fun getChat(chatId: String): ChatsFromFirebase?
     suspend fun sendMessage(chatId: String, message: MessagesFromFirebase): Boolean
+    suspend fun createChat(newChat: ChatsFromFirebase): String
     fun getMessagesFlowForChat(chatId: String): Flow<List<MessagesFromFirebase>>
+    fun getMatchesFlowForUser(userId: String): Flow<List<UserProfile>>
 }

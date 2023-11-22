@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.synder.components.Chat
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.ChatsFromFirebase
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
@@ -41,22 +42,40 @@ class ChatViewModel @Inject constructor(
         val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
         val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
         val messagesCache: MutableMap<String, List<MessagesFromFirebase>> = mutableMapOf()
+        val matchesCache: MutableMap<String, UserProfile> = mutableMapOf()
+
+        val matchChatCache: MutableMap<String, ChatAndParticipant?> = mutableMapOf()
+
+        val matchesFlow = MutableStateFlow<List<UserProfile>>(emptyList())
+        fun updateMatchesFlow() {
+                matchesFlow.value = matchesCache.values.toList()
+        }
+
         private var messageCounter = 0
 
         //TEST FOR LIVE ACTION HENTING AV DATA
         private val _messages = MutableStateFlow<List<MessagesFromFirebase>>(emptyList())
         val messages: StateFlow<List<MessagesFromFirebase>> = _messages.asStateFlow()
 
+        private val _matches = MutableStateFlow<List<UserProfile>>(emptyList())
+        val matches: StateFlow<List<UserProfile>> = _matches.asStateFlow()
+
         init {
                 viewModelScope.launch {
                         storageService.users.collect { userList ->
+                                val currentUserId = accountService.currentUserId
+                                val currentUserProfile = userList.find { it.id == currentUserId }
+
                                 userList.forEach { user ->
                                         usersCache[user.id] = user
-                                        Log.d("TESTBR1: ", user.toString())
-                                        Log.d("TESTBR2: ", usersCache.toString())
-                                        if (accountService.currentUserId === user.id) {
-                                                Log.d("TEST userloggedin: ", accountService.currentUserId)
-                                                Log.d("TEST userloggedin: ", userId)
+
+                                        // Sjekk om brukeren er en match for nåværende bruker
+                                        if (currentUserProfile?.matches?.contains(user.id) == true) {
+                                                matchesCache[user.id] = user
+
+                                                // Sjekk om det finnes en chat mellom nåværende bruker og matchen
+                                                val chatWithMatch = userHasChat(user.id)
+                                                matchChatCache[user.id] = chatWithMatch
                                         }
                                 }
                         }
@@ -91,11 +110,17 @@ class ChatViewModel @Inject constructor(
 
         }
 
-        fun getMatches(userId: String) { //skal kun gjelde for current bruker?
-                viewModelScope.launch {
+        fun userHasChat(chatUserId: String): ChatAndParticipant? {
 
+                // Finn en chat hvor begge brukerne er involvert
+                val foundChat = chatsCache.values.firstOrNull { chatAndParticipant ->
+                        (chatAndParticipant.chat.userId1 == userId && chatAndParticipant.chat.userId2 == chatUserId) ||
+                                (chatAndParticipant.chat.userId1 == chatUserId && chatAndParticipant.chat.userId2 == userId)
                 }
+
+                return foundChat
         }
+
 
         fun readChat(chatId: String) {
                 viewModelScope.launch {
@@ -119,7 +144,6 @@ class ChatViewModel @Inject constructor(
                         val index = messageCounter
 
                         val message = MessagesFromFirebase(
-                                // Du trenger ikke å sette ID her, fordi Firebase vil automatisk generere den
                                 sent = timeString.toString(),
                                 text = messageText,
                                 userId = userId,
@@ -148,7 +172,13 @@ class ChatViewModel @Inject constructor(
                         }
                 }
         }
-
+        fun fetchMatches(userId: String) {
+                viewModelScope.launch {
+                        storageService.getMatchesFlowForUser(userId).collect { matchList ->
+                                _matches.value = matchList
+                        }
+                }
+        }
 
         suspend fun getMessages(chatId: String, getAsync: Boolean = false): List<MessagesFromFirebase> {
                 // Returnerer cachede meldinger hvis de er lageret i listen fra før
@@ -176,15 +206,133 @@ class ChatViewModel @Inject constructor(
                 Log.d("TEST HAS HORE2: ", "${currentChatClicked.value}")
                 return currentChatClicked.value;
         }
+
+        /*
+        * FOKUS PUKUS HJÆVA
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        fun findOrCreateChatWithUser(chatUserId: String) {
+                viewModelScope.launch {
+                        val currentUserId = accountService.currentUserId
+                        // Finn eksisterende chat hvor begge brukerne er en del av
+                        val existingChat = chatsCache.values.firstOrNull { chat ->
+                                (chat.user1.id == currentUserId && chat.user2.id == chatUserId) ||
+                                        (chat.user2.id == currentUserId && chat.user1.id == chatUserId)
+                        }
+
+                        if (existingChat != null) {
+                                // Chat finnes, kan hente meldinger eller gjøre andre nødvendige handlinger
+                                updateCurrentChat(existingChat)
+                        } else {
+                                // Ingen eksisterende chat, opprett en ny
+                                createNewChat(currentUserId, chatUserId)
+                        }
+                }
+        }
+        * */
+
+        fun checkIfExists(chatUserId: String) {
+                viewModelScope.launch {
+                        val existingChat = chatsCache.values.firstOrNull { chat ->
+                                (chat.user1.id == userId && chat.user2.id == chatUserId) ||
+                                        (chat.user2.id == userId && chat.user1.id == chatUserId)
+                        }
+
+                        if (existingChat == null) {
+                                // Ingen eksisterende chat, forsøk å opprette en ny
+                                createNewChat(chatUserId)?.let { (newChatId, newChatAndParticipant) ->
+                                        // Oppdaterer ViewModel-tilstanden med den nye chatten
+                                        currentChatClicked.value = newChatAndParticipant
+                                        currentChatIdClicked.value = newChatId
+                                } ?: run {
+                                        // Håndter tilfellet hvor det ikke var mulig å opprette en ny chat
+                                        // For eksempel, oppdater en feilmelding i ViewModel eller trigger en event
+                                }
+                        } else {
+                                // En eksisterende chat finnes, oppdater currentChat
+                                currentChatClicked.value = existingChat
+                                currentChatIdClicked.value = existingChat.id
+                        }
+                }
+        }
+
+
+        suspend fun createNewChat(userFromChat: String): Pair<String, ChatAndParticipant>? {
+                val newChat = ChatsFromFirebase(
+                        latestmessage = "",
+                        latestsender = "",
+                        userId1 = userId,
+                        userId2 = userFromChat
+                )
+
+                return try {
+                        // Lagrer den nye chatten i databasen og henter chatId
+                        val chatId = storageService.createChat(newChat) // Returnerer nå ID-en til den nye chatten
+
+                        // Oppretter et nytt ChatAndParticipant-objekt
+                        val newChatAndParticipant = ChatAndParticipant(
+                                id = chatId,
+                                chat = newChat,
+                                user1 = usersCache[newChat.userId1] ?: UserProfile(),
+                                user2 = usersCache[newChat.userId2] ?: UserProfile(),
+                                latestmessage = newChat.latestmessage
+                        )
+
+                        // Legger til den nye chatten i cache og oppdaterer currentChat
+                        chatsCache[chatId] = newChatAndParticipant
+                        currentChatClicked.value = newChatAndParticipant
+                        currentChatIdClicked.value = chatId
+
+                        // Returnerer Pair av chatId og ChatAndParticipant
+                        Pair(chatId, newChatAndParticipant)
+                } catch (e: Exception) {
+                        // Logg eller håndter feilen
+                        null
+                }
+        }
+
+
         fun updateCurrentChat(newCurrentChat: ChatAndParticipant): Boolean {
-                Log.d("TEST HAS CLICKED: ", "${currentChatClicked.value}")
-                Log.d("TEST HAS CLICKED: ", "${currentChatIdClicked.value}")
                 currentChatClicked.value = newCurrentChat
                 currentChatIdClicked.value = newCurrentChat.id
-
-                Log.d("TEST HAS CLICKED: ", "TRUE")
-                Log.d("TEST HAS CLICKED: ", "${currentChatClicked.value}")
-                Log.d("TEST HAS CLICKED: ", "${currentChatIdClicked.value}")
                 return true;
         }
 
