@@ -117,7 +117,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val curRoute by rememberUpdatedState(
         newValue = navController.currentBackStackEntryAsState().value?.destination?.route
-            ?: Screen.Swipe.name
+            ?: Screen.Login.name
     )
 
     fun toggleTheme() {
