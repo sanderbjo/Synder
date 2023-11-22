@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -24,14 +25,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
-
 
 
 @Composable
@@ -39,11 +35,12 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
     val viewModel: SettingsViewModel = hiltViewModel()
 
     val scope = rememberCoroutineScope()
+    var checkPermission by remember {mutableStateOf(viewModel.checkPermission)}
 
     val volumeLevel by remember { mutableStateOf(viewModel.volumeLevel).value }
     LazyColumn(){
         item{
-            SwitchSettingItem(
+            switchSettingItem(
                 label = "App Theme",
                 value = if (isDarkTheme) "Dark" else "Light",
                 switchState = isDarkTheme,
@@ -52,38 +49,70 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
             )
         }
         item{
-            SettingItem(
+            settingItem(
                 label = "Notifications",
                 value = "On",
                 onClick = {}
             )
         }
         item{
-            VolumeSettingItem(
+            volumeSettingItem(
                 label = "Volume",
                 volumeLevel = volumeLevel,
                 onVolumeChanged = {newVolumeLevel ->
                     viewModel.setVolumeLevel(newVolumeLevel)
                 })
         }
-        item { 
-            SettingItem(
-                label = "Location",
-                onClick = {
-                    val requestCode = 123
+        item {
+            checkBoxSettingItem(
+
+                label = "Allow GPS location",
+                checked = checkPermission.value,
+                onCheckedChange = {newCheckedState ->
                     scope.launch {
-                        viewModel.requestLocationPermission(context as Activity, requestCode)
+                        if (newCheckedState){
+                            val requestCode = 123
+                            viewModel.requestLocationPermission(context as Activity, requestCode)
+                            checkPermission.value = true
+
+                        }
                     }
-
-
                 })
         }
     }
 
+
 }
 
+
 @Composable
-fun SwitchSettingItem(
+fun checkBoxSettingItem(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { newCheckedState ->
+                onCheckedChange(newCheckedState)
+            }
+        )
+    }
+}
+@Composable
+fun switchSettingItem(
     label: String,
     value: String? = null,
     switchState: Boolean,
@@ -104,8 +133,7 @@ fun SwitchSettingItem(
             if (value != null) {
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -119,7 +147,7 @@ fun SwitchSettingItem(
 }
 
 @Composable
-fun VolumeSettingItem(
+fun volumeSettingItem(
     label: String,
     volumeLevel: Int,
     onVolumeChanged: (Int) -> Unit
@@ -135,8 +163,7 @@ fun VolumeSettingItem(
         ) {
             Text(
                 text = "Volume Level: $volumeLevel%",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                style = MaterialTheme.typography.bodySmall
             )
             Spacer(modifier = Modifier.width(16.dp))
             Slider(
@@ -153,7 +180,7 @@ fun VolumeSettingItem(
 }
 
 @Composable
-fun SettingItem(
+fun settingItem(
     label: String,
     value: String? = null,
     onClick: () -> Unit,
@@ -168,8 +195,7 @@ fun SettingItem(
         if (value != null) {
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                style = MaterialTheme.typography.bodySmall
             )
         }
 

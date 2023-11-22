@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.synder.models.Coordinates
@@ -28,6 +29,9 @@ class SettingsViewModel @Inject constructor(
 
     private val _volumeLevel = mutableIntStateOf(getMediaVolume())
     val volumeLevel: State<Int> = _volumeLevel
+    val checkPermission = mutableStateOf(locationUtils.checkLocationPermission())
+
+
 
     suspend fun requestLocationPermission(activity: Activity, requestCode: Int){
         viewModelScope.launch {
@@ -41,6 +45,7 @@ class SettingsViewModel @Inject constructor(
     suspend fun updateLocationIfPermissionIsGranted(){
         val userid = accountService.currentUserId
         if (locationUtils.checkLocationPermission()) {
+
             locationUtils.getCurrentLocation(
                 onLocationResult = { location ->
                     val coordinates = Coordinates(location.latitude, location.longitude)
@@ -59,6 +64,7 @@ class SettingsViewModel @Inject constructor(
             )
         }
     }
+
 
     fun setVolumeLevel(newVolumeLevel: Int){
         _volumeLevel.value = newVolumeLevel
