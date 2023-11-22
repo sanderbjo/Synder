@@ -161,6 +161,7 @@ fun conversationWindow(
     // Bruk LaunchedEffect for å hente meldinger når Composable-funksjonen først blir vist
     LaunchedEffect(chatId) {
         chatViewModel.fetchMessages(chatId)
+        chatViewModel.updateMessageCounter(messages.size)
     }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {

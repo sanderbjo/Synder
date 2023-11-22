@@ -23,9 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
+import com.google.firebase.storage.StorageReference
 
 @Composable
-fun Message(it: MessagesFromFirebase, userProfile: UserProfile, sentByUser: Boolean) {
+fun Message(it: MessagesFromFirebase, storageRef: StorageReference ,userProfile: UserProfile, sentByUser: Boolean) {
         val shape = RoundedCornerShape(
                 topStart = 15.dp,
                 topEnd =  15.dp,
@@ -59,11 +60,11 @@ fun Message(it: MessagesFromFirebase, userProfile: UserProfile, sentByUser: Bool
                                 verticalAlignment = Alignment.CenterVertically
                         ) {
                                 if (!sentByUser) {
-                                        if (userProfile.profileImageUrl === "") {
-                                                Monogram(name = userProfile.name)
-                                        } else {
-                                                ProfilePicture(url = userProfile.profileImageUrl)
-                                        }
+                                        //if (userProfile.profileImageUrl === "") {
+                                        //        Monogram(name = userProfile.name)
+                                        //} else {
+                                                ProfilePicture(storageRef.child("images/${userProfile.id}.jpg"))
+                                        //}
                                 }
 
                                 Column(

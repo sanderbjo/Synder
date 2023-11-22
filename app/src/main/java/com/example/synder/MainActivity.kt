@@ -248,7 +248,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Screen.Login.name, //login
+                startDestination = Screen.Login.name,
                 modifier = Modifier.padding(innerPadding)
             )
             {
