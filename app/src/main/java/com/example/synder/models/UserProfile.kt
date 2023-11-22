@@ -1,5 +1,6 @@
 package com.example.synder.models
 
+import android.net.Uri
 import com.google.firebase.firestore.DocumentId
 
 
@@ -8,7 +9,6 @@ data class UserProfile(
     val name: String = "",
     val age: String = "",
     val bio: String = "",
-    val profileImageUrl: String = "",
     val kjonn: String = "",
     val serEtter: String = "",
     val likedUsers: List<String> = emptyList(),

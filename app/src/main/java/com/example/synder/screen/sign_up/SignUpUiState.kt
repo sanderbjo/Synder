@@ -1,6 +1,6 @@
 package com.example.synder.screen.sign_up
 
-import android.util.Size
+import android.net.Uri
 
 data class SignUpUiState(
     val email: String = "",
@@ -10,7 +10,7 @@ data class SignUpUiState(
     val name: String = "",
     val age: Float = 0f,
     val bio: String = "",
-    val profileImageUrl: String = "",
+    val profileImageUri: Uri? = null,
     val kjonn: String  = "",
     val serEtter: String = "",
 

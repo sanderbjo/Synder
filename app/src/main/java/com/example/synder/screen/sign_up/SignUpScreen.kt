@@ -1,31 +1,29 @@
 package com.example.synder.screen.sign_up
 
-import android.view.Display
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -35,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,20 +40,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.synder.R
-import com.example.synder.screen.sign_up.EmailField
 
 @Composable
 fun SignUpScreen(
@@ -69,7 +65,7 @@ fun SignUpScreen(
 
     val fieldModifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp, 4.dp)
+        .padding(16.dp, 8.dp)
 
 
     Column(
@@ -86,9 +82,11 @@ fun SignUpScreen(
                 Modifier.padding(vertical = 8.dp)
             )
 
+        Spacer(modifier = Modifier.padding(top = 160.dp))
         EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
         PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
         RepeatPasswordField(uiState.repeatPassword, viewModel::onRepeatPasswordChange, fieldModifier)
+        ImgField(uiState.profileImageUri,viewModel::onProfileImageUrisChange, fieldModifier)
         NameField(uiState.name, viewModel::onNameChange, fieldModifier )
         AgeField(uiState.age, viewModel::onAgeChange, fieldModifier )
         BioField(uiState.bio, viewModel::onBioChange, fieldModifier )
@@ -111,6 +109,52 @@ fun SignUpScreen(
 
     }
 }
+
+    @Composable
+    fun ImgField(value: Uri?, onNewValue: (Uri?) -> Unit, modifier: Modifier) {
+        //var selectedPhoto by remember { mutableStateOf<Uri?>(null) }
+
+        val photoPicker = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = {onNewValue(it)})
+        //ActivityResultLauncher()
+
+        Column(modifier.border(width = 1.dp, color = Color.Gray),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Profilbilde*")
+            if (value == null){
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(160.dp)
+                        .clip(CircleShape)
+                        .border(width = 1.dp, color = Color.Gray, shape = CircleShape),
+                    contentScale = ContentScale.Crop,
+
+                )
+            }else {
+                AsyncImage(
+                    model = value,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(160.dp)
+                        .clip(CircleShape)
+                        .border(width = 1.dp, color = Color.Gray, shape = CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Button(onClick = {
+                photoPicker.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+                Modifier.padding(bottom = 8.dp))
+            {
+                Text(text = "legg til profilbilde")
+            }
+        }
+    }
 
     @Composable
     fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
@@ -184,6 +228,7 @@ fun SignUpScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgeField(value: Float, onNewValue: (Float) -> Unit, modifier: Modifier = Modifier) {
+    Spacer(modifier = Modifier.padding(bottom = 16.dp))
     Text(
         text = "alder*")
     Slider(

@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.synder.Screen
 import com.example.synder.components.MatchCard
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
@@ -46,6 +47,7 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
 
     Log.d("CHATLIST: ", chatsList.toString())
 
+    val storageRef = chatViewModel.storageRef
 
     LazyColumn(
         modifier = Modifier
@@ -57,7 +59,7 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
         }
 
         items(chatsList) { it ->
-            Chat(onChatClick = getChatFromClick, it, navController)
+            Chat(onChatClick = getChatFromClick, it, storageRef , navController)
         }
 
         item {
@@ -86,6 +88,11 @@ fun matchScreen(
     val chatMatchCache = chatViewModel.matchChatCache
     Log.d("P!:Kommer chatter?", chatMatchCache.toString())
 
+    val userList = chatViewModel.usersCache.values.toList()
+    Log.d("Liste med USERS:", "$userList")
+
+
+    val storageRef = chatViewModel.storageRef
     //Column
     LazyColumn(
         modifier = Modifier
@@ -106,6 +113,7 @@ fun matchScreen(
                 getChatFromClick = getChatFromClick,
                 ifChatIsNull = { isNull = true },
                 it = match,
+                storageRef,
                 hasChat = chatForMatch,
                 navController = navController
             )
@@ -148,6 +156,8 @@ fun conversationWindow(
     val messages by chatViewModel.messages.collectAsState()
     chatViewModel.updateMessageCounter(messages.size - 1)
     val sortedMessages = messages.sortedBy { it.index }
+
+    val storageRef = chatViewModel.storageRef
     // Bruk LaunchedEffect for å hente meldinger når Composable-funksjonen først blir vist
     LaunchedEffect(chatId) {
         chatViewModel.fetchMessages(chatId)
@@ -165,6 +175,7 @@ fun conversationWindow(
                 }
                 Message(
                     it = firebaseMessage,
+                    storageRef,
                     userProfile = userProf,
                     sentByUser = sentByUser
                 )

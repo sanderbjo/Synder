@@ -29,11 +29,13 @@ import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.UserProfile
+import com.google.firebase.storage.StorageReference
 import com.example.synder.screen.ChatList.ChatViewModel
 
 @Composable
 fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
          it: ChatAndParticipant = ChatAndParticipant(),
+         storageRef: StorageReference,
          navController: NavHostController,
          chatViewModel: ChatViewModel = hiltViewModel()
 ) {
@@ -48,6 +50,7 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
         it.user2.id == chatViewModel.userId -> "Du"
         else -> UserInChat.name // Hvis ingen av brukerne matcher currentUserId, vis den andre brukerens navn.
     }
+
 
     OutlinedCard(
         modifier = Modifier
@@ -76,12 +79,12 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (UserInChat.profileImageUrl != "") {
-                ProfilePicture(url = UserInChat.profileImageUrl)
-            } else {
-                Monogram(name = UserInChat.name)
-            }
-
+            //if (UserInChat.profileImageUrl != "") {
+            //    ProfilePicture(url = UserInChat.profileImageUrl)
+            //} else {
+            //    Monogram(name = UserInChat.name)
+            //}
+                ProfilePicture(imgReferance = storageRef.child("images/${it.user1.id}.jpg"))
             Column(modifier = Modifier
                 .padding(10.dp)
                 .padding(bottom = 20.dp)) {
@@ -133,6 +136,7 @@ fun MatchCard(
     getChatFromClick: (String, ChatAndParticipant) -> Unit,
     ifChatIsNull: () -> Unit,
     it: UserProfile,
+    storageRef: StorageReference,
     hasChat: ChatAndParticipant?,
     navController: NavHostController,
     chatViewModel: ChatViewModel = hiltViewModel()
@@ -172,11 +176,8 @@ fun MatchCard(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            if (it.profileImageUrl != "") {
-                ProfilePicture(url = it.profileImageUrl)
-            } else {
-                Monogram(name = it.name)
-            }
+            ProfilePicture(imgReferance = storageRef.child("images/${it.id}.jpg"))
+            
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
