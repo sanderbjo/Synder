@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -237,7 +238,8 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         )
                     }
                 } else if (showChatInput) {
-                    Chatbar()
+                    Chatbar(context = LocalContext.current)
+
                 }
             }
         ) { innerPadding ->
@@ -271,7 +273,6 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         chatScreen(getChatFromClick = { chatId, chatData ->
                             id = chatId
                             chat = chatData
-                            // Du kan nå navigere til conversationWindow eller oppdatere UI basert på den nye chatten
                         }
                             , isDarkTheme, curRoute, navController, currentChatAndParticipant)
                     }
@@ -294,34 +295,25 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         Log.d("TEST UPDATED? string", "${id}")
                         Log.d("TEST UPDATED? ChatAndParticipant", "${chat}")
                         val messages = remember { mutableStateListOf<MessagesFromFirebase>() }
+                        val isLoaded = remember { mutableStateOf(false) }
                         isVisible = false
                         showChatInput = true
+                        chatViewModel.upadeCurrentId(id)
 
-                        ChatTopNavigation(
+                        ChatTopNavigation( //Navigasjonen inne i et chat vindu
                             chat,
                             chatViewModel.userId,
                             curRoute = curRoute,
                             navController = navController
                         )
-
-                        val showConversationWindow = remember { mutableStateOf(false) }
-
-                        // LaunchedEffect for å vente i et sekund før du viser conversationWindow
-                        LaunchedEffect(Unit) {
-                            delay(1000) // Venter i et sekund
-                            showConversationWindow.value = true
-                            messages.addAll(chatViewModel.getMessages(id))
-                            chatViewModel.upadeCurrentId(id)
-                        }
-
-                        // Vis lasteikon hvis showConversationWindow er false, ellers vis conversationWindow
+                        conversationWindow(id, chat, messages)
+                        /*
                         if (showConversationWindow.value) {
-                            conversationWindow(id, chat, messages)
                         } else {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator() // Lasteikon
+                                CircularProgressIndicator() //Innlastingds ikon
                             }
-                        }
+                        }*/
                     }
                 }
                 composable(Screen.Login.name){

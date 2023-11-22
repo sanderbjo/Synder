@@ -21,7 +21,7 @@ import coil.compose.AsyncImage
 
 
 @Composable
-fun ProfilePicture (url: String) {
+fun ProfilePicture (url: String, modifierSize: Int = 50) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
@@ -29,15 +29,15 @@ fun ProfilePicture (url: String) {
             .build(),
 
         contentDescription = "profilbilde",
-        modifier = Modifier.size(50.dp)
+        modifier = Modifier.size(modifierSize.dp) //Default 50
             .clip(CircleShape), // Set the size to create a circle
 
     )
 }
 @Composable
-fun Monogram(name: String) {
+fun Monogram(name: String, modifierSize: Int = 50) {
     Card(
-        modifier = Modifier.size(50.dp), // Set the size to create a circle
+        modifier = Modifier.size(modifierSize.dp), // Set the size to create a circle
         shape = CircleShape, // Use CircleShape to make the card circular
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE46962),
@@ -45,7 +45,7 @@ fun Monogram(name: String) {
         )
     ) {
         Text(
-            text = "O"/*name.substring(0, 1)*/,
+            text = name.substring(0, 1)/*name.substring(0, 1)*/,
             color = Color.White, // Set text color to white
             fontSize = 24.sp, // Adjust the font size as needed
             modifier = Modifier

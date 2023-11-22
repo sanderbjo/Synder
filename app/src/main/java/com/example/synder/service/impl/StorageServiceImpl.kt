@@ -3,13 +3,14 @@ package com.example.synder.service.impl
 import android.util.Log
 import com.example.synder.models.FromFirebase.ChatsFromFirebase
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
-import com.example.synder.models.Message
 import com.example.synder.models.UserProfile
 import com.example.synder.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -24,11 +25,23 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         get() = firestore.collection(CHATS).dataObjects() ///FÅ MELDINGENE I EN CACHE; SLIK AT DE AUTOMATISK OPPDATERES MED FIREBASE
 
 
+    override suspend fun getNumberOfMessages(chatId: String): Int {
+        return try {
+            val snapshot = firestore.collection("chats").document(chatId)
+                .collection("messages").get().await()
+
+            snapshot.size()
+        } catch (e: Exception) {
+            Log.e("StorageService", "Error getting number of messages", e)
+            0
+        }
+    }
+
     override suspend fun getMessagesForChat(chatId: String): List<MessagesFromFirebase> {
         val messages = mutableListOf<MessagesFromFirebase>()
         // Use Firestore call to get documents and transform them into a list
         val documents = firestore.collection("chats").document(chatId)
-            .collection("messages").get().await()
+            .collection(MESSAGES).get().await()
         for (document in documents) {
             document.toObject(MessagesFromFirebase::class.java)?.let { message ->
                 messages.add(message)
@@ -37,13 +50,49 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         return messages
     }
 
+    override fun getMessagesFlowForChat(chatId: String): Flow<List<MessagesFromFirebase>> {
+        return callbackFlow {
+            val subscription = firestore.collection("chats").document(chatId)
+                .collection(MESSAGES)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        close(e)
+                        return@addSnapshotListener
+                    }
+                    val messageList = snapshot?.documents?.mapNotNull { it.toObject(MessagesFromFirebase::class.java) }
+                    this.trySend(messageList ?: emptyList()).isSuccess
+                }
+
+            awaitClose { subscription.remove() }
+        }
+    }
+
+    override suspend fun readChat(chatId: String): Boolean { //viser at bruker har lest chatten
+        return try {
+            firestore.collection("chats").document(chatId)
+                .update("latestmessage", "").await()
+            true // Oppdateringen var vellykket
+        } catch (e: Exception) {
+            Log.e("readChat", "Failed to update latestmessage", e)
+            false // Det oppsto en feil under oppdateringen
+        }
+    }
+
+
     override suspend fun sendMessage(chatId: String, message: MessagesFromFirebase): Boolean {
         return try {
-            Log.d("CHAT2 sent id is: ", chatId)
-            Log.d("CHAT2 sent message is: ", message.toString())
+            // Først legg til meldingen i 'messages' underlagret samling
+            val messageRef = firestore.collection("chats").document(chatId)
+                .collection(MESSAGES).add(message).await()
+
+            // Når meldingen er lagt til, oppdater 'latestmessage' og 'latestsender' i 'chats' dokumentet
             firestore.collection("chats").document(chatId)
-                .collection("messages").add(message).await()
-            true // Melding ble sendt
+                .update(mapOf(
+                    "latestmessage" to message.text,
+                    "latestsender" to message.userId
+                )).await()
+
+            true
         } catch (e: Exception) {
             false // error lr no CHATFAIL
         }

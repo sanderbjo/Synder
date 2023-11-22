@@ -12,6 +12,8 @@ import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -39,6 +41,11 @@ class ChatViewModel @Inject constructor(
         val usersCache: MutableMap<String, UserProfile> = mutableMapOf()
         val chatsCache: MutableMap<String, ChatAndParticipant> = mutableMapOf()
         val messagesCache: MutableMap<String, List<MessagesFromFirebase>> = mutableMapOf()
+        private var messageCounter = 0
+
+        //TEST FOR LIVE ACTION HENTING AV DATA
+        private val _messages = MutableStateFlow<List<MessagesFromFirebase>>(emptyList())
+        val messages: StateFlow<List<MessagesFromFirebase>> = _messages.asStateFlow()
 
         init {
                 viewModelScope.launch {
@@ -61,6 +68,7 @@ class ChatViewModel @Inject constructor(
                                 val relevantChats = chatList.filter {
                                         it.userId1 == currentUserId || it.userId2 == currentUserId
                                 }
+                                Log.d("CHATS ALL RELEVANT", relevantChats.toString())
 
                                 relevantChats.forEach { chat ->
                                         // Anta at storageService har en funksjon for å hente meldinger for en gitt chat
@@ -71,17 +79,32 @@ class ChatViewModel @Inject constructor(
                                                 user1 = usersCache[chat.userId1] ?: UserProfile(),
                                                 user2 = usersCache[chat.userId2] ?: UserProfile(),
                                                 latestmessage = chat.latestmessage.toString(),
+                                                latestsender = chat.latestsender.toString(),
                                         )
                                         messagesCache[chat.id] = messages
                                         chatsCache[chat.id] = chatWithParticipant
-                                        Log.d("TESTCHC11: ", chatWithParticipant.toString())
-                                        Log.d("TESTCHC12: ", chat.id)
-                                        Log.d("TESTCHSPES5: ", messages.toString())
+                                        Log.d("CHATS single has data?: ", chat.latestsender)
                                 }
                                 Log.d("ChatsCache: ", chatsCache.toString())
                         }
                 }
 
+        }
+
+        fun getMatches(userId: String) { //skal kun gjelde for current bruker?
+                viewModelScope.launch {
+
+                }
+        }
+
+        fun readChat(chatId: String) {
+                viewModelScope.launch {
+                        storageService.readChat(chatId = chatId)
+                }
+        }
+
+        fun updateMessageCounter(index: Int) {
+                messageCounter = index
         }
 
         fun sendMessage(messageText: String) {
@@ -93,13 +116,16 @@ class ChatViewModel @Inject constructor(
                         val timeString = dateFormat.format(Date(currentTime))
                         Log.d("CURRTIME: ", timeString)
 
+                        val index = messageCounter
 
                         val message = MessagesFromFirebase(
                                 // Du trenger ikke å sette ID her, fordi Firebase vil automatisk generere den
                                 sent = timeString.toString(),
                                 text = messageText,
-                                userId = userId
+                                userId = userId,
+                                index = index,
                         )
+
                         Log.d("CHAT1 id to send: ", currentChatIdClicked.value.toString())
                         Log.d("CHAT1 message to send: ", message.toString())
                         val success = storageService.sendMessage(currentChatIdClicked.value, message)
@@ -107,6 +133,7 @@ class ChatViewModel @Inject constructor(
                         if(success) {
                                 // Meldingen ble sendt suksessfullt
                                 Log.d("CHAT SUKSESS:", success.toString())
+                                messageCounter++
                         } else {
                                 Log.d("CHAT FAIL:", success.toString())
                                 // Håndter feil
@@ -114,21 +141,30 @@ class ChatViewModel @Inject constructor(
                 }
         }
 
+        fun fetchMessages(chatId: String) {
+                viewModelScope.launch {
+                        storageService.getMessagesFlowForChat(chatId).collect { messageList ->
+                                _messages.value = messageList
+                        }
+                }
+        }
 
-        suspend fun getMessages(chatId: String): List<MessagesFromFirebase> {
-                // Returnerer cachede meldinger hvis tilgjengelig
-                messagesCache[chatId]?.let { cachedMessages ->
-                        return cachedMessages
+
+        suspend fun getMessages(chatId: String, getAsync: Boolean = false): List<MessagesFromFirebase> {
+                // Returnerer cachede meldinger hvis de er lageret i listen fra før
+                if (!getAsync) {
+                        messagesCache[chatId]?.let { cachedMessages ->
+                                return cachedMessages
+                        }
                 }
 
                 // Henter meldinger asynkront hvis de ikke er cachet
                 return try {
                         val messages = storageService.getMessagesForChat(chatId)
-                        messagesCache[chatId] = messages // Oppdaterer cachen
-                        messages // Returnerer de nye meldingene
+                        messagesCache[chatId] = messages
+                        messages
                 } catch (e: Exception) {
-                        // Logg feilen eller håndter den som nødvendig
-                        emptyList() // Returnerer en tom liste hvis det oppstår en feil
+                        emptyList()
                 }
         }
 

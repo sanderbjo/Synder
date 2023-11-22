@@ -18,8 +18,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.synder.components.Chat
 import com.example.synder.components.Message
-import com.example.synder.models.Message
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
@@ -33,6 +35,8 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit, isDarkThe
     val chatsList = chatViewModel.chatsCache.values.toList()
 
     val userChats = listOf(chatsList)
+
+    Log.d("CHATLIST: ", chatsList.toString())
 
 
     LazyColumn(
@@ -51,15 +55,18 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit, isDarkThe
         }
 
         item {
-            PageEnd(textcontent = "Ingen flere Chats!")
+            PageEnd(textcontent = "Her var det tomt. Skaff en match!")
         }
     }
 
 }
 @Composable
-fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostController,
-                userInChat: ChatAndParticipant,
-                chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
+fun matchScreen(
+    chatId: String,
+    chat: ChatAndParticipant,
+    messages: List<MessagesFromFirebase>,
+    modifier: Modifier = Modifier,
+    chatViewModel: ChatViewModel = hiltViewModel()
 ) {
 
     val userList = chatViewModel.usersCache.values.toList()
@@ -88,52 +95,56 @@ fun matchScreen(isDarkTheme: Boolean, curRoute: String, navController: NavHostCo
 @Composable
 fun conversationWindow(
     chatId: String,
-    chat: ChatAndParticipant, // Assuming ChatandParticipant has a parameterless constructor
+    chat: ChatAndParticipant,
     messages: List<MessagesFromFirebase>,
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    //Log.d("TESTCHAT1", "$chat")
-    Log.d("TESTCHAT12", "${chatId}")
-    Log.d("TESTCHAT13", "${chat}")
-    Log.d("TEST HVOR MANGE MELDINGER1", "${chat.chat.messages}")
-    Log.d("TEST HVOR MANGE MELDINGER12", "${chat.chat.messages.size}")
-
-    val displayMessages = messages.map { firebaseMessage ->
-        val userProfile = chatViewModel.usersCache[firebaseMessage.userId]
-        val sentByUser = firebaseMessage.userId == chatViewModel.userId
-
-        Message(
-            id = firebaseMessage.id,
-            userId = userProfile?.name ?: "Ukjent bruker",
-            userProfile = userProfile ?: UserProfile(),
-            text = firebaseMessage.text,
-            sent = firebaseMessage.sent,
-            sentByUser = sentByUser
-        )
+    if (chat.latestmessage.isNotEmpty()) {
+        chatViewModel.readChat(chat.id)
     }
-    Log.d("TEST HVOR MANGE MELDINGER", "${displayMessages.size}")
-    Log.d("TEST HVOR MANGE MELDINGER", "${displayMessages}")
+    val messages by chatViewModel.messages.collectAsState()
+    chatViewModel.updateMessageCounter(messages.size - 1)
+    val sortedMessages = messages.sortedBy { it.index }
+    // Bruk LaunchedEffect for å hente meldinger når Composable-funksjonen først blir vist
+    LaunchedEffect(chatId) {
+        chatViewModel.fetchMessages(chatId)
+    }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        if (displayMessages.isNotEmpty()) {
+        if (messages.isNotEmpty()) {
 
-            items(displayMessages) { message ->
-                Message(it = message)
+            items(sortedMessages) { firebaseMessage ->
+                val sentByUser = firebaseMessage.userId == chatViewModel.userId
+                val userProf = when (firebaseMessage.userId) {
+                    chat.user1.id -> chat.user1
+                    chat.user2.id -> chat.user2
+                    else -> UserProfile(name = "Ukjent") // Eller en annen default UserProfile hvis ID ikke matcher
+                }
+                Message(
+                    it = firebaseMessage,
+                    userProfile = userProf,
+                    sentByUser = sentByUser
+                )
+            }
+        }
+        
+        item {
+            if (chat.latestmessage.isEmpty() && chat.latestsender !== chatViewModel.userId) {
+                Text(text = " Lest", fontSize = 16.sp)
             }
         }
 
         item {
-            val textContent = if (displayMessages.isNotEmpty()) {
-                "Siste melding ${displayMessages.last().sent}"
+            val textContent = if (messages.isNotEmpty()) {
+                "Siste melding ${messages.last().sent}"
             } else {
-                "Ingen meldinger enda"
+                "Her var det tomt. Start samtalen da vel!"
             }
             PageEnd(textcontent = textContent)
         }
     }
 }
-
 
 @Composable
 fun PageStart (title: String) {

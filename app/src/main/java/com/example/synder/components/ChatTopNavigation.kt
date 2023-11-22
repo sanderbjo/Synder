@@ -2,6 +2,7 @@ package com.example.synder.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -53,12 +55,18 @@ fun ChatTopNavigation(it: ChatAndParticipant, senderId: String, curRoute: String
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "Chat med ${usertoshow.name} ${usertoshow.age}",
-            fontSize = 22.sp,
-        )
-        Spacer(modifier = Modifier.weight(1f)) // This spacer will push the Icon to the right
-        Monogram(name = usertoshow.name)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Monogram(name = usertoshow.name, 45)
+            Text(
+                text = "Chat med ${usertoshow.name} ${usertoshow.age}",
+                fontSize = 22.sp,
+                textAlign = TextAlign.Center // Denne vil sørge for at teksten er sentrert hvis den er i flere linjer
+            )
+        }
+
         //Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(40.dp).padding(end = 10.dp))
     }
 }

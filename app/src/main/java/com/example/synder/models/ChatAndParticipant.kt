@@ -8,4 +8,5 @@ data class ChatAndParticipant(
     val user1: UserProfile = UserProfile(),
     val user2: UserProfile = UserProfile(),
     val latestmessage: String = "",     //Message
+    val latestsender: String = "",
 )
