@@ -1,4 +1,4 @@
-package com.example.synder.models;
+package com.example.synder.models.FromFirebase;
 import com.google.firebase.firestore.DocumentId
 
 data class ChatsFromFirebase (
@@ -6,5 +6,5 @@ data class ChatsFromFirebase (
         val userId1: String = "",
         val userId2: String = "",
         val latestmessage: String = "",
-        val messages: List<Message> = emptyList()
+        val latestsender: String = "",
 )
