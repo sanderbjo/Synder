@@ -33,11 +33,12 @@ import com.google.firebase.storage.StorageReference
 import com.example.synder.screen.ChatList.ChatViewModel
 
 @Composable
-fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
-         it: ChatAndParticipant = ChatAndParticipant(),
-         storageRef: StorageReference,
-         navController: NavHostController,
-         chatViewModel: ChatViewModel = hiltViewModel()
+fun ChatCard(
+    onChatClick: (String, ChatAndParticipant) -> Unit,
+     it: ChatAndParticipant = ChatAndParticipant(),
+     storageRef: StorageReference,
+     navController: NavHostController,
+     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     val UserInChat = if (it.user1.id == chatViewModel.userId) it.user2 else it.user1
     var newMessage = !it.latestsender.equals(chatViewModel.userId) && !it.latestmessage.isEmpty()

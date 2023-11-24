@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.synder.components.Chat
 import com.example.synder.models.ChatAndParticipant
 import com.example.synder.models.FromFirebase.ChatsFromFirebase
 import com.example.synder.models.FromFirebase.MessagesFromFirebase
@@ -16,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -53,7 +53,7 @@ class ChatViewModel @Inject constructor(
                 matchesFlow.value = matchesCache.values.toList()
         }
 
-        private var messageCounter = 0
+        var messageCounter = 0
 
         //TEST FOR LIVE ACTION HENTING AV DATA
         private val _messages = MutableStateFlow<List<MessagesFromFirebase>>(emptyList())
@@ -135,6 +135,10 @@ class ChatViewModel @Inject constructor(
         fun updateMessageCounter(index: Int) {
                 messageCounter = index
         }
+/*
+        fun getMessageCounter(): Int {
+                return 0
+        }*/
 
         fun sendMessage(messageText: String) {
                 viewModelScope.launch {
@@ -145,13 +149,11 @@ class ChatViewModel @Inject constructor(
                         val timeString = dateFormat.format(Date(currentTime))
                         Log.d("CURRTIME: ", timeString)
 
-                        val index = messageCounter
-
                         val message = MessagesFromFirebase(
                                 sent = timeString.toString(),
                                 text = messageText,
                                 userId = userId,
-                                index = index,
+                                index = 0, ///PLACEHOLDER, SKAL ENDRES I STORAGESERVICE
                         )
 
                         Log.d("CHAT1 id to send: ", currentChatIdClicked.value.toString())
@@ -161,7 +163,6 @@ class ChatViewModel @Inject constructor(
                         if(success) {
                                 // Meldingen ble sendt suksessfullt
                                 Log.d("CHAT SUKSESS:", success.toString())
-                                messageCounter++
                         } else {
                                 Log.d("CHAT FAIL:", success.toString())
                                 // Håndter feil
@@ -171,9 +172,12 @@ class ChatViewModel @Inject constructor(
 
         fun fetchMessages(chatId: String) {
                 viewModelScope.launch {
+                        var index = 0
                         storageService.getMessagesFlowForChat(chatId).collect { messageList ->
                                 _messages.value = messageList
+                                index ++
                         }
+                        updateMessageCounter(index)
                 }
         }
         fun fetchMatches(userId: String) {

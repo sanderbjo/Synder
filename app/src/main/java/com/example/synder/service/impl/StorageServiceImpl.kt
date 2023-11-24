@@ -103,22 +103,30 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
 
     override suspend fun sendMessage(chatId: String, message: MessagesFromFirebase): Boolean {
         return try {
-            // Først legg til meldingen i 'messages' underlagret samling
-            val messageRef = firestore.collection("chats").document(chatId)
-                .collection(MESSAGES).add(message).await()
+            // Hent antall dokumenter i kolleksjonen asynkront og bruk størrelsen som indeks
+            val documents = firestore.collection("chats").document(chatId).collection(MESSAGES).get().await()
+            val index = documents.size()  // Antall eksisterende dokumenter blir din indeks
 
-            // Når meldingen er lagt til, oppdater 'latestmessage' og 'latestsender' i 'chats' dokumentet
+            // Oppdater meldingen med indeksen
+            val updatedMessage = message.copy(index = index)
+
+            // Legg til meldingen i 'messages' underlagret samling
+            firestore.collection("chats").document(chatId)
+                .collection(MESSAGES).add(updatedMessage).await()
+
+            // Oppdater 'latestmessage' og 'latestsender' i 'chats' dokumentet
             firestore.collection("chats").document(chatId)
                 .update(mapOf(
-                    "latestmessage" to message.text,
-                    "latestsender" to message.userId
+                    "latestmessage" to updatedMessage.text,
+                    "latestsender" to updatedMessage.userId
                 )).await()
 
             true
         } catch (e: Exception) {
-            false // error lr no CHATFAIL
+            false // Håndter feilen
         }
     }
+
     override suspend fun createChat(newChat: ChatsFromFirebase): String {
         // Firestore-dokumentet er opprettet og ID-en til det nye dokumentet blir returnert
         val chatRef = firestore.collection(CHATS).document()

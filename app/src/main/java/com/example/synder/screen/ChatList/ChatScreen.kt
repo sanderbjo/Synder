@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.synder.components.Chat
+import com.example.synder.components.ChatCard
 import com.example.synder.components.Message
 import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
@@ -28,9 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.synder.Screen
 import com.example.synder.components.MatchCard
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.synder.models.ChatAndParticipant
-import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
 
 @Composable
@@ -59,7 +57,7 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
         }
 
         items(chatsList) { it ->
-            Chat(onChatClick = getChatFromClick, it, storageRef , navController)
+            ChatCard(onChatClick = getChatFromClick, it, storageRef , navController)
         }
 
         item {
@@ -143,6 +141,7 @@ fun matchScreen(
 }
 
 
+
 @Composable
 fun conversationWindow(
     chatId: String,
@@ -154,14 +153,12 @@ fun conversationWindow(
         chatViewModel.readChat(chat.id)
     }
     val messages by chatViewModel.messages.collectAsState()
-    chatViewModel.updateMessageCounter(messages.size - 1)
     val sortedMessages = messages.sortedBy { it.index }
 
     val storageRef = chatViewModel.storageRef
-    // Bruk LaunchedEffect for å hente meldinger når Composable-funksjonen først blir vist
+
     LaunchedEffect(chatId) {
         chatViewModel.fetchMessages(chatId)
-        chatViewModel.updateMessageCounter(messages.size)
     }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
