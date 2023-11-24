@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.synder.R
 import com.google.android.gms.location.*
 import javax.inject.Inject
 
@@ -26,9 +27,6 @@ class LocationUtils @Inject constructor(private val context: Context){
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult?.lastLocation?.let { onLocationResult.invoke(it)}
             }
-            override fun onLocationAvailability(locationAvailability: LocationAvailability?){
-                //handle location availability if needed
-            }
         }
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
@@ -36,7 +34,7 @@ class LocationUtils @Inject constructor(private val context: Context){
             Looper.getMainLooper()
         )
         } else {
-            onFailure.invoke(SecurityException("Location Permission not granted"))
+            onFailure.invoke(SecurityException(context.getString(R.string.location_permission_not_granted)))
         }
     }
 
@@ -58,10 +56,4 @@ class LocationUtils @Inject constructor(private val context: Context){
         locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
         locationCallback = null
     }
-
-    fun isLocationPermissionGranted(): Boolean{
-        return checkLocationPermission()
-    }
-
-
 }

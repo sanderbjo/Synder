@@ -1,7 +1,7 @@
 package com.example.synder.screen.swipe
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.content.Context
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.background
@@ -54,20 +54,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.compose.md_theme_light_onSecondary
-import com.example.compose.md_theme_light_secondary
+import com.example.synder.R
 import com.example.synder.models.UserProfile
 import com.example.synder.utilities.GeographicalUtils
 import kotlinx.coroutines.delay
@@ -78,33 +74,23 @@ import kotlin.math.roundToInt
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
+fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel(), context: Context) {
 
     var currentUserIndex by viewModel.currentUserIndex
     var nextValueIndex by viewModel.nextUserIndex
-
     val profiles by viewModel.users.collectAsState()
     val currentUser = profiles.getOrNull(currentUserIndex)
     val nextUser = profiles.getOrNull(nextValueIndex)
-
     var swipeOffsetX by remember { mutableIntStateOf(0) }
     var swipeOffsetY by remember { mutableIntStateOf(0) }
     val screenWidth = getScreenWidthInt()
     val screenHeight = getScreenHeightInt()
     var delayIncrement by remember { mutableStateOf(false) }
-
     val scope = rememberCoroutineScope()
     val snackbarHostState = viewModel.snackbarHostState
-
     val storageRef = viewModel.storageRef
-
-
-
-    viewModel.onSnackbarTriggered = {
-        scope.launch {
-            triggerSnackbar(snackbarHostState = snackbarHostState)
-        }
-    }
+    viewModel.onSnackbarTriggered = { scope.launch {
+            triggerSnackbar(snackbarHostState = snackbarHostState, context = context) }}
 
 
 
@@ -125,7 +111,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Clear, contentDescription = "Dislike",
+                        imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.dislike),
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -139,7 +125,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Star, contentDescription = "Super Like",
+                        imageVector = Icons.Default.Star, contentDescription = stringResource(R.string.super_like),
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -154,7 +140,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Favorite, contentDescription = "Like",
+                        imageVector = Icons.Default.Favorite, contentDescription = stringResource(R.string.like),
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -166,7 +152,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
     fun profileCard(userProfile: UserProfile, swipeOffsetX: Int, swipeOffsetY: Int, modifier: Modifier) {
         val offsetState by animateIntOffsetAsState(
             targetValue = IntOffset(swipeOffsetX, swipeOffsetY),
-            animationSpec = TweenSpec(durationMillis = 250), label = "animation"
+            animationSpec = TweenSpec(durationMillis = 250), label = stringResource(R.string.animation_label)
         )
         val swipeableState = rememberSwipeableState(0)
         val sizePx = with(LocalDensity.current) { screenWidth.dp.toPx() }
@@ -186,7 +172,6 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                     viewModel.getNextUserCoordinates()!!
                 ) }
         }
-
 
         Box(
             modifier = Modifier
@@ -229,38 +214,23 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         .padding(16.dp)
                 ) {
                     if (userProfile == profiles[currentUserIndex]){
-                        //AsyncImage(
-                        //    model = ImageRequest.Builder(LocalContext.current)
-                        //        .data(currentUser?.profileImageUrl)
-                        //        .crossfade(true)
-                        //        .build(),
-                        //    contentDescription = "profilbilde",
-                        //    contentScale = ContentScale.Crop,
-                        //    modifier = Modifier
-                        //        .fillMaxWidth()
-                        //        .aspectRatio(1f)
-                        //        .background(MaterialTheme.colorScheme.background)
-                        //        .graphicsLayer {
-                        //            translationX = 0f
-                        //        })
-                        
                         GlideImage(
                             model = storageRef.child("images/${currentUser?.id}.jpg"),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1f)
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .graphicsLayer {
-                                        translationX = 0f
-                                    }
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .graphicsLayer {
+                                    translationX = 0f
+                                }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Row {
                             currentUser?.name?.let {
                                 Text(
-                                    text = "$it, ",
+                                    text = stringResource(R.string.it_with_gap, it),
                                     style = MaterialTheme.typography.headlineSmall
                                 )
                             }
@@ -272,7 +242,10 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "${distanceToCurrentUser.toString()} Km unna deg")
+                        Text(text = stringResource(
+                            R.string.currentUser_km_unna_deg,
+                            distanceToCurrentUser.toString()
+                        ))
                         Spacer(modifier = Modifier.height(8.dp))
                         currentUser?.bio?.let {
                             Text(
@@ -283,20 +256,6 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                     else if (userProfile == profiles[nextValueIndex]){
-                        //AsyncImage(
-                        //    model = ImageRequest.Builder(LocalContext.current)
-                        //        .data(nextUser?.profileImageUrl)
-                        //        .crossfade(true)
-                        //        .build(),
-                        //    contentDescription = "profilbilde",
-                        //    contentScale = ContentScale.Crop,
-                        //    modifier = Modifier
-                        //        .fillMaxWidth()
-                        //        .aspectRatio(1f)
-                        //        .background(MaterialTheme.colorScheme.background)
-                        //        .graphicsLayer {
-                        //            translationX = 0f
-                        //        })
                         GlideImage(
                             model = storageRef.child("images/${nextUser?.id}.jpg"),
                             contentDescription = null,
@@ -313,7 +272,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                         Row {
                             nextUser?.name?.let {
                                 Text(
-                                    text = "$it, ",
+                                    text = stringResource(R.string.it_with_gap, it),
                                     style = MaterialTheme.typography.headlineSmall
                                 )
                             }
@@ -326,7 +285,10 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel()) {
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "${distanceToNextUser.toString()} Km unna deg")
+                        Text(text = stringResource(
+                            R.string.km_unna_deg,
+                            distanceToNextUser.toString()
+                        ))
                         Spacer(modifier = Modifier.height(8.dp))
                         nextUser?.bio?.let {
                             Text(
@@ -435,12 +397,12 @@ fun EndOfListCard(){
         ){
             Icon(
                 imageVector = Icons.Default.Face,
-                contentDescription = "Face Icon",
+                contentDescription = stringResource(R.string.face_icon),
                 modifier = Modifier.size(48.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "You have swiped through all people, Please try again later.",
+                text = stringResource(R.string.du_har_swipet_gjennom_alle_personer_pr_v_igjen_senere),
                 textAlign = TextAlign.Center
             )
 
@@ -449,9 +411,9 @@ fun EndOfListCard(){
 
 }
 
-suspend fun triggerSnackbar(snackbarHostState: SnackbarHostState){
+suspend fun triggerSnackbar(snackbarHostState: SnackbarHostState, context: Context){
     snackbarHostState.showSnackbar(
-        message = "Du har matchet med en Synder!",
+        message = context.getString(R.string.du_har_matchet_med_en_synder),
         duration = SnackbarDuration.Short
     )
 }
@@ -468,11 +430,4 @@ fun getScreenHeightInt(): Int {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current.density
     return (configuration.screenHeightDp * density).toInt()
-}
-
-
-@Composable
-@Preview
-fun Previewpage() {
-    SwipeScreen()
 }

@@ -2,4 +2,15 @@
     <string name="app_name">Synder</string>
     <string name="password">Password</string>
     <string name="mann">mann</string>
+    <string name="du_har_matchet_med_en_synder">Du har matchet med en Synder!</string>
+    <string name="du_har_swipet_gjennom_alle_personer_pr_v_igjen_senere">Du har swipet gjennom alle personer, prøv igjen senere.</string>
+    <string name="km_unna_deg">%1$s Km unna deg</string>
+    <string name="currentUser_km_unna_deg">%1$s Km unna deg</string>
+    <string name="face_icon">Face Icon</string>
+    <string name="it_with_gap">"%1$s, "</string>
+    <string name="like">Like</string>
+    <string name="super_like">Super Like</string>
+    <string name="dislike">Dislike</string>
+    <string name="animation_label">animation</string>
+    <string name="location_permission_not_granted">Location Permission not granted</string>
 </resources>
