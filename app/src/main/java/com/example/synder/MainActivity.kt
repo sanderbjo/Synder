@@ -257,7 +257,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                     isVisible = true
                 }
                 composable(Screen.Settings.name) {
-                    SettingsScreen(isDarkTheme, { toggleTheme() }, context = LocalContext.current)
+                    SettingsScreen(isDarkTheme, { toggleTheme() }, context = LocalContext.current, signedOut = { navController.navigate(Screen.Login.name) })
                     isVisible = true
                 }
                 composable(Screen.Swipe.name) {

@@ -83,4 +83,10 @@ class SettingsViewModel @Inject constructor(
         return (currentVolume * 100) / maxVolume
     }
 
+    fun signOutClick(signedOut: () -> Unit){
+        viewModelScope.launch {
+            accountService.signOut()
+            signedOut()
+        }
+    }
 }

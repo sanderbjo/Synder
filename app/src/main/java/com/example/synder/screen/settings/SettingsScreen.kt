@@ -3,7 +3,6 @@ package com.example.synder.screen.settings
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -26,21 +26,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Context){
-    val viewModel: SettingsViewModel = hiltViewModel()
+fun SettingsScreen(
+    isDarkTheme: Boolean,
+    toggleTheme: () -> Unit,
+    context: Context,
+    signedOut: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel()
+){
 
     val scope = rememberCoroutineScope()
-    var checkPermission by remember {mutableStateOf(viewModel.checkPermission)}
+    val checkPermission by remember {mutableStateOf(viewModel.checkPermission)}
 
     val volumeLevel by remember { mutableStateOf(viewModel.volumeLevel).value }
     LazyColumn(){
         item{
-            switchSettingItem(
+            SwitchSettingItem(
                 label = "App Theme",
                 value = if (isDarkTheme) "Dark" else "Light",
                 switchState = isDarkTheme,
@@ -49,14 +56,14 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
             )
         }
         item{
-            settingItem(
+            SettingItem(
                 label = "Notifications",
                 value = "On",
                 onClick = {}
             )
         }
         item{
-            volumeSettingItem(
+            VolumeSettingItem(
                 label = "Volume",
                 volumeLevel = volumeLevel,
                 onVolumeChanged = {newVolumeLevel ->
@@ -64,7 +71,7 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
                 })
         }
         item {
-            checkBoxSettingItem(
+            CheckBoxSettingItem(
 
                 label = "Allow GPS location",
                 checked = checkPermission.value,
@@ -79,6 +86,9 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
                     }
                 })
         }
+        item {
+            SignOutButton(signedOut)
+        }
     }
 
 
@@ -86,7 +96,7 @@ fun SettingsScreen(isDarkTheme: Boolean, toggleTheme: () -> Unit, context: Conte
 
 
 @Composable
-fun checkBoxSettingItem(
+fun CheckBoxSettingItem(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -112,7 +122,7 @@ fun checkBoxSettingItem(
     }
 }
 @Composable
-fun switchSettingItem(
+fun SwitchSettingItem(
     label: String,
     value: String? = null,
     switchState: Boolean,
@@ -147,7 +157,7 @@ fun switchSettingItem(
 }
 
 @Composable
-fun volumeSettingItem(
+fun VolumeSettingItem(
     label: String,
     volumeLevel: Int,
     onVolumeChanged: (Int) -> Unit
@@ -180,7 +190,7 @@ fun volumeSettingItem(
 }
 
 @Composable
-fun settingItem(
+fun SettingItem(
     label: String,
     value: String? = null,
     onClick: () -> Unit,
@@ -199,6 +209,19 @@ fun settingItem(
             )
         }
 
+    }
+}
+
+@Composable
+fun SignOutButton(signedOut: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = { viewModel.signOutClick(signedOut = signedOut) },
+            modifier = Modifier
+                .padding(16.dp, 8.dp)
+        ) {
+            Text(text = "Sign out", fontSize = 16.sp)
+        }
     }
 }
 

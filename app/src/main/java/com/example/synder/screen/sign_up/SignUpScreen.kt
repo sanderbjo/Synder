@@ -53,7 +53,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.synder.R
-
+//deler av koden er hentet/inspirert av kodeeksempel i forelesning/github
+//men det er endret på for å passe inn i dette prosjektet og det er lagt til en del mer funksjonalitet/elementer
 @Composable
 fun SignUpScreen(
     loggedIn: () -> Unit,
