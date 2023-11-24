@@ -1,19 +1,15 @@
 package com.example.synder.screen.swipe
 
-import android.util.Log
+
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.synder.models.Coordinates
 import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
 import com.example.synder.service.StorageService
-import com.example.synder.utilities.GeographicalUtils
 import com.example.synder.service.ImgStorageService
-import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -23,17 +19,13 @@ import javax.inject.Inject
 class SwipeViewModel @Inject constructor(
     private val storageService: StorageService,
     private val accountService: AccountService,
-    private val geographicalUtils: GeographicalUtils,
     private val imgStorageService: ImgStorageService
 ) : ViewModel() {
-    
 
     val users = MutableStateFlow<List<UserProfile>>(emptyList())
     var currentUserIndex = mutableIntStateOf(0)
     var nextUserIndex = mutableIntStateOf(currentUserIndex.intValue + 1)
-
     var storageRef = imgStorageService.storageRef
-
     val snackbarHostState = SnackbarHostState()
     var onSnackbarTriggered: (() -> Unit)? = null
 
@@ -74,7 +66,6 @@ class SwipeViewModel @Inject constructor(
         val targetUser = storageService.getUser(targetUserId)
 
         if (targetUser?.likedUsers?.contains(currentUserId) == true){
-            Log.d("Matching", "Match found between $currentUserId and $targetUserId")
             storageService.updateMatches(currentUserId, targetUserId)
             onSnackbarTriggered?.invoke()
 
@@ -111,16 +102,13 @@ class SwipeViewModel @Inject constructor(
             storageService.users.collect { profiles ->
                 val filteredAndSortedProfiles = profiles
                     .filter { profile ->
-                        profile.kjonn == lookingForPreference /*&&
+                        profile.kjonn == lookingForPreference &&
                                 profile.id !in likedUsers &&
-                                profile.id !in dislikedUsers                Add this to implement filter based on people liked/disliked*/
+                                profile.id !in dislikedUsers
                     }
                 users.value = filteredAndSortedProfiles
 
             }
-            //imgStorageService.storageRef
-            //storageRef.value = imgStorageService.getStorageRef()
-
         }
     }
 

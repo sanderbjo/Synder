@@ -261,7 +261,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                     isVisible = true
                 }
                 composable(Screen.Swipe.name) {
-                    SwipeScreen()
+                    SwipeScreen(context = LocalContext.current)
                     isVisible = true
                 }
                 composable(Screen.Chats.name) {
