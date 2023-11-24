@@ -30,8 +30,8 @@ import com.example.synder.Screen
 import com.example.synder.models.ChatAndParticipant
 
 @Composable
-fun ChatTopNavigation(it: ChatAndParticipant, senderId: String, curRoute: String, navController: NavHostController) {
-    val usertoshow = if (it.user1.id != senderId) it.user1 else it.user2
+fun ChatTopNavigation(it: ChatAndParticipant, currentUser: String, curRoute: String, navController: NavHostController) {
+    val usertoshow = if (!it.user1.id.equals(currentUser)) it.user1 else it.user2
 
     Row(
         modifier = Modifier

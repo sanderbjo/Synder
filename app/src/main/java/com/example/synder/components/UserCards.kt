@@ -40,15 +40,15 @@ fun ChatCard(
      navController: NavHostController,
      chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    val UserInChat = if (it.user1.id == chatViewModel.userId) it.user2 else it.user1
+    val UserInChat = if (it.user1.id.equals(chatViewModel.userId)) it.user2 else it.user1
     var newMessage = !it.latestsender.equals(chatViewModel.userId) && !it.latestmessage.isEmpty()
 
 // Bestemmer visningsnavnet basert på hvem som sendte meldingen.
 
 
     val DisplayName = when {
-        it.user1.id == chatViewModel.userId -> "Du"
-        it.user2.id == chatViewModel.userId -> "Du"
+        it.user1.id.equals(chatViewModel.userId) -> "Du"
+        it.user2.id.equals(chatViewModel.userId) -> "Du"
         else -> UserInChat.name // Hvis ingen av brukerne matcher currentUserId, vis den andre brukerens navn.
     }
 
@@ -167,9 +167,6 @@ fun MatchCard(
                 }
             }
     ) {
-
-        Log.d("P!: Dette er utskriften fra CHAT: ", hasChat.toString())
-
         Row (
             modifier = Modifier
                 .padding(start = 15.dp, top = 2.dp, bottom = 2.dp)
@@ -185,12 +182,17 @@ fun MatchCard(
                 Text(text = it.bio, fontSize = 16.sp) // Adjust text size as needed
 
                 Card(
-                    modifier = Modifier.padding(top = 10.dp)
+                    modifier = Modifier.padding(top = 10.dp),
+
+                    colors = CardDefaults.cardColors(
+                            containerColor = if (hasChat == null) Color(0xFF901D1D) else Color.Transparent,
+                            contentColor = if (hasChat == null) Color.White else Color.Black
+                ),
                 ) {
                     if (hasChat == null) {
-                        Text(text = "Start samtalen", fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = "Start samtalen", fontSize = 14.sp, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                     } else {
-                        Text(text = "Gå til chat", fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = "Gå til chat", fontSize = 14.sp, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
                     }
                 }
             }

@@ -71,6 +71,45 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         }
     }
 
+    /*
+    override fun getChatsFlowForUser(userId: String): Flow<List<ChatsFromFirebase>> {
+        return callbackFlow {
+            Log.d("CHAP digdigg 1.0 ID", userId)
+            val chatIdsRef = firestore.collection(USERS).document(userId).collection("chats")
+            val chatsRef = firestore.collection("chats") // Antar at det finnes en kolleksjon på toppnivå som heter "chats"
+
+            // Abonnerer på endringer i brukerens chat-ID-er
+            val subscription = chatIdsRef.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("CHAP Error", "Error fetching chat ids", e)
+                    close(e)
+                    return@addSnapshotListener
+                }
+
+                val chatIds = snapshot?.documents?.mapNotNull { it.id } ?: emptyList()
+                Log.d("CHAP digdigg 1", "Chat IDs: $chatIds")
+
+                // Hent de faktiske chat-dokumentene basert på ID-ene
+                if (chatIds.isNotEmpty()) {
+                    chatIds.forEach { chatId ->
+                        chatsRef.document(chatId.toString()).get().addOnSuccessListener { chatSnapshot ->
+                            val chat = chatSnapshot.toObject(ChatsFromFirebase::class.java)
+                            if (chat != null) {
+                                // Håndter mottak av chat-objektet, f.eks. ved å oppdatere en lokal liste og sende listen
+                                // Denne delen av koden må være trådsikker og håndtere sammenslåing av data fra flere asynkrone kall
+                            }
+                        }
+                    }
+                } else {
+                    // Håndter tilfelle der det ikke finnes noen chat-ID-er
+                    this.trySend(emptyList()).isSuccess
+                }
+            }
+
+            awaitClose { subscription.remove() }
+        }
+    }
+
     override fun getMatchesFlowForUser(userId: String): Flow<List<UserProfile>> {
         return callbackFlow {
             val subscription = firestore.collection("users").document(userId)
@@ -86,7 +125,7 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
 
             awaitClose { subscription.remove() }
         }
-    }
+    }*/
 
 
     override suspend fun readChat(chatId: String): Boolean { //viser at bruker har lest chatten
@@ -128,12 +167,24 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
     }
 
     override suspend fun createChat(newChat: ChatsFromFirebase): String {
-        // Firestore-dokumentet er opprettet og ID-en til det nye dokumentet blir returnert
+        // Oppretter et nytt Firestore-dokument for chatten og lagrer chatten
         val chatRef = firestore.collection(CHATS).document()
-        chatRef.set(newChat).await() // Lagrer chatten i Firestore
-        return chatRef.id // Returnerer ID-en til det nyopprettede dokumentet
-    }
+        chatRef.set(newChat).await()
 
+        // Legger til ID-en til det nye chat-dokumentet i 'matches'-listen for hver bruker
+        val chatId = chatRef.id
+        val userId1Ref = firestore.collection(USERS).document(newChat.userId1)
+        val userId2Ref = firestore.collection(USERS).document(newChat.userId2)
+
+        firestore.runBatch { batch ->
+            // Oppdaterer 'matches' for begge brukerne i samme database batch for konsistens
+            batch.update(userId1Ref, "chats", FieldValue.arrayUnion(chatId))
+            batch.update(userId2Ref, "chats", FieldValue.arrayUnion(chatId))
+        }.await()
+
+        // Returnerer ID-en til det nyopprettede chat-dokumentet
+        return chatId
+    }
 
     override suspend fun getUser(userId: String): UserProfile? =
         firestore.collection(USERS).document(userId).get().await().toObject()
@@ -179,5 +230,6 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         private const val USERS = "users"
         private const val CHATS = "chats"
         private const val MESSAGES = "messages" //ligger i en chat
+        private const val CHATSINUSER = "chats" //ligger i en user
     }
 }

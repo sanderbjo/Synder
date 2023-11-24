@@ -1,7 +1,9 @@
 package com.example.synder.screen.ChatList;
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.synder.models.ChatAndParticipant
@@ -31,7 +33,7 @@ class ChatViewModel @Inject constructor(
         ) : ViewModel() {
         val chat = mutableStateOf(ChatsFromFirebase())
 
-        val chats = MutableStateFlow<List<ChatsFromFirebase>>(emptyList())
+        val currentUser = mutableStateOf(UserProfile())
 
         val userId = accountService.currentUserId
 
@@ -59,8 +61,12 @@ class ChatViewModel @Inject constructor(
         private val _messages = MutableStateFlow<List<MessagesFromFirebase>>(emptyList())
         val messages: StateFlow<List<MessagesFromFirebase>> = _messages.asStateFlow()
 
+        /*
+        private val _chats = MutableStateFlow<List<ChatAndParticipant>>(emptyList())
+        val chats: StateFlow<List<ChatAndParticipant>> = _chats.asStateFlow()
+
         private val _matches = MutableStateFlow<List<UserProfile>>(emptyList())
-        val matches: StateFlow<List<UserProfile>> = _matches.asStateFlow()
+        val matches: StateFlow<List<UserProfile>> = _matches.asStateFlow()*/
 
         val storageRef = imgStorageService.storageRef
 
@@ -69,7 +75,9 @@ class ChatViewModel @Inject constructor(
                         storageService.users.collect { userList ->
                                 val currentUserId = accountService.currentUserId
                                 val currentUserProfile = userList.find { it.id == currentUserId }
-
+                                if (currentUserProfile != null) {
+                                        currentUser.value = currentUserProfile
+                                }
                                 userList.forEach { user ->
                                         usersCache[user.id] = user
 
@@ -85,12 +93,16 @@ class ChatViewModel @Inject constructor(
                         }
                 }
                 viewModelScope.launch {
-                        val currentUserId = accountService.currentUserId
-
                         storageService.chats.collect { chatList ->
-                                val relevantChats = chatList.filter {
-                                        it.userId1 == currentUserId || it.userId2 == currentUserId
+                                // Anta at usersCache[currentUserId]?.chats inneholder en liste over chat-IDer for den nåværende brukeren
+                                val userChatIds = usersCache[userId]?.chats ?: emptyList()
+                                Log.d("CHATS USERIDS", userChatIds.toString())
+
+                                // Filtrer listen over chatter basert på om chat-IDen finnes i brukerens 'chats'-liste
+                                val relevantChats = chatList.filter { chat ->
+                                        chat.id in userChatIds
                                 }
+
                                 Log.d("CHATS ALL RELEVANT", relevantChats.toString())
 
                                 relevantChats.forEach { chat ->
@@ -101,8 +113,8 @@ class ChatViewModel @Inject constructor(
                                                 chat = chat,
                                                 user1 = usersCache[chat.userId1] ?: UserProfile(),
                                                 user2 = usersCache[chat.userId2] ?: UserProfile(),
-                                                latestmessage = chat.latestmessage.toString(),
-                                                latestsender = chat.latestsender.toString(),
+                                                latestmessage = chat.latestmessage,
+                                                latestsender = chat.latestsender,
                                         )
                                         messagesCache[chat.id] = messages
                                         chatsCache[chat.id] = chatWithParticipant
@@ -111,7 +123,6 @@ class ChatViewModel @Inject constructor(
                                 Log.d("ChatsCache: ", chatsCache.toString())
                         }
                 }
-
         }
 
         fun userHasChat(chatUserId: String): ChatAndParticipant? {
@@ -180,13 +191,39 @@ class ChatViewModel @Inject constructor(
                         updateMessageCounter(index)
                 }
         }
+
+        /*
+        fun fetchChats(userId: String) {
+                viewModelScope.launch {
+                        storageService.getChatsFlowForUser(userId).collect { chatsList ->
+                                val chatAndParticipants = chatsList.map { chat ->
+                                        val user1 = usersCache[chat.userId1] ?: UserProfile()
+                                        val user2 = usersCache[chat.userId2] ?: UserProfile()
+                                        // Oppretter en ny instans av ChatAndParticipant
+                                        ChatAndParticipant(
+                                                id = chat.id,
+                                                chat = chat,
+                                                user1 = user1,
+                                                user2 = user2,
+                                                latestmessage = chat.latestmessage,
+                                                latestsender = chat.latestsender
+                                        )
+                                }
+                                // Oppdaterer _chats StateFlow eller LiveData med den nye listen
+                                _chats.value = chatAndParticipants
+                                Log.d("CHAP digdigg 2", _chats.value.toString())
+                                Log.d("CHAP digdigg 3", chatAndParticipants.toString())
+                        }
+                }
+        }
+
         fun fetchMatches(userId: String) {
                 viewModelScope.launch {
                         storageService.getMatchesFlowForUser(userId).collect { matchList ->
                                 _matches.value = matchList
                         }
                 }
-        }
+        }*/
 
         suspend fun getMessages(chatId: String, getAsync: Boolean = false): List<MessagesFromFirebase> {
                 // Returnerer cachede meldinger hvis de er lageret i listen fra før
@@ -277,6 +314,7 @@ class ChatViewModel @Inject constructor(
         }
         * */
 
+        /*
         fun checkIfExists(chatUserId: String) {
                 viewModelScope.launch {
                         val existingChat = chatsCache.values.firstOrNull { chat ->
@@ -300,7 +338,7 @@ class ChatViewModel @Inject constructor(
                                 currentChatIdClicked.value = existingChat.id
                         }
                 }
-        }
+        }*/
 
 
         suspend fun createNewChat(userFromChat: String): Pair<String, ChatAndParticipant>? {

@@ -36,8 +36,8 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
                isDarkTheme: Boolean,
                navController: NavHostController,
                userInChat: ChatAndParticipant,
-               chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
-
+               chatViewModel: ChatViewModel = hiltViewModel(),
+               modifier: Modifier = Modifier
 ) {
     val chatsList = chatViewModel.chatsCache.values.toList()
 
@@ -47,21 +47,16 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
 
     val storageRef = chatViewModel.storageRef
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            //.background(Color.White)
-    ) {
+    LazyColumn( modifier = Modifier.fillMaxSize() ) {
         item {
             PageStart(title = "Chats")
         }
-
         items(chatsList) { it ->
             ChatCard(onChatClick = getChatFromClick, it, storageRef , navController)
         }
 
         item {
-            PageEnd(textcontent = "Her var det tomt. Skaff en match!")
+            PageEnd(textcontent = "Her var det tomt. Start en chat først!")
         }
     }
 
@@ -83,8 +78,7 @@ fun matchScreen(
     }
     Log.d("Matches 2:  ", chatViewModel.matchesCache.toString())*/
     val matchList = chatViewModel.matchesCache.values.toList()
-    val chatMatchCache = chatViewModel.matchChatCache
-    Log.d("P!:Kommer chatter?", chatMatchCache.toString())
+    val chatsList = chatViewModel.chatsCache.values.toList()
 
     val userList = chatViewModel.usersCache.values.toList()
     Log.d("Liste med USERS:", "$userList")
@@ -101,11 +95,18 @@ fun matchScreen(
         }
 
         items(matchList) { match ->
-            // Finn matchens ID
-            val matchId = match.id
             var isNull by remember { mutableStateOf(false) }
+            val currentUserChats = chatViewModel.currentUser.value.chats ?: emptyList()
+            val matchChats = match.chats ?: emptyList()
 
-            val chatForMatch = chatMatchCache[matchId]
+            val commonChats = currentUserChats.intersect(matchChats)
+
+            var chatForMatch by remember { mutableStateOf<ChatAndParticipant?>(null) }
+
+            val theID = commonChats.firstOrNull()
+            if (theID != null) {
+                chatForMatch = chatsList.firstOrNull { it.id == theID }
+            }
 
             MatchCard(
                 getChatFromClick = getChatFromClick,
@@ -116,7 +117,6 @@ fun matchScreen(
                 navController = navController
             )
 
-            // Hvis shouldCreateChat er true, håndter oppretting av ny chat
             if (isNull) {
                 LaunchedEffect(match.id) {
                     val result = chatViewModel.createNewChat(match.id)
@@ -149,9 +149,7 @@ fun conversationWindow(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    if (chat.latestmessage.isNotEmpty()) {
-        chatViewModel.readChat(chat.id)
-    }
+    var showLast = false
     val messages by chatViewModel.messages.collectAsState()
     val sortedMessages = messages.sortedBy { it.index }
 
@@ -159,6 +157,12 @@ fun conversationWindow(
 
     LaunchedEffect(chatId) {
         chatViewModel.fetchMessages(chatId)
+        if (chat.latestsender.isNotEmpty() && !chat.latestsender.equals(chatViewModel.userId)) {
+            if (chat.latestmessage.isNotEmpty()) {
+                chatViewModel.readChat(chat.id)
+                showLast = true
+            }
+        }
     }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -178,21 +182,25 @@ fun conversationWindow(
                     sentByUser = sentByUser
                 )
             }
-        }
-        
-        item {
-            if (chat.latestmessage.isEmpty() && chat.latestsender !== chatViewModel.userId) {
-                Text(text = " Lest", fontSize = 16.sp)
-            }
-        }
 
-        item {
-            val textContent = if (messages.isNotEmpty()) {
-                "Siste melding ${messages.last().sent}"
-            } else {
-                "Her var det tomt. Start samtalen da vel!"
+            if (showLast) {
+                item {
+                    Text(text = " Lest", fontSize = 16.sp)
+                }
             }
-            PageEnd(textcontent = textContent)
+
+            item {
+                val textContent = if (messages.isNotEmpty()) {
+                    "Siste melding ${messages.last().sent}"
+                } else {
+                    "Her var det tomt. Start samtalen da vel!"
+                }
+                PageEnd(textcontent = textContent)
+            }
+        } else {
+            item {
+                Text(text = "Her var det tomt. Vær den første til å sende en melding!")
+            }
         }
     }
 }
