@@ -2,7 +2,6 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import com.example.synder.R
-import com.example.synder.R.raw.sendtext
 
 class SoundEffectPlayer(private val context: Context) {
     private val soundPool: SoundPool
@@ -25,7 +24,6 @@ class SoundEffectPlayer(private val context: Context) {
             .setAudioAttributes(audioAttributes)
             .build()
 
-        // Bytt ut 'your_sound_file' med navnet på lydfilen i 'res/raw'
         send = soundPool.load(context, R.raw.sendtext, 1)
         openkeyboard = soundPool.load(context, R.raw.openkeyboard, 1)
         closekeyboard = soundPool.load(context, R.raw.closekeyboard, 1)

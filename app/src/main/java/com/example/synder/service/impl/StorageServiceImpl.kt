@@ -9,12 +9,10 @@ import com.example.synder.service.StorageService
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
-import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -26,7 +24,7 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
     override val chats: Flow<List<ChatsFromFirebase>>
         get() = firestore.collection(CHATS).dataObjects()
     override val messages: Flow<List<List<MessagesFromFirebase>>>
-        get() = firestore.collection(CHATS).dataObjects() ///FÅ MELDINGENE I EN CACHE; SLIK AT DE AUTOMATISK OPPDATERES MED FIREBASE
+        get() = firestore.collection(CHATS).dataObjects()
 
 
     override suspend fun getNumberOfMessages(chatId: String): Int {
@@ -43,7 +41,6 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
 
     override suspend fun getMessagesForChat(chatId: String): List<MessagesFromFirebase> {
         val messages = mutableListOf<MessagesFromFirebase>()
-        // Use Firestore call to get documents and transform them into a list
         val documents = firestore.collection("chats").document(chatId)
             .collection(MESSAGES).get().await()
         for (document in documents) {
@@ -71,89 +68,29 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         }
     }
 
-    /*
-    override fun getChatsFlowForUser(userId: String): Flow<List<ChatsFromFirebase>> {
-        return callbackFlow {
-            Log.d("CHAP digdigg 1.0 ID", userId)
-            val chatIdsRef = firestore.collection(USERS).document(userId).collection("chats")
-            val chatsRef = firestore.collection("chats") // Antar at det finnes en kolleksjon på toppnivå som heter "chats"
 
-            // Abonnerer på endringer i brukerens chat-ID-er
-            val subscription = chatIdsRef.addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.e("CHAP Error", "Error fetching chat ids", e)
-                    close(e)
-                    return@addSnapshotListener
-                }
-
-                val chatIds = snapshot?.documents?.mapNotNull { it.id } ?: emptyList()
-                Log.d("CHAP digdigg 1", "Chat IDs: $chatIds")
-
-                // Hent de faktiske chat-dokumentene basert på ID-ene
-                if (chatIds.isNotEmpty()) {
-                    chatIds.forEach { chatId ->
-                        chatsRef.document(chatId.toString()).get().addOnSuccessListener { chatSnapshot ->
-                            val chat = chatSnapshot.toObject(ChatsFromFirebase::class.java)
-                            if (chat != null) {
-                                // Håndter mottak av chat-objektet, f.eks. ved å oppdatere en lokal liste og sende listen
-                                // Denne delen av koden må være trådsikker og håndtere sammenslåing av data fra flere asynkrone kall
-                            }
-                        }
-                    }
-                } else {
-                    // Håndter tilfelle der det ikke finnes noen chat-ID-er
-                    this.trySend(emptyList()).isSuccess
-                }
-            }
-
-            awaitClose { subscription.remove() }
-        }
-    }
-
-    override fun getMatchesFlowForUser(userId: String): Flow<List<UserProfile>> {
-        return callbackFlow {
-            val subscription = firestore.collection("users").document(userId)
-                .collection("matches") // Antar at det finnes en subcollection "matches"
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        close(e)
-                        return@addSnapshotListener
-                    }
-                    val matchList = snapshot?.documents?.mapNotNull { it.toObject(UserProfile::class.java) }
-                    this.trySend(matchList ?: emptyList()).isSuccess
-                }
-
-            awaitClose { subscription.remove() }
-        }
-    }*/
-
-
-    override suspend fun readChat(chatId: String): Boolean { //viser at bruker har lest chatten
+    override suspend fun readChat(chatId: String): Boolean {
         return try {
             firestore.collection("chats").document(chatId)
                 .update("latestmessage", "").await()
-            true // Oppdateringen var vellykket
+            true
         } catch (e: Exception) {
             Log.e("readChat", "Failed to update latestmessage", e)
-            false // Det oppsto en feil under oppdateringen
+            false
         }
     }
 
 
     override suspend fun sendMessage(chatId: String, message: MessagesFromFirebase): Boolean {
         return try {
-            // Hent antall dokumenter i kolleksjonen asynkront og bruk størrelsen som indeks
             val documents = firestore.collection("chats").document(chatId).collection(MESSAGES).get().await()
-            val index = documents.size()  // Antall eksisterende dokumenter blir din indeks
+            val index = documents.size()
 
-            // Oppdater meldingen med indeksen
             val updatedMessage = message.copy(index = index)
 
-            // Legg til meldingen i 'messages' underlagret samling
             firestore.collection("chats").document(chatId)
                 .collection(MESSAGES).add(updatedMessage).await()
 
-            // Oppdater 'latestmessage' og 'latestsender' i 'chats' dokumentet
             firestore.collection("chats").document(chatId)
                 .update(mapOf(
                     "latestmessage" to updatedMessage.text,
@@ -162,27 +99,23 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
 
             true
         } catch (e: Exception) {
-            false // Håndter feilen
+            false
         }
     }
 
     override suspend fun createChat(newChat: ChatsFromFirebase): String {
-        // Oppretter et nytt Firestore-dokument for chatten og lagrer chatten
         val chatRef = firestore.collection(CHATS).document()
         chatRef.set(newChat).await()
 
-        // Legger til ID-en til det nye chat-dokumentet i 'matches'-listen for hver bruker
         val chatId = chatRef.id
         val userId1Ref = firestore.collection(USERS).document(newChat.userId1)
         val userId2Ref = firestore.collection(USERS).document(newChat.userId2)
 
         firestore.runBatch { batch ->
-            // Oppdaterer 'matches' for begge brukerne i samme database batch for konsistens
             batch.update(userId1Ref, "chats", FieldValue.arrayUnion(chatId))
             batch.update(userId2Ref, "chats", FieldValue.arrayUnion(chatId))
         }.await()
 
-        // Returnerer ID-en til det nyopprettede chat-dokumentet
         return chatId
     }
 
@@ -214,11 +147,6 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
         matchedUserDoc.update("matches", FieldValue.arrayUnion(userId)).await()
     }
 
-    /*override suspend fun updateUserLocation(userid: String, latitude: Double, longitude: Double){
-        val userDoc = firestore.collection(USERS).document(userid)
-        userDoc.update("latitude", latitude, "longitude", longitude).await()
-    }*/
-
     override suspend fun updateUserLocation(userid: String, coordinates: Coordinates) {
         val userdoc = firestore.collection(USERS).document(userid)
         userdoc.update("coordinates", coordinates).await()
@@ -229,7 +157,6 @@ constructor(private val firestore: FirebaseFirestore) : StorageService {
     companion object {
         private const val USERS = "users"
         private const val CHATS = "chats"
-        private const val MESSAGES = "messages" //ligger i en chat
-        private const val CHATSINUSER = "chats" //ligger i en user
+        private const val MESSAGES = "messages"
     }
 }

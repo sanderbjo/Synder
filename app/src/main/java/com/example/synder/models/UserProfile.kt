@@ -1,6 +1,5 @@
 package com.example.synder.models
 
-import android.net.Uri
 import com.google.firebase.firestore.DocumentId
 
 

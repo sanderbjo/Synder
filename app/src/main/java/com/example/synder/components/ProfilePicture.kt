@@ -24,45 +24,39 @@ import com.google.firebase.storage.StorageReference
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-//fun ProfilePicture (url: String)
-fun ProfilePicture (imgReferance: StorageReference, modifierSize: Int = 50) {
-    GlideImage(
-        model = imgReferance,
-        contentDescription = "profilbilde",
-        modifier = Modifier.size(modifierSize.dp) //Default 50
-            .clip(CircleShape), // Set the size to create a circle
+fun ProfilePicture (imgReferance: StorageReference, name: String, modifierSize: Int = 50) {
+    if (imgReferance.path.isNullOrEmpty()) {
+        Monogram(name = name)
+    } else {
+        GlideImage(
+            model = imgReferance,
+            contentDescription = "profilbilde",
+            modifier = Modifier
+                .size(modifierSize.dp)
+                .clip(CircleShape),
 
-    )
-    //AsyncImage(
-    //    model = ImageRequest.Builder(LocalContext.current)
-    //        .data(imgReferance)
-    //        .crossfade(true)
-    //        .build(),
-    //
-    //    contentDescription = "profilbilde",
-    //    modifier = Modifier.size(50.dp)
-    //        .clip(CircleShape), // Set the size to create a circle
-    //)
+            )
+    }
 }
 @Composable
 fun Monogram(name: String, modifierSize: Int = 50) {
     val initial = if (name.isNotEmpty()) name.substring(0, 1) else "?"
     Card(
-        modifier = Modifier.size(modifierSize.dp), // Set the size to create a circle
-        shape = CircleShape, // Use CircleShape to make the card circular
+        modifier = Modifier.size(modifierSize.dp),
+        shape = CircleShape,
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFE46962),
             contentColor = Color.White,
         )
     ) {
         Text(
-            text = initial/*name.substring(0, 1)*/,
-            color = Color.White, // Set text color to white
-            fontSize = 24.sp, // Adjust the font size as needed
+            text = initial,
+            color = Color.White,
+            fontSize = 24.sp,
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxSize(), // Center text both vertically and horizontally
-            textAlign = TextAlign.Center // Center align the text
+                .fillMaxSize(),
+            textAlign = TextAlign.Center
         )
     }
 }

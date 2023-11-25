@@ -18,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.synder.components.ChatCard
 import com.example.synder.components.Message
-import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,11 +39,6 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
                modifier: Modifier = Modifier
 ) {
     val chatsList = chatViewModel.chatsCache.values.toList()
-
-    val userChats = listOf(chatsList)
-
-    Log.d("CHATLIST: ", chatsList.toString())
-
     val storageRef = chatViewModel.storageRef
 
     LazyColumn( modifier = Modifier.fillMaxSize() ) {
@@ -69,23 +63,10 @@ fun matchScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    /*val matches by chatViewModel.matches.collectAsState()
-
-    Log.d("Matches: ", matches.toString())
-
-    LaunchedEffect(chatViewModel.userId) {
-        chatViewModel.fetchMatches(chatViewModel.userId)
-    }
-    Log.d("Matches 2:  ", chatViewModel.matchesCache.toString())*/
     val matchList = chatViewModel.matchesCache.values.toList()
     val chatsList = chatViewModel.chatsCache.values.toList()
 
-    val userList = chatViewModel.usersCache.values.toList()
-    Log.d("Liste med USERS:", "$userList")
-
-
     val storageRef = chatViewModel.storageRef
-    //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -110,6 +91,7 @@ fun matchScreen(
 
             MatchCard(
                 getChatFromClick = getChatFromClick,
+                isDarkTheme = isDarkTheme,
                 ifChatIsNull = { isNull = true },
                 it = match,
                 storageRef,
@@ -174,7 +156,7 @@ fun conversationWindow(
                 val userProf = when (firebaseMessage.userId) {
                     chat.user1.id -> chat.user1
                     chat.user2.id -> chat.user2
-                    else -> UserProfile(name = "Ukjent") // Eller en annen default UserProfile hvis ID ikke matcher
+                    else -> UserProfile(name = "Ukjent")
                 }
                 Message(
                     it = firebaseMessage,
@@ -211,12 +193,11 @@ fun PageStart (title: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)) {
         Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp),
-            /*color = Color.Black*/)
+            )
         Divider(
             thickness = 2.dp,
-            /*color = Color.Black,*/
             modifier = Modifier
-                .fillMaxWidth() // 80% total width
+                .fillMaxWidth()
         )
     }
 }
@@ -225,13 +206,11 @@ fun PageEnd (textcontent: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(20.dp)) {
         Divider(
-            /*color = Color.Black,*/
             thickness = 2.dp,
             modifier = Modifier
-                .fillMaxWidth() // 80% total width
+                .fillMaxWidth()
         )
         Text(
-            /*color = Color.Black,*/
             text = textcontent,
             fontSize = 17.sp,
             modifier = Modifier
