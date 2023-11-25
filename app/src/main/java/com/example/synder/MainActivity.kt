@@ -310,10 +310,10 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         isVisible = false
                         showChatInput = true
                         chatViewModel.upadeCurrentId(id)
+                        val userToSend = chatViewModel.getOtherUserId(chat)
 
                         ChatTopNavigation( //Navigasjonen inne i et chat vindu
-                            chat,
-                            chatViewModel.userId,
+                            it = userToSend,
                             curRoute = curRoute,
                             navController = navController
                         )

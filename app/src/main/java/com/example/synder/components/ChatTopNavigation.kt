@@ -28,11 +28,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.synder.Screen
 import com.example.synder.models.ChatAndParticipant
+import com.example.synder.models.UserProfile
 
 @Composable
-fun ChatTopNavigation(it: ChatAndParticipant, currentUser: String, curRoute: String, navController: NavHostController) {
-    val usertoshow = if (!it.user1.id.equals(currentUser)) it.user1 else it.user2
-
+fun ChatTopNavigation(it: UserProfile, curRoute: String, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth(1f)
@@ -59,9 +58,9 @@ fun ChatTopNavigation(it: ChatAndParticipant, currentUser: String, curRoute: Str
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Monogram(name = usertoshow.name, 45)
+            Monogram(name = it.name, 45)
             Text(
-                text = "Chat med ${usertoshow.name} ${usertoshow.age}",
+                text = "Chat med ${it.name} ${it.age}",
                 fontSize = 22.sp,
                 textAlign = TextAlign.Center // Denne vil sørge for at teksten er sentrert hvis den er i flere linjer
             )

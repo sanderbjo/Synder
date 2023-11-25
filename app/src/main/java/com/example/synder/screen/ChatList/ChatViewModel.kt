@@ -125,6 +125,15 @@ class ChatViewModel @Inject constructor(
                 }
         }
 
+        fun getOtherUserId(chat: ChatAndParticipant): UserProfile {
+                return if (chat.user1.id == userId) {
+                        chat.user1
+                } else {
+                        chat.user2
+                }
+        }
+
+
         fun userHasChat(chatUserId: String): ChatAndParticipant? {
 
                 // Finn en chat hvor begge brukerne er involvert

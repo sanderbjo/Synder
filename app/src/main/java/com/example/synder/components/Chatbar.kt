@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +36,7 @@ import kotlinx.coroutines.delay
 fun Chatbar(context: Context, chatViewModel: ChatViewModel = hiltViewModel()) {
     var textValue by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    //val soundEffectPlayer = SoundEffectPlayer(context)
+    val soundEffectPlayer = SoundEffectPlayer(context)
 
     /*var isClicked by remember { mutableStateOf(false) }
 
@@ -59,6 +60,7 @@ fun Chatbar(context: Context, chatViewModel: ChatViewModel = hiltViewModel()) {
     ) {
         IconButton(
             onClick = {
+            soundEffectPlayer.playCloseKeyboard()
             keyboardController?.hide()
         },
             modifier = Modifier.padding(8.dp)
@@ -70,11 +72,17 @@ fun Chatbar(context: Context, chatViewModel: ChatViewModel = hiltViewModel()) {
             onValueChange = { newTextValue -> textValue = newTextValue },
             placeholder = { Text("Skriv her") },
             modifier = Modifier.weight(1f) // Take up maximum available space
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        soundEffectPlayer.playOpenKeyboard() // Spiller av lyd når tekstfeltet får fokus
+                    }
+                }
         )
         IconButton(
             onClick = {
                 if (textValue.trim().isNotEmpty()) {
                     chatViewModel.sendMessage(textValue.trim())
+                    soundEffectPlayer.playSend()
                     textValue = ""
                 }
             },
