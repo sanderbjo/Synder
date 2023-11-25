@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
@@ -22,15 +23,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.synder.screen.ChatList.ChatViewModel
 import kotlinx.coroutines.delay
-
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Chatbar(context: Context, chatViewModel: ChatViewModel = hiltViewModel()) {
     var textValue by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
     //val soundEffectPlayer = SoundEffectPlayer(context)
 
     /*var isClicked by remember { mutableStateOf(false) }
@@ -54,10 +58,12 @@ fun Chatbar(context: Context, chatViewModel: ChatViewModel = hiltViewModel()) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            onClick = {  },
+            onClick = {
+            keyboardController?.hide()
+        },
             modifier = Modifier.padding(8.dp)
         ) {
-            Icon(Icons.Default.Build, contentDescription = null)
+            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
         }
         TextField(
             value = textValue,

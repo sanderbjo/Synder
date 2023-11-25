@@ -170,6 +170,7 @@ fun conversationWindow(
 
             items(sortedMessages) { firebaseMessage ->
                 val sentByUser = firebaseMessage.userId == chatViewModel.userId
+
                 val userProf = when (firebaseMessage.userId) {
                     chat.user1.id -> chat.user1
                     chat.user2.id -> chat.user2

@@ -51,6 +51,13 @@ fun ChatCard(
         it.user2.id.equals(chatViewModel.userId) -> "Du"
         else -> UserInChat.name // Hvis ingen av brukerne matcher currentUserId, vis den andre brukerens navn.
     }
+    val lastSenderName = when (it.chat.latestsender) {
+        chatViewModel.userId -> "Du"
+        it.user1.id -> it.user1.name // Anta at user1 har et felt `name`
+        it.user2.id -> it.user2.name // Anta at user2 har et felt `name`
+        else -> "Ukjent" // Dette håndterer tilfeller der ingen id matcher, som en sikkerhetskontroll
+    }
+
 
 
     OutlinedCard(
@@ -105,10 +112,10 @@ fun ChatCard(
                         }
 
                         if (it.chat.latestmessage.isEmpty()) {
-                            Text(text = "Lest av ", fontSize = 18.sp)
-                            TruncatedText(hvemLeste, 18, 20, true)
+                            Text(text = "Lest av ", fontSize = 20.sp)
+                            TruncatedText(hvemLeste, 20, 20, true)
                         } else {
-                            TruncatedText(DisplayName + ": ", 18, 10, newMessage)
+                            TruncatedText(lastSenderName + ": ", 20, 10, newMessage)
                             TruncatedText(it.latestmessage,20, 20, newMessage)
                         }
                     }
