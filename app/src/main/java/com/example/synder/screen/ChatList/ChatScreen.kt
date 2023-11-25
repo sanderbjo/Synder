@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.synder.components.Chat
+import com.example.synder.components.ChatCard
 import com.example.synder.components.Message
-import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,9 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.synder.Screen
 import com.example.synder.components.MatchCard
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.synder.models.ChatAndParticipant
-import com.example.synder.models.FromFirebase.MessagesFromFirebase
 import com.example.synder.models.UserProfile
 
 @Composable
@@ -38,32 +35,22 @@ fun chatScreen(getChatFromClick: (String, ChatAndParticipant) -> Unit,
                isDarkTheme: Boolean,
                navController: NavHostController,
                userInChat: ChatAndParticipant,
-               chatViewModel: ChatViewModel = hiltViewModel(), modifier: Modifier = Modifier
-
+               chatViewModel: ChatViewModel = hiltViewModel(),
+               modifier: Modifier = Modifier
 ) {
     val chatsList = chatViewModel.chatsCache.values.toList()
-
-    val userChats = listOf(chatsList)
-
-    Log.d("CHATLIST: ", chatsList.toString())
-
     val storageRef = chatViewModel.storageRef
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            //.background(Color.White)
-    ) {
+    LazyColumn( modifier = Modifier.fillMaxSize() ) {
         item {
             PageStart(title = "Chats")
         }
-
         items(chatsList) { it ->
-            Chat(onChatClick = getChatFromClick, it, storageRef , navController)
+            ChatCard(onChatClick = getChatFromClick, it, storageRef , navController)
         }
 
         item {
-            PageEnd(textcontent = "Her var det tomt. Skaff en match!")
+            PageEnd(textcontent = "Her var det tomt. Start en chat først!")
         }
     }
 
@@ -76,24 +63,10 @@ fun matchScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    /*val matches by chatViewModel.matches.collectAsState()
-
-    Log.d("Matches: ", matches.toString())
-
-    LaunchedEffect(chatViewModel.userId) {
-        chatViewModel.fetchMatches(chatViewModel.userId)
-    }
-    Log.d("Matches 2:  ", chatViewModel.matchesCache.toString())*/
     val matchList = chatViewModel.matchesCache.values.toList()
-    val chatMatchCache = chatViewModel.matchChatCache
-    Log.d("P!:Kommer chatter?", chatMatchCache.toString())
-
-    val userList = chatViewModel.usersCache.values.toList()
-    Log.d("Liste med USERS:", "$userList")
-
+    val chatsList = chatViewModel.chatsCache.values.toList()
 
     val storageRef = chatViewModel.storageRef
-    //Column
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -103,14 +76,22 @@ fun matchScreen(
         }
 
         items(matchList) { match ->
-            // Finn matchens ID
-            val matchId = match.id
             var isNull by remember { mutableStateOf(false) }
+            val currentUserChats = chatViewModel.currentUser.value.chats ?: emptyList()
+            val matchChats = match.chats ?: emptyList()
 
-            val chatForMatch = chatMatchCache[matchId]
+            val commonChats = currentUserChats.intersect(matchChats)
+
+            var chatForMatch by remember { mutableStateOf<ChatAndParticipant?>(null) }
+
+            val theID = commonChats.firstOrNull()
+            if (theID != null) {
+                chatForMatch = chatsList.firstOrNull { it.id == theID }
+            }
 
             MatchCard(
                 getChatFromClick = getChatFromClick,
+                isDarkTheme = isDarkTheme,
                 ifChatIsNull = { isNull = true },
                 it = match,
                 storageRef,
@@ -118,7 +99,6 @@ fun matchScreen(
                 navController = navController
             )
 
-            // Hvis shouldCreateChat er true, håndter oppretting av ny chat
             if (isNull) {
                 LaunchedEffect(match.id) {
                     val result = chatViewModel.createNewChat(match.id)
@@ -143,6 +123,7 @@ fun matchScreen(
 }
 
 
+
 @Composable
 fun conversationWindow(
     chatId: String,
@@ -150,18 +131,20 @@ fun conversationWindow(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    if (chat.latestmessage.isNotEmpty()) {
-        chatViewModel.readChat(chat.id)
-    }
+    var showLast = false
     val messages by chatViewModel.messages.collectAsState()
-    chatViewModel.updateMessageCounter(messages.size - 1)
     val sortedMessages = messages.sortedBy { it.index }
 
     val storageRef = chatViewModel.storageRef
-    // Bruk LaunchedEffect for å hente meldinger når Composable-funksjonen først blir vist
+
     LaunchedEffect(chatId) {
         chatViewModel.fetchMessages(chatId)
-        chatViewModel.updateMessageCounter(messages.size)
+        if (chat.latestsender.isNotEmpty() && !chat.latestsender.equals(chatViewModel.userId)) {
+            if (chat.latestmessage.isNotEmpty()) {
+                chatViewModel.readChat(chat.id)
+                showLast = true
+            }
+        }
     }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -169,10 +152,11 @@ fun conversationWindow(
 
             items(sortedMessages) { firebaseMessage ->
                 val sentByUser = firebaseMessage.userId == chatViewModel.userId
+
                 val userProf = when (firebaseMessage.userId) {
                     chat.user1.id -> chat.user1
                     chat.user2.id -> chat.user2
-                    else -> UserProfile(name = "Ukjent") // Eller en annen default UserProfile hvis ID ikke matcher
+                    else -> UserProfile(name = "Ukjent")
                 }
                 Message(
                     it = firebaseMessage,
@@ -181,21 +165,25 @@ fun conversationWindow(
                     sentByUser = sentByUser
                 )
             }
-        }
-        
-        item {
-            if (chat.latestmessage.isEmpty() && chat.latestsender !== chatViewModel.userId) {
-                Text(text = " Lest", fontSize = 16.sp)
-            }
-        }
 
-        item {
-            val textContent = if (messages.isNotEmpty()) {
-                "Siste melding ${messages.last().sent}"
-            } else {
-                "Her var det tomt. Start samtalen da vel!"
+            if (showLast) {
+                item {
+                    Text(text = " Lest", fontSize = 16.sp)
+                }
             }
-            PageEnd(textcontent = textContent)
+
+            item {
+                val textContent = if (messages.isNotEmpty()) {
+                    "Siste melding ${messages.last().sent}"
+                } else {
+                    "Her var det tomt. Start samtalen da vel!"
+                }
+                PageEnd(textcontent = textContent)
+            }
+        } else {
+            item {
+                Text(text = "Her var det tomt. Vær den første til å sende en melding!")
+            }
         }
     }
 }
@@ -205,12 +193,11 @@ fun PageStart (title: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 5.dp)) {
         Text(text = "Nylige ${title}", fontSize = 32.sp, modifier = Modifier.padding(bottom = 5.dp),
-            /*color = Color.Black*/)
+            )
         Divider(
             thickness = 2.dp,
-            /*color = Color.Black,*/
             modifier = Modifier
-                .fillMaxWidth() // 80% total width
+                .fillMaxWidth()
         )
     }
 }
@@ -219,13 +206,11 @@ fun PageEnd (textcontent: String) {
     Column (horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(20.dp)) {
         Divider(
-            /*color = Color.Black,*/
             thickness = 2.dp,
             modifier = Modifier
-                .fillMaxWidth() // 80% total width
+                .fillMaxWidth()
         )
         Text(
-            /*color = Color.Black,*/
             text = textcontent,
             fontSize = 17.sp,
             modifier = Modifier

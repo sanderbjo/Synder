@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.Synder" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Synder.Splash" parent="Theme.Synder">
+        <item name="android:windowBackground">@drawable/ic_launcher_background</item>
+    </style>
 </resources>

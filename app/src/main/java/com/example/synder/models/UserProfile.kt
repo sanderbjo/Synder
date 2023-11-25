@@ -1,6 +1,5 @@
 package com.example.synder.models
 
-import android.net.Uri
 import com.google.firebase.firestore.DocumentId
 
 
@@ -14,5 +13,6 @@ data class UserProfile(
     val likedUsers: List<String> = emptyList(),
     val dislikedUsers: List<String> = emptyList(),
     val matches: List<String> = emptyList(),
+    val chats: List<String> = emptyList(),
     val coordinates: Coordinates = Coordinates(latitude = 0.0, longitude = 0.0),
 )

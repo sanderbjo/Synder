@@ -33,23 +33,30 @@ import com.google.firebase.storage.StorageReference
 import com.example.synder.screen.ChatList.ChatViewModel
 
 @Composable
-fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
-         it: ChatAndParticipant = ChatAndParticipant(),
-         storageRef: StorageReference,
-         navController: NavHostController,
-         chatViewModel: ChatViewModel = hiltViewModel()
+fun ChatCard(
+    onChatClick: (String, ChatAndParticipant) -> Unit,
+     it: ChatAndParticipant = ChatAndParticipant(),
+     storageRef: StorageReference,
+     navController: NavHostController,
+     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    val UserInChat = if (it.user1.id == chatViewModel.userId) it.user2 else it.user1
+    val UserInChat = if (it.user1.id.equals(chatViewModel.userId)) it.user2 else it.user1
     var newMessage = !it.latestsender.equals(chatViewModel.userId) && !it.latestmessage.isEmpty()
 
-// Bestemmer visningsnavnet basert på hvem som sendte meldingen.
 
 
     val DisplayName = when {
-        it.user1.id == chatViewModel.userId -> "Du"
-        it.user2.id == chatViewModel.userId -> "Du"
-        else -> UserInChat.name // Hvis ingen av brukerne matcher currentUserId, vis den andre brukerens navn.
+        it.user1.id.equals(chatViewModel.userId) -> "Du"
+        it.user2.id.equals(chatViewModel.userId) -> "Du"
+        else -> UserInChat.name
     }
+    val lastSenderName = when (it.chat.latestsender) {
+        chatViewModel.userId -> "Du"
+        it.user1.id -> it.user1.name
+        it.user2.id -> it.user2.name
+        else -> "Ukjent"
+    }
+
 
 
     OutlinedCard(
@@ -75,22 +82,16 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
         Row (
             modifier = Modifier
                 .padding(start = 15.dp, top = 2.dp, bottom = 2.dp)
-                .fillMaxSize(), // Center text both vertically and horizontally
+                .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            //if (UserInChat.profileImageUrl != "") {
-            //    ProfilePicture(url = UserInChat.profileImageUrl)
-            //} else {
-            //    Monogram(name = UserInChat.name)
-            //}
-                ProfilePicture(imgReferance = storageRef.child("images/${it.user1.id}.jpg"))
+            ProfilePicture(imgReferance = storageRef.child("images/${UserInChat.id}.jpg"), UserInChat.name)
             Column(modifier = Modifier
                 .padding(10.dp)
                 .padding(bottom = 20.dp)) {
                 TruncatedText(UserInChat.name,20, 20, true)
                 Row {
-                    /*TruncatedText(DisplayName,16, 15)*/
                     if (it.chat.latestsender.isEmpty()) {
                         TruncatedText(DisplayName + " ", 18, 10, newMessage)
 
@@ -104,10 +105,10 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
                         }
 
                         if (it.chat.latestmessage.isEmpty()) {
-                            Text(text = "Lest av ", fontSize = 18.sp)
-                            TruncatedText(hvemLeste, 18, 20, true)
+                            Text(text = "Lest av ", fontSize = 20.sp)
+                            TruncatedText(hvemLeste, 20, 20, true)
                         } else {
-                            TruncatedText(DisplayName + ": ", 18, 10, newMessage)
+                            TruncatedText(lastSenderName + ": ", 20, 10, newMessage)
                             TruncatedText(it.latestmessage,20, 20, newMessage)
                         }
                     }
@@ -117,15 +118,15 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
                     Card(
                         modifier = Modifier.padding(top = 10.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFD3454E), // Bakgrunnsfarge
-                            contentColor = Color.White, // Innholdsfarge
+                            containerColor = Color(0xFFD3454E),
+                            contentColor = Color.White,
                         ),
                     ) {
-                        Text(text = "Du har en ny melding!", fontSize = 14.sp, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = "Du har en ny melding!", fontSize = 14.sp, modifier = Modifier.padding(5.dp))
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f)) // This spacer will push the OutlinedCard to the right
+            Spacer(modifier = Modifier.weight(1f))
 
         }
     }
@@ -134,6 +135,7 @@ fun Chat(onChatClick: (String, ChatAndParticipant) -> Unit,
 @Composable
 fun MatchCard(
     getChatFromClick: (String, ChatAndParticipant) -> Unit,
+    isDarkTheme: Boolean,
     ifChatIsNull: () -> Unit,
     it: UserProfile,
     storageRef: StorageReference,
@@ -162,51 +164,52 @@ fun MatchCard(
                     }
                 } else {
                     ifChatIsNull()
-                    Log.d("PRØVDE Å TRYKKE PÅ BRUKJER ", it.name + " " + it.age.toString())
                 }
             }
     ) {
-
-        Log.d("P!: Dette er utskriften fra CHAT: ", hasChat.toString())
-
         Row (
             modifier = Modifier
                 .padding(start = 15.dp, top = 2.dp, bottom = 2.dp)
-                .fillMaxSize(), // Center text both vertically and horizontally
+                .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            ProfilePicture(imgReferance = storageRef.child("images/${it.id}.jpg"))
+            ProfilePicture(imgReferance = storageRef.child("images/${it.id}.jpg"), it.name)
             
 
             Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp) // Use "sp" for text size
-                Text(text = it.bio, fontSize = 16.sp) // Adjust text size as needed
+                Text(text = it.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text(text = it.bio, fontSize = 16.sp)
 
                 Card(
-                    modifier = Modifier.padding(top = 10.dp)
+                    modifier = Modifier.padding(top = 10.dp),
+
+                    colors = CardDefaults.cardColors(
+                            containerColor = if (hasChat == null) Color(0xFF901D1D) else Color.Transparent,
+                            contentColor = if (hasChat == null) Color.White else Color.Black
+                ),
                 ) {
                     if (hasChat == null) {
-                        Text(text = "Start samtalen", fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = "Start samtalen", fontSize = 14.sp, modifier = Modifier.padding(5.dp))
                     } else {
-                        Text(text = "Gå til chat", fontSize = 12.sp, color = Color.Black, modifier = Modifier.padding(5.dp)) // Adjust text size as needed
+                        Text(text = "Gå til chat", fontSize = 14.sp, color = if (isDarkTheme) Color.White else Color.Black, modifier = Modifier.padding(5.dp))
                     }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f)) // This spacer will push the OutlinedCard to the right
+            Spacer(modifier = Modifier.weight(1f))
 
             if (hasChat === null) {
                 OutlinedCard(
                     shape = RoundedCornerShape(10.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.Transparent, // Set background to transparent
-                        contentColor = Color.White, // Set content color to white
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
                     ),
-                    border = BorderStroke(1.dp, Color(0xFFFFC700)), // Set border color to #FFC700
+                    border = BorderStroke(1.dp, Color(0xFFFFC700)),
                     modifier = Modifier.padding(end = 10.dp)
 
                 ) {
-                    Text(text = "Ny!", color = Color(0xFFFFC700), modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)) // Set text color to #FFC700
+                    Text(text = "Ny!", color = Color(0xFFFFC700), modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp))
                 }
             }
         }

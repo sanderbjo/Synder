@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -74,6 +75,7 @@ import kotlinx.coroutines.delay
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -308,10 +310,10 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         isVisible = false
                         showChatInput = true
                         chatViewModel.upadeCurrentId(id)
+                        val userToSend = chatViewModel.getOtherUserId(chat)
 
                         ChatTopNavigation( //Navigasjonen inne i et chat vindu
-                            chat,
-                            chatViewModel.userId,
+                            it = userToSend,
                             curRoute = curRoute,
                             navController = navController
                         )
