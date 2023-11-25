@@ -30,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -45,14 +46,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.synder.R
+import com.example.synder.ui.theme.Typography
+
 //deler av koden er hentet/inspirert av kodeeksempel i forelesning/github
 //men det er endret på for å passe inn i dette prosjektet og det er lagt til en del mer funksjonalitet/elementer
 @Composable
@@ -77,13 +82,11 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.errorMessage != "")
-            Text(
-                text = uiState.errorMessage,
-                Modifier.padding(vertical = 8.dp)
-            )
 
-        Spacer(modifier = Modifier.padding(top = 160.dp))
+        Spacer(modifier = Modifier.padding(top = 120.dp))
+
+        Text(text = "Registrering", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineLarge
+        )
         EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
         PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
         RepeatPasswordField(uiState.repeatPassword, viewModel::onRepeatPasswordChange, fieldModifier)
@@ -95,18 +98,27 @@ fun SignUpScreen(
         SerEtterField(uiState.serEtter, uiState.serEtterDropdownEnabled,viewModel::onSerEtterEnabledChange, viewModel::onSerEtterChange, fieldModifier )
 
         Spacer(modifier = Modifier.padding(bottom = 80.dp))
-        Text(text = "Du må ha fylt ut alle feltene med * for å lage konto")
-        Row {
 
+        //feilmelding om det er en feil i sign up
+        if (uiState.errorMessage != "")
+            Text(
+                text = uiState.errorMessage,
+                Modifier.padding(16.dp, 8.dp),
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
+            )
+
+        Row {
             Button(
                 onClick = { viewModel.onSignUpClick(loggedIn) },
                 modifier = Modifier
                     .padding(16.dp, 8.dp),
             ) {
-                Text(text = "create_account", fontSize = 16.sp)
+                Text(text = "Lag bruker", fontSize = 16.sp)
             }
         }
-        Spacer(modifier = Modifier.padding(bottom = 300.dp))
+        //lagt til en liten spacer som gjør at når man har tastaturet åpent så kan man swipe ned for å se knappene
+        Spacer(modifier = Modifier.padding(bottom = 260.dp))
 
     }
 }
@@ -152,7 +164,7 @@ fun SignUpScreen(
             },
                 Modifier.padding(bottom = 8.dp))
             {
-                Text(text = "legg til profilbilde")
+                Text(text = "Legg til profilbilde")
             }
         }
     }
@@ -164,14 +176,14 @@ fun SignUpScreen(
             modifier = modifier,
             value = value,
             onValueChange = { onNewValue(it) },
-            placeholder = { Text(text = "email*") },
+            placeholder = { Text(text = "Email*") },
             leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
         )
     }
 
     @Composable
     fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-        PasswordField(value, "password*", onNewValue, modifier)
+        PasswordField(value, "Passord*", onNewValue, modifier)
     }
 
     @Composable
@@ -180,7 +192,7 @@ fun SignUpScreen(
         onNewValue: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
-        PasswordField(value, "repeat_password*", onNewValue, modifier)
+        PasswordField(value, "Gjenta passord*", onNewValue, modifier)
     }
 
     @Composable
@@ -221,22 +233,21 @@ fun SignUpScreen(
             modifier = modifier,
             value = value,
             onValueChange = { onNewValue(it) },
-            placeholder = { Text(text = "fornavn*") },
+            placeholder = { Text(text = "Fornavn*") },
             leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") }
         )
     }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgeField(value: Float, onNewValue: (Float) -> Unit, modifier: Modifier = Modifier) {
     Spacer(modifier = Modifier.padding(bottom = 16.dp))
     Text(
-        text = "alder*")
+        text = "Alder*")
     Slider(
         value = value,
         valueRange = 0f..100f,
         onValueChange = {onNewValue(it)},
-        modifier = modifier
+        modifier = modifier.padding(20.dp, 0.dp)
         )
     Text(
         text = value.toInt().toString() + " år",
@@ -274,7 +285,7 @@ fun BioField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = M
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
-        placeholder = { Text(text = "bio") },
+        placeholder = { Text(text = "Bio") },
         leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Name") }
     )
 }
@@ -302,7 +313,7 @@ fun KjonnField(value: String, enabled: Boolean ,onEnabledChange: (Boolean) -> Un
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = enabled)
                     },
-            placeholder = { Text(text = "kjønn*") },
+            placeholder = { Text(text = "Kjønn*") },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor()
@@ -358,7 +369,7 @@ fun SerEtterField(value: String, enabled: Boolean ,onEnabledChange: (Boolean) ->
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = enabled)
             },
-            placeholder = { Text(text = "hvem kjønn ser du etter?*") },
+            placeholder = { Text(text = "Hvem kjønn ser du etter?*") },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor()

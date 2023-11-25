@@ -81,19 +81,54 @@ class SignUpViewModel @Inject constructor( private val accountService: AccountSe
 
     fun onSignUpClick(loggedIn: () -> Unit) {
         if (!email.isValidEmail()) {
-            uiState.value = uiState.value.copy(errorMessage = "email_error")
+            //sier ikke noe om hva emailen må inneholde av sikkerhetsgrunner, skal gjøre det vanskeligere for hackere å skrive inn falsk email
+            uiState.value = uiState.value.copy(errorMessage = "ikke gyldig email")
             return
         }
 
         else if (!password.isValidPassword()) {
-            uiState.value = uiState.value.copy(errorMessage = "password_error")
+            uiState.value = uiState.value.copy(errorMessage = "ikke sikkert nok passord, passordet må være minst 6 siffer langt og passordet må inneholde liten bokstav, stor bokstav og tall, og det kan ikke inneholde mellomrom")
             return
         }
 
         else if (password != uiState.value.repeatPassword) {
-            uiState.value = uiState.value.copy(errorMessage = "password_match_error")
+            uiState.value = uiState.value.copy(errorMessage = "passordet ditt matcher ikke med gjenta passord")
             return
         }
+
+        else if (profileImageUri == null) {
+            uiState.value = uiState.value.copy(errorMessage = "mangler bilde")
+            return
+        }
+
+        else if (name == "") {
+            uiState.value = uiState.value.copy(errorMessage = "Du må skrive inn navn")
+            return
+        }
+
+        else if (age < 18) {
+            uiState.value = uiState.value.copy(errorMessage = "Du må være over 18 år for å lage bruker")
+            return
+        }
+
+        //else if (bio == "") {
+        //    uiState.value = uiState.value.copy(errorMessage = "password_match_error")
+        //    return
+        //}
+
+        else if (kjonn == "") {
+            uiState.value = uiState.value.copy(errorMessage = "Du må velge kjonn")
+            return
+        }
+
+        else if (serEtter == "") {
+            uiState.value = uiState.value.copy(errorMessage = "Du må velge hvem kjønn du ser etter")
+            return
+        }
+
+
+
+
 
         viewModelScope.launch {
             try {

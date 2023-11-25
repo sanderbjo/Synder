@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -58,36 +61,43 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.padding(top = 120.dp))
         if (uiState.errorMessage != "") {
             Text(
                 text = uiState.errorMessage,
-                Modifier.padding(vertical = 8.dp)
+                Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
             )
         }
-            Text(text = "Vi har lagd en anonym bruker som kan brukes for testing",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                textAlign = TextAlign.Center)
-            Text(text = "email = anonym@bruker.no")
-            Text(text = "passord = Anonym123",
-                modifier = modifier.padding(bottom = 24.dp))
-            EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
-            PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
+        Text(text = "Logg inn", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineLarge)
+        Text(
+            text = "Vi har lagd en anonym bruker som kan brukes for testing",
+            modifier = Modifier.padding(horizontal = 20.dp),
+            textAlign = TextAlign.Center)
+        Text(text = "Email = anonym@bruker.no")
+        Text(text = "Passord = Anonym123",
+            modifier = modifier.padding(bottom = 24.dp))
+        EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
+        PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
 
 
-            Row {
-                Button(
-                    onClick = { viewModel.onLoginClick(loggedIn) },
-                    modifier = Modifier
-                        .padding(16.dp, 8.dp),
+        Row {
+            Button(
+                onClick = { viewModel.onLoginClick(loggedIn) },
+                modifier = Modifier
+                    .padding(16.dp, 8.dp),
                 ) {
-                    Text(text = "login", fontSize = 16.sp)
-                }
+                Text(text = "Logg inn", fontSize = 16.sp)
+            }
 
-            }
-            Text(text = "Har du ikke bruker? Sign up nå!")
-            Button(onClick = onSignupClick) {
-                Text(text = "Sign up")
-            }
+        }
+        Text(text = "Har du ikke bruker? Opprett nå!")
+        Button(onClick = onSignupClick) {
+            Text(text = "Opprett bruker")
+        }
+        //lagt til en liten spacer som gjør at når man har tastaturet åpent så kan man swipe ned for å se knappene
+        Spacer(modifier = Modifier.padding(bottom = 200.dp))
     }
 }
 
@@ -106,14 +116,14 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
 
 @Composable
 fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-    PasswordField(value, R.string.password, onNewValue, modifier)
+    PasswordField(value, stringResource(R.string.passord), onNewValue, modifier)
 }
 
 
     @Composable
     private fun PasswordField(
         value: String,
-        @StringRes placeholder: Int,
+        placeholder: String,
         onNewValue: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
@@ -130,7 +140,7 @@ fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifie
             modifier = modifier,
             value = value,
             onValueChange = { onNewValue(it) },
-            placeholder = { Text(text = stringResource(placeholder)) },
+            placeholder = { Text(text = placeholder) },
             leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
             trailingIcon = {
                 IconButton(onClick = { isVisible = !isVisible }) {

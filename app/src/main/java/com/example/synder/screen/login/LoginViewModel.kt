@@ -33,12 +33,12 @@ class LoginViewModel @Inject constructor(private val accountService: AccountServ
 
     fun onLoginClick(loggedIn: () -> Unit) {
         if (!email.isValidEmail()) {
-            uiState.value = uiState.value.copy(errorMessage = "email_error")
+            uiState.value = uiState.value.copy(errorMessage = "Feil email")
             return
         }
 
         if (!password.isValidPassword()) {
-            uiState.value = uiState.value.copy(errorMessage = "password_error")
+            uiState.value = uiState.value.copy(errorMessage = "Feil passord")
             return
         }
 
@@ -50,7 +50,7 @@ class LoginViewModel @Inject constructor(private val accountService: AccountServ
                 }
             }
             catch(e: Exception) {
-                uiState.value = uiState.value.copy(errorMessage = "could_not_log_in")
+                uiState.value = uiState.value.copy(errorMessage = "Kunne ikke logge inn")
             }
         }
     }
