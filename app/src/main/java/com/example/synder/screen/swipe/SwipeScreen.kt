@@ -340,7 +340,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel(), context: Context) {
                 }
                 item {
                     if (currentUserIndex == profiles.size) {
-                        EndOfListCard()
+                        endOfListCard()
                     }
                 }
 
@@ -369,6 +369,8 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel(), context: Context) {
                 }
             }
         }
+    } else if (profiles.isEmpty()){
+        endOfListCard()
     }
 
     LaunchedEffect(delayIncrement){
@@ -386,7 +388,7 @@ fun SwipeScreen(viewModel: SwipeViewModel = hiltViewModel(), context: Context) {
 
 
 @Composable
-fun EndOfListCard(){
+fun endOfListCard(){
     Card(
         modifier = Modifier
             .padding(16.dp)
