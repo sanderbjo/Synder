@@ -1,9 +1,6 @@
 package com.example.synder.screen.profile
 
 
-import android.util.Log
-import android.widget.ImageView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -27,20 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.compose.SynderTheme
+import com.example.synder.R
 import com.example.synder.Screen
-import com.example.synder.screen.settings.SettingsScreen
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -52,59 +44,15 @@ fun ProfileScreen(modifier: Modifier = Modifier,
     val userImgRef by viewModel.userImgRef
     val storageRef by viewModel.storageRef
 
-
-    /*val images = listOf(
-        painterResource(id = R.drawable.ic_launcher_foreground),
-        painterResource(id = R.drawable.ic_launcher_foreground),
-        painterResource(id = R.drawable.ic_launcher_foreground),
-        painterResource(id = R.drawable.ic_launcher_foreground),
-        painterResource(id = R.drawable.ic_launcher_foreground)
-    )*/
     Column(
         modifier
             .fillMaxSize()
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        /*LazyRow {
-            items(images) {image ->
-                Image(painter = image,
-                    contentDescription = "profilePicture",
-                    modifier = Modifier
-                        .border(BorderStroke(1.dp, Color.Black))
-                        .height(180.dp)
-                        .width(120.dp))
-            }
-        }*/
-
-        //AsyncImage(
-        //    model = ImageRequest.Builder(LocalContext.current)
-        //            .data(userImg)
-        //            .crossfade(true)
-        //            .build(),
-        //    contentDescription = "profilbilde",
-        //    contentScale = ContentScale.Crop,
-        //    modifier = Modifier
-        //        .size(160.dp)
-        //        .clip(CircleShape)
-        //        .fillMaxWidth(),
-        //    alignment = Alignment.TopEnd
-        //)
-        //Image(
-        //    painter = rememberAsyncImagePainter( model = Glide.with(LocalContext.current)
-        //        .load(userImgRef)
-        //    ),
-        //    contentDescription = null,
-        //)
-        val img = rememberAsyncImagePainter(model = Glide.with(LocalContext.current).load(userImgRef))
-
-        Log.d("img", "${img}")
-        Log.d("imgRef", "${userImgRef}")
-        //AsyncImage(model = Glide.with(LocalContext.current).load(userImgRef),
-        //    contentDescription = null)
         GlideImage(
             model = storageRef?.child("images/${user.id}.jpg"),
-            contentDescription = "Profilbilde",
+            contentDescription = stringResource(R.string.profilbilde),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(160.dp)
@@ -134,10 +82,10 @@ fun ProfileScreen(modifier: Modifier = Modifier,
                     .height(60.dp)) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = null
+                    contentDescription = stringResource(R.string.edit_bilde)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Rediger bilder")
+                Text(text = stringResource(R.string.rediger_bilder))
             }
         }
         Spacer(modifier = Modifier.height(40.dp))
@@ -149,11 +97,11 @@ fun ProfileScreen(modifier: Modifier = Modifier,
                     .height(60.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Innstillinger")
+                Text(text = stringResource(R.string.innstillinger))
             }
             Button(onClick = { /*TODO*/ },
                 Modifier
@@ -162,48 +110,11 @@ fun ProfileScreen(modifier: Modifier = Modifier,
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = null
+                    contentDescription = stringResource(R.string.edit_profil)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Personlig informasjon")
+                Text(text = stringResource(R.string.personlig_informasjon))
             }
         }
-        /*Row(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 12.dp) ,horizontalArrangement = Arrangement.SpaceAround) {
-
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null
-                    )
-                }
-                Text(text = "Edit bio")
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.Face,
-                        contentDescription = null
-
-                    )
-                }
-                Text(text = "Edit images")
-            }
-        }*/
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProfile(){
-    SynderTheme {
-        //ProfileScreen()
     }
 }

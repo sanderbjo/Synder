@@ -2,8 +2,8 @@ package com.example.synder.screen.login
 
 import androidx.annotation.StringRes
 
-data class LoginUiState (
+data class LoginUiState(
     val email: String = "",
     val password: String = "",
-    val errorMessage: String = ""
+    @StringRes val errorMessage: Int = 0
 )

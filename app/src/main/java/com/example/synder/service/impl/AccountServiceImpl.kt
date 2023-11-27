@@ -3,10 +3,8 @@ package com.example.synder.service.impl
 import android.net.Uri
 import com.example.synder.models.UserProfile
 import com.example.synder.service.AccountService
-import com.example.synder.service.ImgStorageService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -46,15 +44,10 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         serEtter: String,
         onResult: (Throwable?) -> Unit
     ) {
-
         auth.createUserWithEmailAndPassword(email,password)
             .addOnCompleteListener { onResult(it.exception) }.await()
-        //UserProfile user = new UserProfile(currentUserId, name, age.toString(),bio, profileImageUrl, kjonn, serEtter)
-        //val profileimg =
 
         FirebaseFirestore.getInstance().collection("users").document(currentUserId).set(UserProfile(currentUserId, name, age.toInt().toString(),bio ,kjonn, serEtter))
-        //auth.createUserWithEmailAndPassword(email, password).
-        //bilde til storage
     }
 
     override suspend fun signOut() {

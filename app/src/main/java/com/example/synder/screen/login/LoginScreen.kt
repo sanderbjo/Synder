@@ -1,9 +1,9 @@
 package com.example.synder.screen.login
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +14,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -58,36 +59,36 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (uiState.errorMessage != "") {
+        Spacer(modifier = Modifier.padding(top = 120.dp))
+        if (uiState.errorMessage != 0) {
             Text(
-                text = uiState.errorMessage,
-                Modifier.padding(vertical = 8.dp)
+                text = stringResource(id = uiState.errorMessage),
+                Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold
             )
         }
-            Text(text = "Vi har lagd en anonym bruker som kan brukes for testing",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                textAlign = TextAlign.Center)
-            Text(text = "email = anonym@bruker.no")
-            Text(text = "passord = Anonym123",
-                modifier = modifier.padding(bottom = 24.dp))
-            EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
-            PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
+        Text(text = stringResource(R.string.logg_inn), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineLarge)
+        EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
+        PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
 
 
-            Row {
-                Button(
-                    onClick = { viewModel.onLoginClick(loggedIn) },
-                    modifier = Modifier
-                        .padding(16.dp, 8.dp),
+        Row {
+            Button(
+                onClick = { viewModel.onLoginClick(loggedIn) },
+                modifier = Modifier
+                    .padding(16.dp, 8.dp),
                 ) {
-                    Text(text = "login", fontSize = 16.sp)
-                }
+                Text(text = stringResource(R.string.logg_inn), fontSize = 16.sp)
+            }
 
-            }
-            Text(text = "Har du ikke bruker? Sign up nå!")
-            Button(onClick = onSignupClick) {
-                Text(text = "Sign up")
-            }
+        }
+        Text(text = stringResource(R.string.har_du_ikke_bruker_opprett_n))
+        Button(onClick = onSignupClick) {
+            Text(text = stringResource(R.string.opprett_bruker))
+        }
+        //lagt til en liten spacer som gjør at når man har tastaturet åpent så kan man swipe ned for å se knappene
+        Spacer(modifier = Modifier.padding(bottom = 200.dp))
     }
 }
 
@@ -99,21 +100,21 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
-        placeholder = { Text("email") },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
+        placeholder = { Text(stringResource(R.string.email)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = stringResource(R.string.email)) }
     )
 }
 
 @Composable
 fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
-    PasswordField(value, R.string.password, onNewValue, modifier)
+    PasswordField(value, stringResource(R.string.passord), onNewValue, modifier)
 }
 
 
     @Composable
     private fun PasswordField(
         value: String,
-        @StringRes placeholder: Int,
+        placeholder: String,
         onNewValue: (String) -> Unit,
         modifier: Modifier = Modifier
     ) {
@@ -130,11 +131,14 @@ fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifie
             modifier = modifier,
             value = value,
             onValueChange = { onNewValue(it) },
-            placeholder = { Text(text = stringResource(placeholder)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
+            placeholder = { Text(text = placeholder) },
+            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = stringResource(
+                R.string.lock
+            )
+            ) },
             trailingIcon = {
                 IconButton(onClick = { isVisible = !isVisible }) {
-                    Icon(painter = icon, contentDescription = "Visibility")
+                    Icon(painter = icon, contentDescription = stringResource(R.string.visibility))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

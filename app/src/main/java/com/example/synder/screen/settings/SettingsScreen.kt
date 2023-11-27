@@ -2,7 +2,6 @@ package com.example.synder.screen.settings
 
 import android.app.Activity
 import android.content.Context
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,13 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.synder.R
 import kotlinx.coroutines.launch
 
 
@@ -48,23 +47,16 @@ fun SettingsScreen(
     LazyColumn(){
         item{
             SwitchSettingItem(
-                label = "App Theme",
-                value = if (isDarkTheme) "Dark" else "Light",
+                label = stringResource(R.string.app_tema),
+                value = if (isDarkTheme) stringResource(R.string.m_rk) else stringResource(R.string.lys),
                 switchState = isDarkTheme,
                 onSwitchStateChanged = { newSwitchState -> toggleTheme() }
 
             )
         }
         item{
-            SettingItem(
-                label = "Notifications",
-                value = "On",
-                onClick = {}
-            )
-        }
-        item{
             VolumeSettingItem(
-                label = "Volume",
+                label = stringResource(R.string.volum),
                 volumeLevel = volumeLevel,
                 onVolumeChanged = {newVolumeLevel ->
                     viewModel.setVolumeLevel(newVolumeLevel)
@@ -73,7 +65,7 @@ fun SettingsScreen(
         item {
             CheckBoxSettingItem(
 
-                label = "Allow GPS location",
+                label = stringResource(R.string.godta_gps_lokasjon),
                 checked = checkPermission.value,
                 onCheckedChange = {newCheckedState ->
                     scope.launch {
@@ -172,7 +164,7 @@ fun VolumeSettingItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Volume Level: $volumeLevel%",
+                text = "Volum level: $volumeLevel%",
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -190,29 +182,6 @@ fun VolumeSettingItem(
 }
 
 @Composable
-fun SettingItem(
-    label: String,
-    value: String? = null,
-    onClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp)
-    ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        if (value != null) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-
-    }
-}
-
-@Composable
 fun SignOutButton(signedOut: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
         Button(
@@ -220,7 +189,7 @@ fun SignOutButton(signedOut: () -> Unit, viewModel: SettingsViewModel = hiltView
             modifier = Modifier
                 .padding(16.dp, 8.dp)
         ) {
-            Text(text = "Sign out", fontSize = 16.sp)
+            Text(text = stringResource(R.string.logg_ut), fontSize = 16.sp)
         }
     }
 }
