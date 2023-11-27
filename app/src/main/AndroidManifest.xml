@@ -23,7 +23,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Synder.MySplash"> <!-- Bruk én stil her -->
+            android:theme="@style/Theme.Synder.MySplash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

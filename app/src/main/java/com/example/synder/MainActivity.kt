@@ -80,7 +80,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SynderTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -257,18 +256,22 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                 composable(Screen.Profile.name) {
                     ProfileScreen(navController = navController)
                     isVisible = true
+                    showChatInput = false
                 }
                 composable(Screen.Settings.name) {
                     SettingsScreen(isDarkTheme, { toggleTheme() }, context = LocalContext.current, signedOut = { navController.navigate(Screen.Login.name) })
                     isVisible = true
+                    showChatInput = false
                 }
                 composable(Screen.Swipe.name) {
                     SwipeScreen(context = LocalContext.current)
                     isVisible = true
+                    showChatInput = false
                 }
                 composable(Screen.Chats.name) {
                     Column {
                         isVisible = true
+                        showChatInput = false
                         SegmentedButton(
                             curRoute = curRoute,
                             navController = navController,
@@ -285,6 +288,7 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                 composable(Screen.Matches.name) {
                     Column {
                         isVisible = true
+                        showChatInput = false
                         SegmentedButton(
                             curRoute = curRoute,
                             navController = navController,
@@ -303,7 +307,6 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                 }
                 composable(Screen.Chat.name) {
                     Column {
-                        // State for å kontrollere om conversationWindow skal vises
                         Log.d("TEST UPDATED? string", "${id}")
                         Log.d("TEST UPDATED? ChatAndParticipant", "${chat}")
                         val isLoaded = remember { mutableStateOf(false) }
@@ -312,29 +315,24 @@ fun Navigation(chatViewModel: ChatViewModel = hiltViewModel()) {
                         chatViewModel.upadeCurrentId(id)
                         val userToSend = chatViewModel.getOtherUserId(chat)
 
-                        ChatTopNavigation( //Navigasjonen inne i et chat vindu
+                        ChatTopNavigation(
                             it = userToSend,
                             curRoute = curRoute,
                             navController = navController
                         )
                         conversationWindow(id, chat)
-                        /*
-                        if (showConversationWindow.value) {
-                        } else {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator() //Innlastingds ikon
-                            }
-                        }*/
                     }
                 }
                 composable(Screen.Login.name){
-                LoginScreen(loggedIn = { navController.navigate("profile") },
+                    LoginScreen(loggedIn = { navController.navigate("profile") },
                             onSignupClick = {navController.navigate("signup")})
-                isVisible = false;
+                    isVisible = false;
+                    showChatInput = false
                 }
                 composable(Screen.SignUp.name){
                     SignUpScreen(loggedIn = { navController.navigate("profile") })
                     isVisible = false;
+                    showChatInput = false
                 }
             }
         }

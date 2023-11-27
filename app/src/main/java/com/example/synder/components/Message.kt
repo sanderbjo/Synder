@@ -81,7 +81,7 @@ fun Message(it: MessagesFromFirebase, storageRef: StorageReference ,userProfile:
                                                 text = it.text,
                                                 fontSize = 20.sp,
                                                 color = Color.White,
-                                                maxLines = 2,
+                                                maxLines = 18,
                                                 overflow = TextOverflow.Ellipsis,
                                                 textAlign = if (sentByUser) TextAlign.End else TextAlign.Start
                                         )
