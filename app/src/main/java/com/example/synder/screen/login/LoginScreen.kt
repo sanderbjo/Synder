@@ -1,6 +1,5 @@
 package com.example.synder.screen.login
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,22 +60,15 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.padding(top = 120.dp))
-        if (uiState.errorMessage != "") {
+        if (uiState.errorMessage != 0) {
             Text(
-                text = uiState.errorMessage,
+                text = stringResource(id = uiState.errorMessage),
                 Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.error,
                 fontWeight = FontWeight.Bold
             )
         }
-        Text(text = "Logg inn", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineLarge)
-        Text(
-            text = "Vi har lagd en anonym bruker som kan brukes for testing",
-            modifier = Modifier.padding(horizontal = 20.dp),
-            textAlign = TextAlign.Center)
-        Text(text = "Email = anonym@bruker.no")
-        Text(text = "Passord = Anonym123",
-            modifier = modifier.padding(bottom = 24.dp))
+        Text(text = stringResource(R.string.logg_inn), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineLarge)
         EmailField(uiState.email, viewModel::onEmailChange, fieldModifier)
         PasswordField(uiState.password, viewModel::onPasswordChange, fieldModifier)
 
@@ -88,13 +79,13 @@ fun LoginScreen(
                 modifier = Modifier
                     .padding(16.dp, 8.dp),
                 ) {
-                Text(text = "Logg inn", fontSize = 16.sp)
+                Text(text = stringResource(R.string.logg_inn), fontSize = 16.sp)
             }
 
         }
-        Text(text = "Har du ikke bruker? Opprett nå!")
+        Text(text = stringResource(R.string.har_du_ikke_bruker_opprett_n))
         Button(onClick = onSignupClick) {
-            Text(text = "Opprett bruker")
+            Text(text = stringResource(R.string.opprett_bruker))
         }
         //lagt til en liten spacer som gjør at når man har tastaturet åpent så kan man swipe ned for å se knappene
         Spacer(modifier = Modifier.padding(bottom = 200.dp))
@@ -109,8 +100,8 @@ fun EmailField(value: String, onNewValue: (String) -> Unit, modifier: Modifier =
         modifier = modifier,
         value = value,
         onValueChange = { onNewValue(it) },
-        placeholder = { Text("email") },
-        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
+        placeholder = { Text(stringResource(R.string.email)) },
+        leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = stringResource(R.string.email)) }
     )
 }
 
@@ -141,10 +132,13 @@ fun PasswordField(value: String, onNewValue: (String) -> Unit, modifier: Modifie
             value = value,
             onValueChange = { onNewValue(it) },
             placeholder = { Text(text = placeholder) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Lock") },
+            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = stringResource(
+                R.string.lock
+            )
+            ) },
             trailingIcon = {
                 IconButton(onClick = { isVisible = !isVisible }) {
-                    Icon(painter = icon, contentDescription = "Visibility")
+                    Icon(painter = icon, contentDescription = stringResource(R.string.visibility))
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

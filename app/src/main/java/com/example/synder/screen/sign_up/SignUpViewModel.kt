@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.synder.R
 import com.example.synder.common.ext.isValidEmail
 import com.example.synder.common.ext.isValidPassword
 import com.example.synder.service.AccountService
@@ -82,47 +83,42 @@ class SignUpViewModel @Inject constructor( private val accountService: AccountSe
     fun onSignUpClick(loggedIn: () -> Unit) {
         if (!email.isValidEmail()) {
             //sier ikke noe om hva emailen må inneholde av sikkerhetsgrunner, skal gjøre det vanskeligere for hackere å skrive inn falsk email
-            uiState.value = uiState.value.copy(errorMessage = "ikke gyldig email")
+            uiState.value = uiState.value.copy(errorMessage = R.string.ikke_gyldig_email)
             return
         }
 
         else if (!password.isValidPassword()) {
-            uiState.value = uiState.value.copy(errorMessage = "ikke sikkert nok passord, passordet må være minst 6 siffer langt og passordet må inneholde liten bokstav, stor bokstav og tall, og det kan ikke inneholde mellomrom")
+            uiState.value = uiState.value.copy(errorMessage = R.string.ikke_sikkert_nok_passord_passordet_m_v_re_minst_6_siffer_langt_og_passordet_m_inneholde_liten_bokstav_stor_bokstav_og_tall_og_det_kan_ikke_inneholde_mellomrom)
             return
         }
 
         else if (password != uiState.value.repeatPassword) {
-            uiState.value = uiState.value.copy(errorMessage = "passordet ditt matcher ikke med gjenta passord")
+            uiState.value = uiState.value.copy(errorMessage =R.string.passordet_ditt_matcher_ikke_med_gjenta_passord)
             return
         }
 
         else if (profileImageUri == null) {
-            uiState.value = uiState.value.copy(errorMessage = "mangler bilde")
+            uiState.value = uiState.value.copy(errorMessage = R.string.mangler_bilde)
             return
         }
 
         else if (name == "") {
-            uiState.value = uiState.value.copy(errorMessage = "Du må skrive inn navn")
+            uiState.value = uiState.value.copy(errorMessage = R.string.du_m_skrive_inn_navn)
             return
         }
 
         else if (age < 18) {
-            uiState.value = uiState.value.copy(errorMessage = "Du må være over 18 år for å lage bruker")
+            uiState.value = uiState.value.copy(errorMessage = R.string.du_m_v_re_over_18_r_for_lage_bruker)
             return
         }
 
-        //else if (bio == "") {
-        //    uiState.value = uiState.value.copy(errorMessage = "password_match_error")
-        //    return
-        //}
-
         else if (kjonn == "") {
-            uiState.value = uiState.value.copy(errorMessage = "Du må velge kjonn")
+            uiState.value = uiState.value.copy(errorMessage = R.string.du_m_velge_kjonn)
             return
         }
 
         else if (serEtter == "") {
-            uiState.value = uiState.value.copy(errorMessage = "Du må velge hvem kjønn du ser etter")
+            uiState.value = uiState.value.copy(errorMessage = R.string.du_m_velge_hvem_kj_nn_du_ser_etter)
             return
         }
 
@@ -145,7 +141,7 @@ class SignUpViewModel @Inject constructor( private val accountService: AccountSe
 
             }
             catch(e: Exception) {
-                uiState.value = uiState.value.copy(errorMessage = "could_not_create_account")
+                uiState.value = uiState.value.copy(errorMessage = R.string.could_not_create_account)
             }
         }
     }

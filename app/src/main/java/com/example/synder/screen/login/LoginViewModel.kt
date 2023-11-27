@@ -3,6 +3,7 @@ package com.example.synder.screen.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.synder.R
 import com.example.synder.common.ext.isValidEmail
 import com.example.synder.common.ext.isValidPassword
 import com.example.synder.service.AccountService
@@ -33,12 +34,12 @@ class LoginViewModel @Inject constructor(private val accountService: AccountServ
 
     fun onLoginClick(loggedIn: () -> Unit) {
         if (!email.isValidEmail()) {
-            uiState.value = uiState.value.copy(errorMessage = "Feil email")
+            uiState.value = uiState.value.copy(errorMessage = R.string.feil_email)
             return
         }
 
         if (!password.isValidPassword()) {
-            uiState.value = uiState.value.copy(errorMessage = "Feil passord")
+            uiState.value = uiState.value.copy(errorMessage = R.string.feil_passord)
             return
         }
 
@@ -50,7 +51,7 @@ class LoginViewModel @Inject constructor(private val accountService: AccountServ
                 }
             }
             catch(e: Exception) {
-                uiState.value = uiState.value.copy(errorMessage = "Kunne ikke logge inn")
+                uiState.value = uiState.value.copy(errorMessage = R.string.kunne_ikke_logge_inn)
             }
         }
     }
